@@ -38,7 +38,9 @@ def create_app(config_name=None):
     # Register blueprints
     with app.app_context():
         from app.blueprints.auth import auth_bp
+        from app.blueprints.groups import bp as groups_bp
         app.register_blueprint(auth_bp)
+        app.register_blueprint(groups_bp)
     
     # Register CLI commands
     from app.seed import seed_command
