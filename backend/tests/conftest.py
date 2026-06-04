@@ -60,22 +60,30 @@ def seed_groups(db_session):
 
 @pytest.fixture
 def seed_teams(db_session, seed_groups):
-    """Create 48 teams across 12 groups."""
+    """Create 48 teams across 12 groups (4 teams per group for 12 groups)."""
     teams = []
-    team_data = {
-        "A": ["ARG", "PAR", "URY", "CAN"],
-        "B": ["ENG", "USA", "IRA", "WAL"],
-        "C": ["MEX", "POL", "ARG", "SAU"],
-        "D": ["FRA", "NED", "SEN", "EQG"],
-        "E": ["ESP", "GER", "JAP", "CRC"],
-        "F": ["BEL", "CRO", "MAR", "CAN"],
-        "G": ["BRA", "SUI", "CMR", "SRB"],
-        "H": ["POR", "URU", "KOR", "GHA"],
-    }
+    team_codes = [
+        "ARG", "PAR", "URY", "CAN",
+        "ENG", "USA", "IRA", "WAL",
+        "MEX", "POL", "AUS", "SAU",
+        "FRA", "NED", "SEN", "EQG",
+        "ESP", "GER", "JAP", "CRC",
+        "BEL", "CRO", "MAR", "CMR",
+        "BRA", "SUI", "SRB", "ECU",
+        "POR", "URU", "KOR", "GHA",
+        "ITA", "SVN", "DAN", "TUN",
+        "NZL", "NOR", "SWE", "CZE",
+        "ROU", "SVK", "GRC", "BIH",
+        "ISL", "ALB", "AUT", "HUN",
+    ]
     
-    # Use first 8 groups for seed data (48 teams / 8 groups = 6 teams per group)
-    for idx, group in enumerate(seed_groups[:8]):
-        for code in team_data.get(group.name, ["TM1", "TM2", "TM3", "TM4"]):
+    # Create 4 teams for each of 12 groups
+    for idx, group in enumerate(seed_groups):
+        group_start = idx * 4
+        group_end = group_start + 4
+        group_codes = team_codes[group_start:group_end]
+        
+        for code in group_codes:
             team = Team(
                 code=code,
                 world_cup_group_id=group.id
@@ -89,23 +97,21 @@ def seed_teams(db_session, seed_groups):
 
 @pytest.fixture
 def seed_matches(db_session, seed_groups, seed_teams):
-    """Create 72 group-stage matches."""
+    """Create 48 group-stage matches (6 per group, 8 groups tested)."""
     matches = []
-    # For testing: create 72 matches across groups
-    group_idx = 0
+    # For testing: create 6 matches per group for first 8 groups (48 total)
+    # 4 teams per group gives C(4,2) = 6 unique match-ups
     match_count = 0
-    kickoff = datetime.utcnow() + timedelta(days=1)
+    # Make kickoff sufficiently far in future so deadline is also in future
+    # deadline_utc = kickoff_utc - 24h, so we need kickoff > now + 24h
+    kickoff = datetime.utcnow() + timedelta(days=2)
     
-    while match_count < 72 and group_idx < len(seed_groups):
-        group = seed_groups[group_idx]
+    for group in seed_groups:
         teams_in_group = [t for t in seed_teams if t.world_cup_group_id == group.id]
         
-        # Create round-robin matches for this group (6 teams = 15 matches)
+        # Create round-robin matches for this group (4 teams = 6 matches)
         for i, home_team in enumerate(teams_in_group):
             for away_team in teams_in_group[i+1:]:
-                if match_count >= 72:
-                    break
-                
                 match = Match(
                     home_team_id=home_team.id,
                     away_team_id=away_team.id,
@@ -117,8 +123,6 @@ def seed_matches(db_session, seed_groups, seed_teams):
                 matches.append(match)
                 match_count += 1
                 kickoff += timedelta(hours=1)
-        
-        group_idx += 1
     
     db_session.add_all(matches)
     db_session.commit()

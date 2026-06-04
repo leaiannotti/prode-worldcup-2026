@@ -38,7 +38,15 @@ def create_app(config_name=None):
     # Register blueprints
     with app.app_context():
         from app.blueprints.auth import auth_bp
+        from app.blueprints.groups import bp as groups_bp
+        from app.blueprints.matches import bp as matches_bp
+        from app.blueprints.predictions import bp as predictions_bp
+        from app.blueprints.webhook import bp as webhook_bp
         app.register_blueprint(auth_bp)
+        app.register_blueprint(groups_bp)
+        app.register_blueprint(matches_bp)
+        app.register_blueprint(predictions_bp)
+        app.register_blueprint(webhook_bp)
     
     # Register CLI commands
     from app.seed import seed_command
