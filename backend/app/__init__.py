@@ -26,6 +26,15 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     oauth.init_app(app)
     
+    # Configure Google OAuth
+    oauth.register(
+        "google",
+        client_id=os.getenv("GOOGLE_CLIENT_ID"),
+        client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
+        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+        client_kwargs={"scope": "openid email profile"}
+    )
+    
     # Register blueprints
     with app.app_context():
         from app.blueprints.auth import auth_bp
