@@ -1,0 +1,68 @@
+schema: spec-driven
+
+context: |
+  Project: prode-worldcup-2026
+  Type: Monorepo — two apps in a single repo
+  Frontend: Vue 3 + Vite (frontend/)
+  Backend: Python Flask (backend/)
+  Database: PostgreSQL
+  Auth: Google OAuth
+  Testing: pytest (backend), vitest (frontend)
+  Strict TDD: true
+
+testing:
+  strict_tdd: true
+  detected: "2026-06-04"
+  backend:
+    runner: pytest
+    command: "pytest"
+    coverage_command: "pytest --cov"
+    layers:
+      unit: true
+      integration: true
+      e2e: false
+    quality:
+      linter: flake8 / ruff
+      type_checker: mypy
+      formatter: black / ruff format
+  frontend:
+    runner: vitest
+    command: "vitest run"
+    coverage_command: "vitest run --coverage"
+    layers:
+      unit: true
+      integration: true
+      e2e: false
+    quality:
+      linter: ESLint
+      type_checker: TypeScript (tsc)
+      formatter: Prettier
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+    - Identify which app(s) are affected (frontend / backend / both)
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+    - Separate backend and frontend specs under their respective domains
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+    - Reference Flask blueprint / Vue composable patterns where applicable
+  tasks:
+    - Group by phase and app, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns per app
+    tdd: true
+    test_command_backend: "pytest"
+    test_command_frontend: "vitest run"
+  verify:
+    test_command_backend: "pytest --cov"
+    test_command_frontend: "vitest run --coverage"
+    build_command: ""
+    coverage_threshold: 80
+  archive:
+    - Warn before merging destructive deltas
+    - Keep backend and frontend specs in separate domain folders
