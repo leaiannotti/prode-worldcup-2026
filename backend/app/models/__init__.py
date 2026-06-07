@@ -5,6 +5,7 @@ from app.models.match import Match
 from app.models.group import PredictionGroup, GroupMembership, GroupPrize
 from app.models.prediction import Prediction
 from app.models.score import PredictionScore
+from app.models.activity import ActivityEvent
 
 __all__ = [
     "User",
@@ -16,4 +17,5 @@ __all__ = [
     "GroupPrize",
     "Prediction",
     "PredictionScore",
+    "ActivityEvent",
 ]

@@ -51,6 +51,22 @@ def load_teams_from_json():
     return groups
 
 
+def load_team_names_from_json():
+    """Load team name mapping from worldcup.teams.json.
+    
+    Returns:
+        dict: Mapping {fifa_code: name}
+              Example: {"ARG": "Argentina", "BRA": "Brazil", ...}
+    """
+    json_dir = _get_json_dir()
+    teams_file = json_dir / "worldcup.teams.json"
+    
+    with open(teams_file) as f:
+        teams_data = json.load(f)
+    
+    return {team["fifa_code"]: team["name"] for team in teams_data}
+
+
 def _parse_kickoff_utc(date_str, time_str):
     """Parse a kickoff datetime from date and time strings.
     

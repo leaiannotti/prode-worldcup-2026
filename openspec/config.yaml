@@ -3,40 +3,91 @@ schema: spec-driven
 context: |
   Project: prode-worldcup-2026
   Type: Monorepo — two apps in a single repo
-  Frontend: Vue 3 + Vite (frontend/)
-  Backend: Python Flask (backend/)
-  Database: PostgreSQL
-  Auth: Google OAuth
-  Testing: pytest (backend), vitest (frontend)
+  Frontend: Vue 3.5 + Vite 8 + TypeScript + Tailwind v4 + Pinia + Vue Router 4 (frontend/)
+  Backend: Python Flask 3 + SQLAlchemy 2 + Alembic + PostgreSQL 16 + PyJWT + Pydantic v2 (backend/)
+  Database: PostgreSQL 16 (Docker service: db)
+  Auth: Google OAuth (Authlib) + JWT (PyJWT)
+  Infrastructure: Docker Compose (db + backend services); frontend runs via Vite dev server
+  Testing: pytest + pytest-cov (backend), vitest + @vue/test-utils + happy-dom (frontend)
   Strict TDD: true
+  Last updated: 2026-06-07
+
+stack:
+  frontend:
+    language: TypeScript 5.6
+    runtime: Node (ESM)
+    framework: Vue 3.5
+    bundler: Vite 8
+    styling: Tailwind CSS v4 (PostCSS plugin)
+    state: Pinia 2
+    routing: Vue Router 4
+    http: axios
+    test_dom: happy-dom
+    path_alias: "@/ → src/"
+    tsconfig_strict: true
+  backend:
+    language: Python 3 (venv at .venv/)
+    framework: Flask 3
+    orm: SQLAlchemy 2 + Flask-SQLAlchemy
+    migrations: Alembic (Flask-Migrate)
+    database: PostgreSQL 16
+    auth: Authlib (Google OAuth) + PyJWT
+    validation: Pydantic v2
+    architecture: blueprints + services + models + schemas + middleware
+    infra: Docker Compose
 
 testing:
   strict_tdd: true
-  detected: "2026-06-04"
+  detected: "2026-06-07"
   backend:
     runner: pytest
     command: "pytest"
     coverage_command: "pytest --cov"
+    workdir: "backend/"
     layers:
       unit: true
       integration: true
       e2e: false
+    fixtures: conftest.py (app, client, db_session, seed_user, seed_groups, seed_teams, seed_matches)
+    test_files:
+      - tests/test_auth.py
+      - tests/test_groups.py
+      - tests/test_history.py
+      - tests/test_leaderboard.py
+      - tests/test_matches.py
+      - tests/test_predictions.py
+      - tests/test_scoring.py
+      - tests/test_seed.py
+      - tests/test_webhook.py
     quality:
       linter: flake8 / ruff
       type_checker: mypy
       formatter: black / ruff format
   frontend:
-    runner: vitest
+    runner: vitest 4
     command: "vitest run"
     coverage_command: "vitest run --coverage"
+    workdir: "frontend/"
     layers:
       unit: true
       integration: true
       e2e: false
+    test_utils: "@vue/test-utils + happy-dom"
+    test_files:
+      - src/stores/auth.test.ts
     quality:
       linter: ESLint
-      type_checker: TypeScript (tsc)
+      type_checker: TypeScript strict (tsc / vue-tsc)
       formatter: Prettier
+
+openspec:
+  mode: openspec
+  artifact_store: openspec/
+  changes_dir: openspec/changes/
+  active_changes:
+    - prode-worldcup-2026-mvp      # has proposal, spec, design, tasks
+    - prode-worldcup-2026           # has exploration only
+    - dashboard-backend-apis        # has exploration, proposal
 
 rules:
   proposal:
@@ -61,7 +112,7 @@ rules:
   verify:
     test_command_backend: "pytest --cov"
     test_command_frontend: "vitest run --coverage"
-    build_command: ""
+    build_command: "vite build"
     coverage_threshold: 80
   archive:
     - Warn before merging destructive deltas

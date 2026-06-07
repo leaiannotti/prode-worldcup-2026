@@ -3,7 +3,10 @@ from flask import Blueprint, request, jsonify, g
 from app.models import (
     PredictionGroup, GroupMembership, Prediction, PredictionScore, User, Match, Team
 )
-from app.schemas.score import LeaderboardResponse, HistoryResponse, LeaderboardEntryResponse, HistoryEntryResponse
+from app.schemas.score import (
+    LeaderboardResponse, HistoryResponse, LeaderboardEntryResponse,
+    HistoryEntryResponse, MyStandingItem,
+)
 from app.middleware.auth import jwt_required
 from sqlalchemy import func
 from sqlalchemy.orm import aliased
@@ -157,6 +160,57 @@ def get_history():
     )
     
     return jsonify(response.model_dump(by_alias=True)), 200
+
+
+@scores_bp.route("/my-standing", methods=["GET"])
+@jwt_required
+def my_standing():
+    """GET /api/scores/my-standing — cross-group rank summary for current user."""
+    user_id = g.current_user.id
+
+    memberships = GroupMembership.query.filter_by(user_id=user_id).all()
+
+    results = []
+    for membership in memberships:
+        group = PredictionGroup.query.get(membership.group_id)
+        if not group:
+            continue
+
+        member_count = GroupMembership.query.filter_by(group_id=group.id).count()
+
+        # Aggregate points for every member in this group
+        member_points_rows = (
+            db.session.query(
+                Prediction.user_id,
+                func.coalesce(func.sum(PredictionScore.points), 0).label("total")
+            )
+            .outerjoin(PredictionScore)
+            .filter(Prediction.group_id == group.id)
+            .group_by(Prediction.user_id)
+            .all()
+        )
+
+        points_map = {uid: total for uid, total in member_points_rows}
+
+        # Include all members, even those with no predictions
+        all_members = GroupMembership.query.filter_by(group_id=group.id).all()
+        sorted_members = sorted(
+            [(m.user_id, points_map.get(m.user_id, 0)) for m in all_members],
+            key=lambda x: (-x[1], x[0])
+        )
+
+        user_total = points_map.get(user_id, 0)
+        user_rank = sum(1 for _, pts in sorted_members if pts > user_total) + 1
+
+        results.append(MyStandingItem(
+            group_id=group.id,
+            group_name=group.name,
+            rank=user_rank,
+            total_points=user_total,
+            member_count=member_count,
+        ).model_dump())
+
+    return jsonify(results), 200
 
 
 # Import db at the end to avoid circular imports

@@ -25,7 +25,7 @@
         <p class="text-body-md text-on-error-container mb-4">
           You're not a member of this group
         </p>
-        <RouterLink to="/dashboard" class="btn btn-primary">
+        <RouterLink to="/dashboard" class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-primary text-on-primary">
           Back to Dashboard
         </RouterLink>
       </div>
@@ -118,11 +118,11 @@
         <div class="flex gap-4 justify-center mt-8">
           <RouterLink
             :to="`/groups/${groupId}/leaderboard`"
-            class="btn btn-primary"
+            class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-primary text-on-primary"
           >
             View Leaderboard
           </RouterLink>
-          <RouterLink to="/dashboard" class="btn btn-secondary">
+          <RouterLink to="/dashboard" class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-secondary text-on-secondary">
             Back to Dashboard
           </RouterLink>
         </div>
@@ -197,15 +197,5 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.btn {
-  @apply px-6 py-3 rounded-lg font-semibold text-body-md transition-colors;
-}
-
-.btn-primary {
-  @apply bg-primary text-on-primary hover:bg-primary-dark;
-}
-
-.btn-secondary {
-  @apply bg-secondary text-on-secondary hover:bg-secondary-dark;
-}
+/* Component uses Tailwind utility classes only */
 </style>

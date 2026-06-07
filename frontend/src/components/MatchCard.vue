@@ -1,11 +1,11 @@
 <template>
   <div
-    class="bg-surface-container-lowest rounded-lg p-md border transition-all"
+    class="bg-surface-container-lowest rounded-lg p-4 border transition-all"
     :class="isOpen ? 'border-outline-variant hover:border-primary' : 'border-error bg-opacity-75'"
   >
     <!-- Header: Time and Status Badge -->
-    <div class="flex justify-between items-center mb-md">
-      <div class="space-y-xs">
+    <div class="flex justify-between items-center mb-4">
+      <div class="space-y-1">
         <p class="font-label-md text-label-md text-on-surface-variant uppercase">
           {{ formatDate(match.kickoff_utc) }}
         </p>
@@ -15,12 +15,12 @@
       <!-- Status Badge -->
       <div
         v-if="isOpen"
-        class="flex items-center gap-xs bg-secondary text-on-secondary px-sm py-xs rounded-full font-label-md text-label-md uppercase animate-pulse"
+        class="flex items-center gap-1 bg-secondary text-on-secondary px-2 py-1 rounded-full font-label-md text-label-md uppercase animate-pulse"
       >
         <span class="w-2 h-2 rounded-full bg-on-secondary" />
         Open
       </div>
-      <div v-else class="flex items-center gap-xs bg-error text-on-error px-sm py-xs rounded-full font-label-md text-label-md uppercase">
+      <div v-else class="flex items-center gap-1 bg-error text-on-error px-2 py-1 rounded-full font-label-md text-label-md uppercase">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
           <path
             fill-rule="evenodd"
@@ -33,10 +33,10 @@
     </div>
 
     <!-- Teams Section -->
-    <div class="space-y-md mb-md">
+    <div class="space-y-4 mb-4">
       <!-- Home Team -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-sm flex-1">
+        <div class="flex items-center gap-2 flex-1">
           <div class="w-12 h-8 rounded border border-outline-variant overflow-hidden flex-shrink-0">
             <img :src="teamFlagUrl(match.home_team.code)" :alt="match.home_team.code" class="w-full h-full object-cover" />
           </div>
@@ -49,7 +49,7 @@
 
       <!-- Away Team -->
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-sm flex-1">
+        <div class="flex items-center gap-2 flex-1">
           <div class="w-12 h-8 rounded border border-outline-variant overflow-hidden flex-shrink-0">
             <img :src="teamFlagUrl(match.away_team.code)" :alt="match.away_team.code" class="w-full h-full object-cover" />
           </div>
@@ -62,22 +62,22 @@
     </div>
 
     <!-- Prediction Form or Result Display -->
-    <div v-if="match.status !== 'finished'" class="space-y-md">
+    <div v-if="match.status !== 'finished'" class="space-y-4">
       <slot name="prediction-form" :is-open="isOpen">
-        <div class="p-md bg-surface-container-low rounded-lg text-center text-on-surface-variant font-body-md">
+        <div class="p-4 bg-surface-container-low rounded-lg text-center text-on-surface-variant font-body-md">
           Add prediction form here
         </div>
       </slot>
     </div>
-    <div v-else class="p-md bg-surface-container-low rounded-lg text-center">
-      <p class="font-label-md text-label-md text-on-surface-variant uppercase mb-xs">Final Result</p>
+    <div v-else class="p-4 bg-surface-container-low rounded-lg text-center">
+      <p class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Final Result</p>
       <p class="font-headline-sm text-headline-sm text-primary">
         {{ match.home_score }} - {{ match.away_score }}
       </p>
     </div>
 
     <!-- Time Remaining or Closed Message -->
-    <div class="mt-md text-center">
+    <div class="mt-4 text-center">
       <p v-if="isOpen" class="text-secondary font-bold font-label-md text-label-md">
         Closes in {{ timeLeft }}
       </p>

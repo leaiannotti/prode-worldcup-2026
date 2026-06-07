@@ -84,7 +84,22 @@ def submit_prediction_endpoint(group_id):
     
     # Return 201 for new, 200 for update
     status_code = 200 if existing else 201
-    
+
+    # Emit activity event (best-effort — never blocks prediction submit)
+    from app.services.activity_service import emit_event
+    emit_event(
+        user_id=user.id,
+        event_type="prediction_submitted",
+        group_id=group_id,
+        match_id=pred_request.match_id,
+        payload={
+            "home_score": prediction.home_score,
+            "away_score": prediction.away_score,
+        },
+    )
+    from app.extensions import db as _db
+    _db.session.commit()
+
     response_data = {
         "id": prediction.id,
         "match_id": prediction.match_id,
@@ -94,7 +109,7 @@ def submit_prediction_endpoint(group_id):
         "submitted_at": prediction.submitted_at.isoformat() + "Z",
         "is_frozen": prediction.is_frozen
     }
-    
+
     return jsonify(response_data), status_code
 
 

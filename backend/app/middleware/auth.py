@@ -15,6 +15,11 @@ def jwt_required(f):
         # Get token from cookies
         token = request.cookies.get("jwt_token")
         
+        # Debug: log all cookies
+        if not token:
+            print(f"DEBUG: No jwt_token cookie. Request path: {request.path}")
+            print(f"DEBUG: All cookies: {request.cookies}")
+        
         if not token:
             return jsonify({"error": "missing_token"}), 401
         

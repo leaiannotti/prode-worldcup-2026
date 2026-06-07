@@ -41,6 +41,8 @@ class Team(db.Model):
         nullable=False,
         index=True
     )
+    name = db.Column(db.String(100), nullable=False, server_default="")
+    flag_url = db.Column(db.String(500), nullable=True)
     
     # Relationships
     home_matches = db.relationship(

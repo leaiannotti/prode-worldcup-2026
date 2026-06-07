@@ -4,6 +4,16 @@ from datetime import datetime
 from typing import Optional, List
 
 
+class MyStandingItem(BaseModel):
+    """One group entry in the my-standing response."""
+
+    group_id: str
+    group_name: str
+    rank: int
+    total_points: int
+    member_count: int
+
+
 class LeaderboardEntryResponse(BaseModel):
     """Entry in the leaderboard."""
     

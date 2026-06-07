@@ -67,9 +67,10 @@ source .venv/bin/activate       # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-Run database migrations:
+Generate and apply database migrations:
 
 ```bash
+alembic revision --autogenerate -m "initial schema"
 alembic upgrade head
 ```
 

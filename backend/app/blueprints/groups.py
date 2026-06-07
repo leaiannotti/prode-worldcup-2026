@@ -126,7 +126,17 @@ def join_group():
     )
     db.session.add(membership)
     db.session.commit()
-    
+
+    # Emit activity event (best-effort — never blocks join)
+    from app.services.activity_service import emit_event
+    emit_event(
+        user_id=user_id,
+        event_type="group_joined",
+        group_id=group.id,
+        payload={"group_name": group.name},
+    )
+    db.session.commit()
+
     response = GroupResponse.model_validate(group)
     return jsonify(response.model_dump()), 200
 

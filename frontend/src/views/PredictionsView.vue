@@ -1,9 +1,9 @@
 <template>
   <AppLayout>
-    <div class="px-gutter py-lg max-w-7xl mx-auto space-y-lg">
+    <div class="px-5 py-6 max-w-7xl mx-auto space-y-6">
       <!-- Header -->
-      <section class="space-y-md">
-        <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">My Predictions</h1>
+      <section class="space-y-4">
+        <h1 class="font-headline-lg text-headline-lg text-primary mb-1">My Predictions</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant">
           Track all your predictions across groups.
         </p>
@@ -12,7 +12,7 @@
         <select
           v-model="selectedGroup"
           @change="fetchPredictions"
-          class="w-full md:w-64 px-md py-sm border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
+          class="w-full md:w-64 px-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
         >
           <option value="">All Groups</option>
           <option v-for="group in groupsStore.groups" :key="group.id" :value="group.id">
@@ -22,15 +22,15 @@
       </section>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="text-center py-lg">
+      <div v-if="isLoading" class="text-center py-6">
         <p class="text-on-surface-variant font-body-lg">Loading predictions...</p>
       </div>
 
       <!-- Predictions List -->
-      <div v-else-if="predictionsStore.predictions.length > 0" class="space-y-md">
-        <div v-for="prediction in predictionsStore.predictions" :key="prediction.id" class="bg-surface-container-lowest rounded-lg p-md border border-outline-variant">
-          <div class="flex flex-col md:flex-row justify-between md:items-center gap-md">
-            <div class="space-y-xs">
+      <div v-else-if="predictionsStore.predictions.length > 0" class="space-y-4">
+        <div v-for="prediction in predictionsStore.predictions" :key="prediction.id" class="bg-surface-container-lowest rounded-lg p-4 border border-outline-variant">
+          <div class="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div class="space-y-1">
               <p class="font-label-md text-label-md text-on-surface-variant uppercase">Submitted at {{ formatDate(prediction.submitted_at) }}</p>
               <p class="font-headline-sm text-headline-sm text-primary">
                 {{ prediction.home_score }} - {{ prediction.away_score }}
@@ -42,7 +42,7 @@
             <button
               v-if="!prediction.is_frozen"
               @click="editPrediction(prediction)"
-              class="px-lg py-md bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all"
+              class="px-6 py-4 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all"
             >
               Edit
             </button>
@@ -51,8 +51,8 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-lg">
-        <svg class="w-16 h-16 mx-auto mb-md text-on-surface-variant opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else class="text-center py-6">
+        <svg class="w-16 h-16 mx-auto mb-4 text-on-surface-variant opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
         </svg>
         <p class="font-body-lg text-body-lg text-on-surface-variant">No predictions yet.</p>

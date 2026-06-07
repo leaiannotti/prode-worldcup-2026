@@ -26,6 +26,8 @@ export interface Match {
 export interface MatchFilters {
   group?: string
   date?: string
+  status?: 'upcoming' | 'scheduled' | 'in_progress' | 'finished'
+  limit?: number
 }
 
 export const useMatchesStore = defineStore('matches', () => {
@@ -42,6 +44,8 @@ export const useMatchesStore = defineStore('matches', () => {
       const params = new URLSearchParams()
       if (filters?.group) params.append('group', filters.group)
       if (filters?.date) params.append('date', filters.date)
+      if (filters?.status) params.append('status', filters.status)
+      if (filters?.limit) params.append('limit', String(filters.limit))
 
       const queryString = params.toString()
       const url = queryString ? `/api/matches?${queryString}` : '/api/matches'

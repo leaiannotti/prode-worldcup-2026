@@ -1,10 +1,10 @@
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-md">
+  <form @submit.prevent="handleSubmit" class="space-y-4">
     <!-- Score Inputs -->
-    <div class="flex items-center justify-center gap-sm md:gap-md">
+    <div class="flex items-center justify-center gap-2 md:gap-4">
       <!-- Home Score -->
       <div class="flex flex-col items-center">
-        <label class="font-label-md text-label-md text-on-surface-variant mb-xs">Home</label>
+        <label class="font-label-md text-label-md text-on-surface-variant mb-1">Home</label>
         <input
           v-model.number="formData.homeScore"
           type="number"
@@ -25,7 +25,7 @@
 
       <!-- Away Score -->
       <div class="flex flex-col items-center">
-        <label class="font-label-md text-label-md text-on-surface-variant mb-xs">Away</label>
+        <label class="font-label-md text-label-md text-on-surface-variant mb-1">Away</label>
         <input
           v-model.number="formData.awayScore"
           type="number"
@@ -61,7 +61,7 @@
     <button
       type="submit"
       :disabled="!isOpen || isSubmitting"
-      class="w-full py-md px-lg rounded-lg font-bold transition-all active:scale-95"
+      class="w-full py-4 px-6 rounded-lg font-bold transition-all active:scale-95"
       :class="
         isOpen && !isSubmitting
           ? 'bg-primary text-on-primary hover:opacity-90'

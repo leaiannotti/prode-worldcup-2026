@@ -5,6 +5,29 @@ from app.extensions import db
 from app.models import WorldCupGroup, Team, Match
 from app.fixture_data import GROUPS_DATA, MATCHES_DATA
 
+# FIFA country code → ISO 3166-1 alpha-2 code for flagcdn.com URLs
+FIFA_TO_ISO2 = {
+    "ARG": "ar", "AUS": "au", "BRA": "br", "CAN": "ca", "CHI": "cl",
+    "CHN": "cn", "CMR": "cm", "COL": "co", "CRC": "cr", "CRO": "hr",
+    "DEN": "dk", "ECU": "ec", "EGY": "eg", "ENG": "gb-eng", "ESP": "es",
+    "FRA": "fr", "GER": "de", "GHA": "gh", "IRN": "ir", "ITA": "it",
+    "JAM": "jm", "JPN": "jp", "KOR": "kr", "KSA": "sa", "MAR": "ma",
+    "MEX": "mx", "NED": "nl", "NGA": "ng", "NZL": "nz", "PAN": "pa",
+    "PAR": "py", "PER": "pe", "POL": "pl", "POR": "pt", "QAT": "qa",
+    "RSA": "za", "RUS": "ru", "SCO": "gb-sct", "SEN": "sn", "SRB": "rs",
+    "SUI": "ch", "TUN": "tn", "URU": "uy", "USA": "us", "WAL": "gb-wls",
+    "CIV": "ci", "ALG": "dz", "NOR": "no", "SWE": "se",
+}
+
+
+def get_flag_url(fifa_code: str) -> str | None:
+    """Return flagcdn.com URL for a FIFA team code, or None if not mapped."""
+    iso2 = FIFA_TO_ISO2.get(fifa_code)
+    if not iso2:
+        print(f"WARNING: No ISO2 mapping for {fifa_code}")
+        return None
+    return f"https://flagcdn.com/w80/{iso2}.png"
+
 
 def load_seed_data(session):
     """Load seed data into database (idempotent).
@@ -16,6 +39,8 @@ def load_seed_data(session):
     All matches are loaded exactly as defined in the JSON source.
     No algorithmic generation is used.
     """
+    from app.json_loader import load_team_names_from_json
+    team_names = load_team_names_from_json()
     
     # 1. Upsert groups (A–L)
     for group_letter in "ABCDEFGHIJKL":
@@ -25,7 +50,7 @@ def load_seed_data(session):
             session.add(group)
     session.commit()
     
-    # 2. Upsert teams
+    # 2. Upsert teams (with name and flag_url)
     groups_map = {g.name: g for g in session.query(WorldCupGroup).all()}
     
     for group_name, team_codes in GROUPS_DATA.items():
@@ -33,8 +58,17 @@ def load_seed_data(session):
         for code in team_codes:
             existing = session.query(Team).filter_by(code=code).first()
             if not existing:
-                team = Team(code=code, world_cup_group_id=group.id)
+                team = Team(
+                    code=code,
+                    world_cup_group_id=group.id,
+                    name=team_names.get(code, ""),
+                    flag_url=get_flag_url(code),
+                )
                 session.add(team)
+            else:
+                # Update name and flag_url on existing records
+                existing.name = team_names.get(code, existing.name)
+                existing.flag_url = get_flag_url(code)
     session.commit()
     
     # 3. Upsert matches (all 72 from JSON)

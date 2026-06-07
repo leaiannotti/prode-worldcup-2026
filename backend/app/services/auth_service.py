@@ -82,7 +82,7 @@ def set_jwt_cookie(response, token: str):
         "jwt_token",
         token,
         httponly=True,
-        secure=True,  # HTTPS only in production
+        secure=current_app.config.get("ENV") == "production",  # HTTPS only in production
         samesite="Lax",
         max_age=int(7 * 24 * 60 * 60)  # 7 days in seconds
     )

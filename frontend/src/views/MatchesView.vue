@@ -1,19 +1,19 @@
 <template>
   <AppLayout>
-    <div class="px-gutter py-lg max-w-7xl mx-auto space-y-lg">
+    <div class="px-5 py-6 max-w-7xl mx-auto space-y-6">
       <!-- Header -->
-      <section class="space-y-md">
-        <h1 class="font-headline-lg text-headline-lg text-primary mb-xs">Matches</h1>
+      <section class="space-y-4">
+        <h1 class="font-headline-lg text-headline-lg text-primary mb-1">Matches</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant">
           Place your predictions for upcoming fixtures.
         </p>
 
         <!-- Filters -->
-        <div class="flex flex-col md:flex-row gap-md">
+        <div class="flex flex-col md:flex-row gap-4">
           <select
             v-model="selectedGroup"
             @change="fetchMatches"
-            class="flex-1 px-md py-sm border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
+            class="flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
           >
             <option value="">All Groups</option>
             <option v-for="group in groupsStore.groups" :key="group.id" :value="group.id">
@@ -24,18 +24,18 @@
             v-model="selectedDate"
             @change="fetchMatches"
             type="date"
-            class="flex-1 px-md py-sm border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
+            class="flex-1 px-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
           />
         </div>
       </section>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="text-center py-lg">
+      <div v-if="isLoading" class="text-center py-6">
         <p class="text-on-surface-variant font-body-lg">Loading matches...</p>
       </div>
 
       <!-- Matches Grid -->
-      <div v-else-if="matchesStore.matches.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-md">
+      <div v-else-if="matchesStore.matches.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div v-for="match in matchesStore.matches" :key="match.id">
           <MatchCard :match="match">
             <template #prediction-form="{ isOpen }">
@@ -53,8 +53,8 @@
       </div>
 
       <!-- Empty State -->
-      <div v-else class="text-center py-lg">
-        <svg class="w-16 h-16 mx-auto mb-md text-on-surface-variant opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div v-else class="text-center py-6">
+        <svg class="w-16 h-16 mx-auto mb-4 text-on-surface-variant opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
         </svg>
         <p class="font-body-lg text-body-lg text-on-surface-variant">No matches found.</p>

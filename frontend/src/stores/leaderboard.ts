@@ -5,7 +5,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { api } from '@/lib/api'
+import { apiClient as api } from '@/lib/api'
 
 export interface LeaderboardEntry {
   rank: number

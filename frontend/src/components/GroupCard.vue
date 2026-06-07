@@ -1,13 +1,13 @@
 <template>
-  <div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant hover:border-primary hover:shadow-md transition-all">
+  <div class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant hover:border-primary hover:shadow-md transition-all">
     <!-- Header: Name and Type -->
-    <div class="mb-md">
-      <h3 class="font-headline-sm text-headline-sm text-primary mb-xs">{{ group.name }}</h3>
+    <div class="mb-4">
+      <h3 class="font-headline-sm text-headline-sm text-primary mb-1">{{ group.name }}</h3>
       <p class="font-body-md text-body-md text-on-surface-variant">{{ group.member_count || 0 }} members</p>
     </div>
 
     <!-- Invite Code -->
-    <div class="bg-surface-container-low rounded-lg p-sm mb-md flex items-center justify-between">
+    <div class="bg-surface-container-low rounded-lg p-2 mb-4 flex items-center justify-between">
       <span class="font-label-sm text-label-sm text-on-surface-variant uppercase">Code:</span>
       <code class="font-bold text-primary">{{ group.invite_code }}</code>
       <button
@@ -22,15 +22,15 @@
     </div>
 
     <!-- Prizes Section -->
-    <div v-if="group.prizes && group.prizes.length > 0" class="space-y-xs mb-md">
+    <div v-if="group.prizes && group.prizes.length > 0" class="space-y-1 mb-4">
       <p class="font-label-md text-label-md text-on-surface-variant uppercase">Prizes</p>
-      <div class="flex flex-col gap-xs">
+      <div class="flex flex-col gap-1">
         <div
           v-for="prize in group.prizes"
           :key="prize.rank"
-          class="flex items-center justify-between bg-surface-container-low p-xs rounded-lg"
+          class="flex items-center justify-between bg-surface-container-low p-1 rounded-lg"
         >
-          <div class="flex items-center gap-sm">
+          <div class="flex items-center gap-2">
             <span class="w-6 h-6 flex items-center justify-center font-bold text-xs rounded-full" :class="prizeColor(prize.rank)">
               {{ prize.rank }}
             </span>
@@ -43,7 +43,7 @@
     <!-- Action Button -->
     <button
       @click="navigateToGroup"
-      class="w-full py-sm px-md bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all active:scale-95"
+      class="w-full py-2 px-4 bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 transition-all active:scale-95"
     >
       View Details
     </button>

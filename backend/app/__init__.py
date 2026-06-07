@@ -43,12 +43,14 @@ def create_app(config_name=None):
         from app.blueprints.predictions import bp as predictions_bp
         from app.blueprints.webhook import bp as webhook_bp
         from app.blueprints.scores import scores_bp
+        from app.blueprints.activity import bp as activity_bp
         app.register_blueprint(auth_bp)
         app.register_blueprint(groups_bp)
         app.register_blueprint(matches_bp)
         app.register_blueprint(predictions_bp)
         app.register_blueprint(webhook_bp)
         app.register_blueprint(scores_bp, url_prefix="/api/scores")
+        app.register_blueprint(activity_bp)
     
     # Register CLI commands
     from app.seed import seed_command

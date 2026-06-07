@@ -1,13 +1,13 @@
 <template>
   <header class="fixed top-0 z-50 w-full bg-surface shadow-sm h-16 border-b border-outline-variant">
-    <div class="flex justify-between items-center w-full px-gutter max-w-7xl mx-auto h-full">
+    <div class="flex justify-between items-center w-full px-5 h-full">
       <!-- Logo and Brand Name -->
-      <div class="flex items-center gap-md">
+      <div class="flex items-center gap-4">
         <span class="font-display-lg text-headline-lg font-black text-primary uppercase tracking-tighter">
           PRODE 2026
         </span>
         <!-- Navigation Links (Desktop) -->
-        <nav class="hidden md:flex gap-md ml-lg">
+        <nav class="hidden md:flex gap-4 ml-6">
           <RouterLink
             to="/dashboard"
             class="text-on-surface-variant hover:text-primary font-label-md text-body-md transition-colors"
@@ -33,14 +33,14 @@
       </div>
 
       <!-- Right Section: Points, Notifications, Avatar, Logout -->
-      <div class="flex items-center gap-sm">
+      <div class="flex items-center gap-2">
         <!-- Points Display (Desktop) -->
-        <div v-if="authStore.user" class="hidden sm:flex items-center bg-primary-fixed text-on-primary-fixed px-sm py-xs rounded-full">
+        <div v-if="authStore.user" class="hidden sm:flex items-center bg-primary-fixed text-on-primary-fixed px-2 py-1 rounded-full">
           <span class="font-bold font-label-md text-label-md">Points: 1,250</span>
         </div>
 
         <!-- Notifications Button -->
-        <button class="p-xs text-on-surface-variant hover:bg-surface-container rounded-full transition-colors duration-200">
+        <button class="p-1 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors duration-200">
           <svg
             class="w-6 h-6"
             fill="none"
@@ -68,7 +68,7 @@
         <!-- Logout Button -->
         <button
           @click="handleLogout"
-          class="p-xs text-on-surface-variant hover:bg-surface-container rounded-full transition-colors duration-200"
+          class="p-1 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors duration-200"
           title="Logout"
         >
           <svg
