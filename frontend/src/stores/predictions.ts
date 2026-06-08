@@ -7,30 +7,28 @@ import { apiClient } from '@/lib/api'
 
 export interface Prediction {
   id: string
-  user_id: string
+  user_id?: string
   match_id: number
-  group_id: string
   home_score: number
   away_score: number
   is_frozen: boolean
   submitted_at: string
+  points: number | null
 }
 
 export interface PredictionRequest {
   match_id: number
-  group_id: string
   home_score: number
   away_score: number
 }
 
 export interface GroupPrediction {
-  id: string
   user_id: string
-  match_id: number
+  name: string
+  picture?: string | null
   home_score?: number | null
   away_score?: number | null
   submitted_at?: string
-  is_frozen: boolean
 }
 
 export const usePredictionsStore = defineStore('predictions', () => {
@@ -40,11 +38,12 @@ export const usePredictionsStore = defineStore('predictions', () => {
 
   // Actions
   /**
-   * Fetch user's predictions for a specific group
+   * Fetch all predictions for the current user.
+   * Predictions are global (not per group).
    */
-  async function fetchMyPredictions(groupId: string): Promise<void> {
+  async function fetchMyPredictions(): Promise<void> {
     try {
-      const response = await apiClient.get(`/api/predictions?group_id=${groupId}`)
+      const response = await apiClient.get('/api/predictions')
       predictions.value = response.data
     } catch (error) {
       console.error('Error fetching my predictions:', error)
@@ -53,11 +52,11 @@ export const usePredictionsStore = defineStore('predictions', () => {
   }
 
   /**
-   * Fetch all predictions for a specific match in a group
+   * Fetch all group member predictions for a specific match.
    */
   async function fetchGroupPredictions(groupId: string, matchId: number): Promise<void> {
     try {
-      const response = await apiClient.get(`/api/groups/${groupId}/matches/${matchId}/predictions`)
+      const response = await apiClient.get(`/api/predictions/matches/${matchId}/group/${groupId}`)
       groupPredictions.value = response.data
     } catch (error) {
       console.error('Error fetching group predictions:', error)
@@ -66,11 +65,10 @@ export const usePredictionsStore = defineStore('predictions', () => {
   }
 
   /**
-   * Submit or update a prediction
-   * Throws 423 error if match deadline has passed
+   * Submit or update a prediction for a match.
+   * Throws error with status 423 if deadline has passed.
    */
   async function submitPrediction(
-    groupId: string,
     matchId: number,
     homeScore: number,
     awayScore: number
@@ -78,7 +76,6 @@ export const usePredictionsStore = defineStore('predictions', () => {
     try {
       const response = await apiClient.post('/api/predictions', {
         match_id: matchId,
-        group_id: groupId,
         home_score: homeScore,
         away_score: awayScore,
       })
@@ -86,9 +83,7 @@ export const usePredictionsStore = defineStore('predictions', () => {
       const prediction = response.data
 
       // Update local cache
-      const existingIndex = predictions.value.findIndex(
-        (p) => p.match_id === matchId && p.group_id === groupId
-      )
+      const existingIndex = predictions.value.findIndex((p) => p.match_id === matchId)
       if (existingIndex >= 0) {
         predictions.value[existingIndex] = prediction
       } else {
@@ -97,7 +92,6 @@ export const usePredictionsStore = defineStore('predictions', () => {
 
       return prediction
     } catch (error: any) {
-      // 423 Locked (deadline passed)
       if (error.response?.status === 423) {
         const err = new Error('Prediction locked: match deadline has passed')
         ;(err as any).status = 423

@@ -12,7 +12,10 @@ auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
 @auth_bp.route("/login", methods=["GET"])
 def login():
     """Redirect to Google OAuth consent screen."""
-    redirect_uri = url_for("auth.callback", _external=True)
+    redirect_uri = current_app.config.get(
+        "OAUTH_REDIRECT_URI",
+        url_for("auth.callback", _external=True)
+    )
     return oauth.google.authorize_redirect(redirect_uri)
 
 

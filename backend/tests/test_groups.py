@@ -109,6 +109,33 @@ class TestGroupBlueprint:
             ).first()
             assert membership is not None
             assert membership.role == "admin"
+
+    def test_create_group_with_prizes_returns_prizes(self, app, client, seed_user):
+        """POST /api/groups with prizes returns the created prize tiers."""
+        from app.services.auth_service import issue_jwt
+
+        with app.app_context():
+            token = issue_jwt(seed_user.id)
+            client.set_cookie(key="jwt_token", value=token)
+
+            response = client.post(
+                "/api/groups",
+                data=json.dumps({
+                    "name": "Prize League",
+                    "prizes": [
+                        {"rank": 1, "description": "Winner pizza"},
+                        {"rank": 2, "description": "Runner-up beer"},
+                    ],
+                }),
+                content_type="application/json"
+            )
+
+            assert response.status_code == 201
+            data = json.loads(response.data)
+            assert data["prizes"] == [
+                {"rank": 1, "description": "Winner pizza"},
+                {"rank": 2, "description": "Runner-up beer"},
+            ]
     
     def test_create_group_with_duplicate_name_returns_409(self, app, client, seed_user):
         """POST /api/groups with duplicate name returns 409."""
@@ -302,6 +329,43 @@ class TestGroupBlueprint:
             assert isinstance(data, list)
             assert len(data) == 1
             assert data[0]["name"] == "Group 1"
+
+    def test_list_groups_includes_prizes(self, app, client, seed_user):
+        """GET /api/groups includes prize tiers for detail modal cards."""
+        from app.services.auth_service import issue_jwt
+
+        with app.app_context():
+            group = PredictionGroup(
+                name="Prize List Group",
+                invite_code="PRZLST",
+                creator_id=seed_user.id
+            )
+            db.session.add(group)
+            db.session.commit()
+
+            membership = GroupMembership(
+                user_id=seed_user.id,
+                group_id=group.id,
+                role="admin"
+            )
+            prize = GroupPrize(
+                group_id=group.id,
+                rank=1,
+                description="Winner dinner"
+            )
+            db.session.add_all([membership, prize])
+            db.session.commit()
+
+            token = issue_jwt(seed_user.id)
+            client.set_cookie(key="jwt_token", value=token)
+
+            response = client.get("/api/groups")
+
+            assert response.status_code == 200
+            data = json.loads(response.data)
+            assert data[0]["prizes"] == [
+                {"rank": 1, "description": "Winner dinner"}
+            ]
     
     def test_get_group_detail_returns_group_object(self, app, client, seed_user):
         """GET /api/groups/{id} returns group details for member."""

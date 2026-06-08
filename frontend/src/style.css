@@ -2,7 +2,7 @@
 @import "tailwindcss" source("../");
 
 @theme {
-  /* Colors — Material Design 3 */
+  /* Colors — Material Design 3 — Light */
   --color-primary: #00134d;
   --color-on-primary: #ffffff;
   --color-primary-container: #00247d;
@@ -93,11 +93,66 @@
   --text-body-md: 14px;
   --text-body-md--line-height: 20px;
   --text-body-md--font-weight: 400;
+}
 
-  /* Border radius — M3 (using Tailwind v4 defaults; custom overrides removed to prevent token collision) */
+/* Dark mode — class-based (.dark on <html>) */
+.dark {
+  --color-primary: #b7c4ff;
+  --color-on-primary: #001552;
+  --color-primary-container: #0e2878;
+  --color-on-primary-container: #dde1ff;
+  --color-primary-fixed: #dde1ff;
+  --color-primary-fixed-dim: #b7c4ff;
+  --color-on-primary-fixed: #001552;
+  --color-on-primary-fixed-variant: #264096;
+  --color-secondary: #96ccff;
+  --color-on-secondary: #003351;
+  --color-secondary-container: #004a75;
+  --color-on-secondary-container: #cee5ff;
+  --color-secondary-fixed: #cee5ff;
+  --color-secondary-fixed-dim: #96ccff;
+  --color-on-secondary-fixed: #001d32;
+  --color-on-secondary-fixed-variant: #004a75;
+  --color-tertiary: #ffb3af;
+  --color-on-tertiary: #680012;
+  --color-tertiary-container: #93000a;
+  --color-on-tertiary-container: #ffdad8;
+  --color-tertiary-fixed: #ffdad8;
+  --color-tertiary-fixed-dim: #ffb3af;
+  --color-on-tertiary-fixed: #410006;
+  --color-on-tertiary-fixed-variant: #930019;
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-background: #111318;
+  --color-on-background: #e2e2e9;
+  --color-surface: #111318;
+  --color-on-surface: #e2e2e9;
+  --color-surface-dim: #111318;
+  --color-surface-bright: #37393f;
+  --color-surface-container-lowest: #0c0e13;
+  --color-surface-container-low: #191c22;
+  --color-surface-container: #1d2026;
+  --color-surface-container-high: #282b31;
+  --color-surface-container-highest: #33353c;
+  --color-on-surface-variant: #c5c6d0;
+  --color-outline: #8f9099;
+  --color-outline-variant: #44474e;
+  --color-surface-tint: #b7c4ff;
+  --color-inverse-surface: #e2e2e9;
+  --color-inverse-on-surface: #2e3036;
+  --color-inverse-primary: #00134d;
 }
 
 html, body, #app {
   width: 100%;
   height: 100%;
+}
+
+/* Smooth theme transition — only on specific properties, never on interactive elements */
+body, main, header, footer, nav, section, article, aside,
+div, span, p, h1, h2, h3, h4, h5, h6, label, li, ul, ol,
+svg, path, circle, rect, img {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
 }

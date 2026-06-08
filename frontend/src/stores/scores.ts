@@ -14,15 +14,11 @@ export interface MyStandingItem {
 }
 
 export const useScoresStore = defineStore('scores', () => {
-  // State
   const myStanding = ref<MyStandingItem[]>([])
+  const myTotalPoints = ref<number | null>(null)
   const isLoading = ref(false)
   const error = ref<string | null>(null)
 
-  // Actions
-  /**
-   * Fetch cross-group rank summary for current user
-   */
   async function fetchMyStanding(): Promise<void> {
     isLoading.value = true
     error.value = null
@@ -31,16 +27,26 @@ export const useScoresStore = defineStore('scores', () => {
       myStanding.value = response.data
     } catch (err: any) {
       error.value = err.message || 'Error al cargar posición'
-      console.error('Error fetching my standing:', err)
     } finally {
       isLoading.value = false
     }
   }
 
+  async function fetchMyTotal(): Promise<void> {
+    try {
+      const response = await apiClient.get('/api/scores/my-total')
+      myTotalPoints.value = response.data.total_points
+    } catch {
+      myTotalPoints.value = null
+    }
+  }
+
   return {
     myStanding,
+    myTotalPoints,
     isLoading,
     error,
     fetchMyStanding,
+    fetchMyTotal,
   }
 })

@@ -12,8 +12,10 @@ bp = Blueprint("matches", __name__, url_prefix="/api/matches")
 
 # Maps ?status= param values to DB status column values.
 # "upcoming" is a UI alias for "scheduled".
+# Special values:
+#   "closed"  → deadline < now, any status (pending result or finished)
+#   "upcoming" → scheduled AND deadline > now
 VALID_STATUSES = {
-    "upcoming": "scheduled",
     "scheduled": "scheduled",
     "in_progress": "in_progress",
     "finished": "finished",
@@ -52,12 +54,26 @@ def list_matches():
             return jsonify({"error": "invalid_date_format"}), 400
 
     # Filter by status if provided
+    now = datetime.utcnow()
     status_filter = request.args.get("status")
+    order_desc = False
+
     if status_filter:
-        mapped = VALID_STATUSES.get(status_filter.lower())
-        if not mapped:
-            return jsonify({"error": "invalid_status"}), 400
-        query = query.filter(Match.status == mapped)
+        if status_filter.lower() == "upcoming":
+            # scheduled AND deadline not yet passed
+            query = query.filter(
+                Match.status == "scheduled",
+                Match.deadline_utc > now,
+            )
+        elif status_filter.lower() == "closed":
+            # deadline has passed, any status (finished or awaiting result)
+            query = query.filter(Match.deadline_utc <= now)
+            order_desc = True  # most recent first
+        else:
+            mapped = VALID_STATUSES.get(status_filter.lower())
+            if not mapped:
+                return jsonify({"error": "invalid_status"}), 400
+            query = query.filter(Match.status == mapped)
 
     # Apply limit if provided
     limit_param = request.args.get("limit")
@@ -68,10 +84,11 @@ def list_matches():
                 raise ValueError("limit must be positive")
         except (ValueError, TypeError):
             return jsonify({"error": "invalid_limit"}), 400
-        matches = query.order_by(Match.kickoff_utc.asc()).limit(limit_val).all()
+        order = Match.kickoff_utc.desc() if order_desc else Match.kickoff_utc.asc()
+        matches = query.order_by(order).limit(limit_val).all()
     else:
-        # Sort by kickoff_utc ascending
-        matches = query.order_by(Match.kickoff_utc.asc()).all()
+        order = Match.kickoff_utc.desc() if order_desc else Match.kickoff_utc.asc()
+        matches = query.order_by(order).all()
     
     # Serialize
     return jsonify([

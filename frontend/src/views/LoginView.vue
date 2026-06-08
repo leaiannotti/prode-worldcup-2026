@@ -29,10 +29,10 @@
 
       <!-- Heading -->
       <div class="mb-6 text-center">
-        <h2 class="font-display-lg text-headline-lg text-primary mb-2">
+        <h2 class="font-display-lg text-headline-lg mb-2" style="color: #00134d">
           Comienza tu camino a la gloria
         </h2>
-        <p class="font-body-md text-body-md text-on-surface-variant">
+        <p class="font-body-md text-body-md" style="color: #444652">
           Únete a la mayor competencia de predicciones del mundo.
         </p>
       </div>
@@ -42,7 +42,10 @@
         <!-- Google OAuth Button -->
         <a
           href="/api/auth/login"
-          class="w-full flex items-center justify-center gap-3 bg-white border border-outline-variant py-4 px-6 rounded-xl text-on-surface font-title-md text-base hover:bg-surface-container transition-all active:scale-95 duration-150"
+          class="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 py-4 px-6 rounded-xl font-title-md text-base transition-all active:scale-95 duration-150 group"
+          style="color: #191c1d; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
+          onmouseover="this.style.boxShadow='0 4px 12px rgba(0,19,77,0.15)'; this.style.borderColor='#b7c4ff'"
+          onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'; this.style.borderColor='#e5e7eb'"
         >
           <svg class="w-5 h-5" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -56,19 +59,29 @@
         <!-- Divider -->
         <div class="flex items-center gap-3 my-2">
           <div class="h-px flex-1 bg-outline-variant" />
-          <span class="text-on-surface-variant font-label-sm text-xs uppercase tracking-widest">o accede con</span>
+          <span class="font-label-sm text-xs uppercase tracking-widest" style="color: #444652">o accede con</span>
           <div class="h-px flex-1 bg-outline-variant" />
         </div>
 
         <!-- Alternative Methods -->
         <div class="grid grid-cols-2 gap-4">
-          <button class="flex items-center justify-center gap-2 py-4 border border-outline-variant rounded-xl font-title-md text-base text-on-surface hover:bg-surface-container transition-all active:scale-95">
-            <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button
+            class="flex items-center justify-center gap-2 py-4 border border-gray-200 rounded-xl font-title-md text-base transition-all active:scale-95"
+            style="color: #191c1d; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
+            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,19,77,0.15)'; this.style.borderColor='#b7c4ff'"
+            onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'; this.style.borderColor='#e5e7eb'"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="#236391" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
             Email
           </button>
-          <button class="flex items-center justify-center gap-2 py-4 border border-outline-variant rounded-xl font-title-md text-base text-on-surface hover:bg-surface-container transition-all active:scale-95">
+          <button
+            class="flex items-center justify-center gap-2 py-4 border border-gray-200 rounded-xl font-title-md text-base transition-all active:scale-95"
+            style="color: #191c1d; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
+            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,19,77,0.15)'; this.style.borderColor='#b7c4ff'"
+            onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'; this.style.borderColor='#e5e7eb'"
+          >
             <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
               <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
             </svg>

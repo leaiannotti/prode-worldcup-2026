@@ -46,7 +46,7 @@ class TestSeedDataCreation:
         """Scenario 3: Seed creates exactly 72 group-stage matches (JSON source).
         
         No algorithmic generation. All 72 matches come from jsons/worldcup.json.
-        Each match must have deadline_utc = kickoff_utc - 24h.
+        Each match must have deadline_utc = kickoff_utc - 1h.
         """
         with app.app_context():
             load_seed_data(db_session)
@@ -55,9 +55,9 @@ class TestSeedDataCreation:
             assert len(matches) == 72, \
                 f"Expected exactly 72 group-stage matches, got {len(matches)}"
             
-            # Verify each match has deadline = kickoff - 24h
+            # Verify each match has deadline = kickoff - 1h
             for match in matches:
-                expected_deadline = match.kickoff_utc - timedelta(hours=24)
+                expected_deadline = match.kickoff_utc - timedelta(hours=1)
                 assert match.deadline_utc == expected_deadline, \
                     f"Match {match.id} deadline {match.deadline_utc} != " \
                     f"expected {expected_deadline}"

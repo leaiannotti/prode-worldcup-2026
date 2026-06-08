@@ -64,7 +64,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await api.get(`/scores/leaderboard?group_id=${groupId}`)
+      const response = await api.get(`/api/scores/leaderboard?group_id=${groupId}`)
       standings.value = response.data.standings || []
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to fetch leaderboard'
@@ -81,7 +81,7 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await api.get(`/scores/history?group_id=${groupId}`)
+      const response = await api.get(`/api/scores/history?group_id=${groupId}`)
       history.value = response.data.history || []
     } catch (err: any) {
       error.value = err.response?.data?.error || 'Failed to fetch history'

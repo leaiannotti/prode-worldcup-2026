@@ -8,6 +8,7 @@ class CreateGroupRequest(BaseModel):
     """Request to create a new prediction group."""
     
     name: str = Field(..., min_length=1, max_length=100, description="Group name")
+    prizes: Optional[List['PrizeRequest']] = Field(default=None, description="Optional prizes (max 3)")
 
 
 class JoinGroupRequest(BaseModel):
@@ -29,18 +30,6 @@ class SetPrizesRequest(BaseModel):
     prizes: List[PrizeRequest] = Field(..., min_length=0, max_length=3, description="Prize tiers")
 
 
-class GroupResponse(BaseModel):
-    """Response schema for a prediction group."""
-    
-    model_config = ConfigDict(from_attributes=True)
-    
-    id: str = Field(..., description="Group UUID")
-    name: str = Field(..., description="Group name")
-    invite_code: str = Field(..., description="Invite code")
-    created_at: datetime = Field(..., description="Creation timestamp")
-    creator_id: Optional[str] = Field(None, description="Creator user ID")
-
-
 class MemberResponse(BaseModel):
     """Response schema for a group member."""
     
@@ -60,6 +49,19 @@ class PrizeResponse(BaseModel):
     
     rank: int = Field(..., description="Prize rank (1-3)")
     description: str = Field(..., description="Prize description")
+
+
+class GroupResponse(BaseModel):
+    """Response schema for a prediction group."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str = Field(..., description="Group UUID")
+    name: str = Field(..., description="Group name")
+    invite_code: str = Field(..., description="Invite code")
+    created_at: datetime = Field(..., description="Creation timestamp")
+    creator_id: Optional[str] = Field(None, description="Creator user ID")
+    prizes: List[PrizeResponse] = Field(default_factory=list, description="Prize tiers")
 
 
 class GroupDetailResponse(BaseModel):

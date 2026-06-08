@@ -7,7 +7,7 @@ import { apiClient } from '@/lib/api'
 
 export interface ActivityEvent {
   id: string
-  event_type: 'group_joined' | 'prediction_submitted'
+  event_type: 'group_joined' | 'group_created' | 'prediction_submitted' | 'prediction_updated' | 'score_calculated'
   group_id: string | null
   match_id: number | null
   payload: Record<string, any>

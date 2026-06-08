@@ -84,6 +84,29 @@ def create_group():
     db.session.add(membership)
     db.session.commit()
     
+    # Save prizes if provided
+    if req.prizes:
+        from app.models.group import GroupPrize
+        for prize_req in req.prizes:
+            if prize_req.description.strip():
+                prize = GroupPrize(
+                    group_id=group.id,
+                    rank=prize_req.rank,
+                    description=prize_req.description.strip(),
+                )
+                db.session.add(prize)
+        db.session.commit()
+
+    # Emit activity event
+    from app.services.activity_service import emit_event
+    emit_event(
+        user_id=user_id,
+        event_type="group_created",
+        group_id=group.id,
+        payload={"group_name": group.name},
+    )
+    db.session.commit()
+
     # Return group response
     response = GroupResponse.model_validate(group)
     return jsonify(response.model_dump()), 201
@@ -277,4 +300,29 @@ def set_group_prizes(group_id):
     
     db.session.commit()
     
+    return jsonify({"success": True}), 200
+
+
+@bp.route("/<group_id>/leave", methods=["POST"])
+@jwt_required
+def leave_group(group_id):
+    """Leave a group. POST /api/groups/:id/leave — non-admins only."""
+    user_id = g.current_user.id
+
+    group = PredictionGroup.query.get(group_id)
+    if not group:
+        return jsonify({"error": "not_found"}), 404
+
+    membership = GroupMembership.query.filter_by(
+        user_id=user_id, group_id=group_id
+    ).first()
+    if not membership:
+        return jsonify({"error": "not_member"}), 403
+
+    if membership.role == "admin":
+        return jsonify({"error": "admin_cannot_leave"}), 403
+
+    db.session.delete(membership)
+    db.session.commit()
+
     return jsonify({"success": True}), 200

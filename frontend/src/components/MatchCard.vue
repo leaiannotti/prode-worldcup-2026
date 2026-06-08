@@ -7,9 +7,9 @@
     <div class="flex justify-between items-center mb-4">
       <div class="space-y-1">
         <p class="font-label-md text-label-md text-on-surface-variant uppercase">
-          {{ formatDate(match.kickoff_utc) }}
+          {{ formatDate(match.kickoff_at) }}
         </p>
-        <p class="font-label-md text-label-md font-bold text-primary">{{ formatTime(match.kickoff_utc) }}</p>
+        <p class="font-label-md text-label-md font-bold text-primary">{{ formatTime(match.kickoff_at) }}</p>
       </div>
 
       <!-- Status Badge -->
@@ -98,16 +98,14 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { isOpen, timeLeft } = useDeadlineGuard(props.match.deadline_utc)
+const { isOpen, timeLeft } = useDeadlineGuard(props.match.prediction_deadline_at)
 
 function formatDate(dateStr: string): string {
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+  return new Date(dateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
 
 function formatTime(dateStr: string): string {
-  const date = new Date(dateStr)
-  return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })
+  return new Date(dateStr).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
 }
 
 function teamFlagUrl(teamCode: string): string {

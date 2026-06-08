@@ -153,7 +153,7 @@ const groupName = computed(() => {
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr)
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleString(undefined, {
     weekday: 'short',
     month: 'short',
     day: 'numeric',

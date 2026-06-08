@@ -35,6 +35,7 @@ def jwt_required(f):
         
         except Exception as e:
             # Catch unexpected errors
+            print(f"DEBUG jwt_required unexpected error: {type(e).__name__}: {e}")
             return jsonify({"error": "invalid_token"}), 401
     
     return decorated_function

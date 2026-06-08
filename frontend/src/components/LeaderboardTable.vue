@@ -1,6 +1,6 @@
 <template>
-  <div class="w-full">
-    <table class="w-full border-collapse">
+  <div class="w-full overflow-x-auto">
+    <table class="w-full border-collapse min-w-[320px]">
       <thead>
         <tr class="border-b border-outline-variant">
           <th class="text-left py-3 px-4 text-label-md font-semibold">Rank</th>

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-background flex flex-col">
     <NavBar />
-    <main class="flex-1 pt-16 overflow-y-auto">
+    <main class="flex-1 pt-16 pb-16 md:pb-0 overflow-y-auto">
       <slot />
     </main>
   </div>

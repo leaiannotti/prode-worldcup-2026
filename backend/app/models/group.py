@@ -31,6 +31,7 @@ class PredictionGroup(db.Model):
         "GroupPrize",
         backref="group",
         lazy=True,
+        order_by="GroupPrize.rank",
         cascade="all, delete-orphan"
     )
     

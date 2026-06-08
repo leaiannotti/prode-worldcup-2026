@@ -15,12 +15,14 @@ export interface Group {
   name: string
   invite_code: string
   created_at: string
+  creator_id?: string
   member_count?: number
   prizes?: Prize[]
 }
 
 export interface CreateGroupRequest {
   name: string
+  prizes?: Prize[]
 }
 
 export interface JoinGroupRequest {
@@ -66,9 +68,9 @@ export const useGroupsStore = defineStore('groups', () => {
   /**
    * Create a new prediction group
    */
-  async function createGroup(name: string): Promise<Group> {
+  async function createGroup(name: string, prizes?: Prize[]): Promise<Group> {
     try {
-      const response = await apiClient.post('/api/groups', { name })
+      const response = await apiClient.post('/api/groups', { name, prizes })
       const newGroup = response.data
       groups.value.push(newGroup)
       return newGroup
@@ -116,6 +118,11 @@ export const useGroupsStore = defineStore('groups', () => {
     }
   }
 
+  async function leaveGroup(id: string): Promise<void> {
+    await apiClient.post(`/api/groups/${id}/leave`)
+    groups.value = groups.value.filter(g => g.id !== id)
+  }
+
   return {
     groups,
     currentGroup,
@@ -125,5 +132,6 @@ export const useGroupsStore = defineStore('groups', () => {
     createGroup,
     joinGroup,
     setPrizes,
+    leaveGroup,
   }
 })

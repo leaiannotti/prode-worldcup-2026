@@ -17,25 +17,64 @@
       No hay actividad reciente
     </div>
 
-    <!-- List -->
-    <div v-else class="space-y-3">
-      <div
-        v-for="event in activityStore.events"
-        :key="event.id"
-        class="flex items-start gap-3 p-3 bg-surface-container-low rounded-lg"
-      >
-        <div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
-             :class="eventIcon(event.event_type).bgClass">
-          <svg class="w-4 h-4" :class="eventIcon(event.event_type).iconClass" fill="currentColor" viewBox="0 0 20 20">
-            <path v-if="event.event_type === 'group_joined'" d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z" />
-            <path v-else d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z" />
-          </svg>
-        </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-body-md text-on-surface">{{ eventDescription(event) }}</p>
-          <p class="font-label-sm text-on-surface-variant">{{ formatRelativeTime(event.occurred_at) }}</p>
+    <!-- List: first 3 visible, rest scrollable -->
+    <div v-else>
+      <div class="space-y-2 overflow-y-auto" :class="activityStore.events.length > 3 ? 'max-h-[280px] pr-1' : ''">
+        <div
+          v-for="event in activityStore.events"
+          :key="event.id"
+          class="flex items-start gap-3 p-3 rounded-lg"
+          :class="eventStyle(event.event_type).rowClass"
+        >
+          <!-- Icon -->
+          <div
+            class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+            :class="eventStyle(event.event_type).iconBg"
+          >
+            <!-- prediction_submitted -->
+            <svg v-if="event.event_type === 'prediction_submitted'" class="w-4 h-4" :class="eventStyle(event.event_type).iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <!-- prediction_updated -->
+            <svg v-else-if="event.event_type === 'prediction_updated'" class="w-4 h-4" :class="eventStyle(event.event_type).iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <!-- score_calculated -->
+            <svg v-else-if="event.event_type === 'score_calculated'" class="w-4 h-4" :class="eventStyle(event.event_type).iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+            </svg>
+            <!-- group_created -->
+            <svg v-else-if="event.event_type === 'group_created'" class="w-4 h-4" :class="eventStyle(event.event_type).iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <!-- group_joined -->
+            <svg v-else class="w-4 h-4" :class="eventStyle(event.event_type).iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+          </div>
+
+          <!-- Text -->
+          <div class="flex-1 min-w-0">
+            <p class="text-sm text-on-surface leading-snug">{{ eventText(event) }}</p>
+            <p class="text-[11px] text-on-surface-variant mt-0.5">{{ formatRelativeTime(event.occurred_at) }}</p>
+          </div>
+
+          <!-- Points badge for score_calculated -->
+          <div v-if="event.event_type === 'score_calculated'" class="flex-shrink-0">
+            <span
+              class="text-xs font-bold tabular-nums px-2 py-0.5 rounded-full"
+              :class="pointsBadge(event.payload?.points)"
+            >
+              +{{ event.payload?.points }}pts
+            </span>
+          </div>
         </div>
       </div>
+
+      <!-- Scroll hint -->
+      <p v-if="activityStore.events.length > 3" class="text-[10px] text-on-surface-variant/50 text-center mt-2">
+        {{ activityStore.events.length - 3 }} más arriba
+      </p>
     </div>
   </div>
 </template>
@@ -43,6 +82,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useActivityStore } from '@/stores/activity'
+import { formatRelativeTime } from '@/composables/useDateFormat'
 
 const activityStore = useActivityStore()
 
@@ -50,35 +90,84 @@ onMounted(() => {
   activityStore.fetchActivity(10)
 })
 
-function eventIcon(type: string) {
-  if (type === 'group_joined') {
-    return { bgClass: 'bg-secondary-container', iconClass: 'text-on-secondary-container' }
+function eventStyle(type: string) {
+  switch (type) {
+    case 'prediction_submitted':
+      return {
+        rowClass: 'bg-primary-container/30',
+        iconBg: 'bg-primary-container',
+        iconColor: 'text-on-primary-container',
+      }
+    case 'prediction_updated':
+      return {
+        rowClass: 'bg-secondary-container/30',
+        iconBg: 'bg-secondary-container',
+        iconColor: 'text-on-secondary-container',
+      }
+    case 'score_calculated':
+      return {
+        rowClass: 'bg-tertiary-container/30',
+        iconBg: 'bg-tertiary-container',
+        iconColor: 'text-on-tertiary-container',
+      }
+    case 'group_created':
+      return {
+        rowClass: 'bg-secondary-container/30',
+        iconBg: 'bg-secondary-container',
+        iconColor: 'text-on-secondary-container',
+      }
+    case 'group_joined':
+      return {
+        rowClass: 'bg-secondary-container/30',
+        iconBg: 'bg-secondary-container',
+        iconColor: 'text-on-secondary-container',
+      }
+    default:
+      return {
+        rowClass: 'bg-surface-container-low',
+        iconBg: 'bg-surface-container',
+        iconColor: 'text-on-surface-variant',
+      }
   }
-  return { bgClass: 'bg-primary-container', iconClass: 'text-on-primary-container' }
 }
 
-function eventDescription(event: any): string {
-  if (event.event_type === 'group_joined') {
-    return `Te uniste a ${event.payload?.group_name || 'un grupo'}`
+function eventText(event: any): string {
+  const p = event.payload || {}
+
+  switch (event.event_type) {
+    case 'prediction_submitted': {
+      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
+      return `Predijiste ${p.home_score}-${p.away_score} en ${match}`
+    }
+    case 'prediction_updated': {
+      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
+      return `Actualizaste tu predicción a ${p.home_score}-${p.away_score} en ${match}`
+    }
+    case 'score_calculated': {
+      const match = p.home_team && p.away_team
+        ? `${p.home_team} vs ${p.away_team}`
+        : 'un partido'
+      const typeLabel = p.score_type === 'exact'
+        ? 'marcador exacto'
+        : p.score_type === 'outcome'
+        ? 'resultado correcto'
+        : 'sin puntos'
+      return `Acumulaste ${p.points} pt${p.points !== 1 ? 's' : ''} en ${match} — ${typeLabel}`
+    }
+    case 'group_created':
+      return `Creaste la liga "${p.group_name || 'nueva'}"`
+    case 'group_joined':
+      return `Te uniste a la liga "${p.group_name || 'una liga'}"`
+    default:
+      return 'Actividad desconocida'
   }
-  if (event.event_type === 'prediction_submitted') {
-    return `Predijiste ${event.payload?.home_score}-${event.payload?.away_score} para un partido`
-  }
-  return 'Actividad desconocida'
 }
 
-function formatRelativeTime(isoDate: string): string {
-  const date = new Date(isoDate)
-  const now = new Date()
-  const diffMs = now.getTime() - date.getTime()
-  const diffMins = Math.floor(diffMs / 60000)
-  const diffHours = Math.floor(diffMs / 3600000)
-  const diffDays = Math.floor(diffMs / 86400000)
-
-  if (diffMins < 1) return 'Hace un momento'
-  if (diffMins < 60) return `Hace ${diffMins} minutos`
-  if (diffHours < 24) return `Hace ${diffHours} horas`
-  if (diffDays < 7) return `Hace ${diffDays} días`
-  return date.toLocaleDateString('es-AR')
+function pointsBadge(points: number | undefined): string {
+  if (points === 3) return 'bg-tertiary text-on-tertiary'
+  if (points === 1) return 'bg-secondary text-on-secondary'
+  return 'bg-surface-container text-on-surface-variant'
 }
+
+
 </script>

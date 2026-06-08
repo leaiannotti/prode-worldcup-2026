@@ -1,6 +1,6 @@
 """Scoring service - calculate and record prediction scores."""
 from datetime import datetime
-from app.models import Prediction, PredictionScore
+from app.models import Prediction, PredictionScore, Match
 
 
 def calculate_score(predicted_home: int, predicted_away: int, actual_home: int, actual_away: int) -> tuple[int, str]:
@@ -50,9 +50,16 @@ def score_match(match_id: int, home_score: int, away_score: int, session) -> Non
         away_score: Actual away team score
         session: SQLAlchemy session
     """
+    # Get match info for activity payload
+    match = Match.query.get(match_id)
+    home_code = match.home_team.code if match else "?"
+    away_code = match.away_team.code if match else "?"
+
     # Get all predictions for this match
     predictions = Prediction.query.filter_by(match_id=match_id).all()
-    
+
+    from app.services.activity_service import emit_event
+
     for prediction in predictions:
         # Calculate score for this prediction
         points, score_type = calculate_score(
@@ -61,22 +68,37 @@ def score_match(match_id: int, home_score: int, away_score: int, session) -> Non
             home_score,
             away_score
         )
-        
+
         # Check if score already exists
         existing_score = PredictionScore.query.filter_by(prediction_id=prediction.id).first()
-        
+
         if existing_score:
-            # Update existing (idempotent)
             existing_score.points = points
             existing_score.score_type = score_type
             existing_score.calculated_at = datetime.utcnow()
         else:
-            # Create new score
             score = PredictionScore(
                 prediction_id=prediction.id,
                 points=points,
                 score_type=score_type
             )
             session.add(score)
-    
+
+        # Emit score_calculated event (best-effort)
+        emit_event(
+            user_id=prediction.user_id,
+            event_type="score_calculated",
+            match_id=match_id,
+            payload={
+                "points": points,
+                "score_type": score_type,
+                "home_team": home_code,
+                "away_team": away_code,
+                "actual_home": home_score,
+                "actual_away": away_score,
+                "predicted_home": prediction.home_score,
+                "predicted_away": prediction.away_score,
+            },
+        )
+
     session.commit()

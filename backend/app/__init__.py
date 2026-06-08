@@ -47,7 +47,7 @@ def create_app(config_name=None):
         app.register_blueprint(auth_bp)
         app.register_blueprint(groups_bp)
         app.register_blueprint(matches_bp)
-        app.register_blueprint(predictions_bp)
+        app.register_blueprint(predictions_bp)  # now at /api/predictions
         app.register_blueprint(webhook_bp)
         app.register_blueprint(scores_bp, url_prefix="/api/scores")
         app.register_blueprint(activity_bp)
@@ -55,10 +55,18 @@ def create_app(config_name=None):
     # Register CLI commands
     from app.seed import seed_command
     app.cli.add_command(seed_command)
-    
+
     @app.before_request
     def before_request():
         """Create tables if they don't exist (for dev)."""
         db.create_all()
-    
+
+    # Auto-seed on first run if the DB has no match data
+    with app.app_context():
+        db.create_all()
+        from app.models import Match
+        if db.session.query(Match).count() == 0:
+            from app.seed import load_seed_data
+            load_seed_data(db.session)
+
     return app

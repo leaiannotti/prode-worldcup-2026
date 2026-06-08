@@ -17,6 +17,10 @@ FIFA_TO_ISO2 = {
     "RSA": "za", "RUS": "ru", "SCO": "gb-sct", "SEN": "sn", "SRB": "rs",
     "SUI": "ch", "TUN": "tn", "URU": "uy", "USA": "us", "WAL": "gb-wls",
     "CIV": "ci", "ALG": "dz", "NOR": "no", "SWE": "se",
+    # WC 2026 additions
+    "CZE": "cz", "BIH": "ba", "HAI": "ht", "TUR": "tr", "CUW": "cw",
+    "BEL": "be", "CPV": "cv", "IRQ": "iq", "AUT": "at", "JOR": "jo",
+    "COD": "cd", "UZB": "uz",
 }
 
 
@@ -88,7 +92,7 @@ def load_seed_data(session):
             ).first()
             
             if not existing:
-                deadline_utc = kickoff_utc - timedelta(hours=24)
+                deadline_utc = kickoff_utc - timedelta(hours=1)
                 
                 match = Match(
                     home_team_id=home_team.id,

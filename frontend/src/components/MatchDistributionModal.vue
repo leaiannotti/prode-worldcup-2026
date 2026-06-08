@@ -33,7 +33,7 @@
           Las predicciones se mostrarán después del cierre
         </p>
         <p class="font-label-sm text-on-surface-variant mt-1">
-          Cierre: {{ formatDate(match?.deadline_utc) }}
+          Cierre: {{ formatDate(match?.prediction_deadline_at) }}
         </p>
       </div>
 
@@ -140,11 +140,11 @@ function close() {
 
 function formatDate(isoDate: string | undefined): string {
   if (!isoDate) return ''
-  return new Date(isoDate).toLocaleDateString('es-AR', {
+  return new Date(isoDate).toLocaleString(undefined, {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   })
 }
 </script>

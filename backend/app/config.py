@@ -19,6 +19,10 @@ class DevelopmentConfig(BaseConfig):
         "postgresql://prode:prode@localhost:5432/prode_worldcup"
     )
     SQLALCHEMY_ECHO = True
+    OAUTH_REDIRECT_URI = os.getenv(
+        "OAUTH_REDIRECT_URI",
+        "http://localhost:5173/api/auth/callback"
+    )
 
 
 class TestingConfig(BaseConfig):
