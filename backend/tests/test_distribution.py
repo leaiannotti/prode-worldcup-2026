@@ -135,7 +135,6 @@ class TestDistributionEndpoint:
                 db_session.add(Prediction(
                     user_id=u.id,
                     match_id=match_id,
-                    group_id=group.id,
                     home_score=home,
                     away_score=away,
                 ))
@@ -174,6 +173,7 @@ class TestDistributionEndpoint:
             db_session.add(multi_user)
             db_session.flush()
 
+            # User joins 3 groups but has only one prediction (unique per user+match)
             for i in range(3):
                 grp = PredictionGroup(
                     name=f"Dedup Group {i}",
@@ -185,13 +185,13 @@ class TestDistributionEndpoint:
                 db_session.add(GroupMembership(
                     user_id=multi_user.id, group_id=grp.id, role="member"
                 ))
-                db_session.add(Prediction(
-                    user_id=multi_user.id,
-                    match_id=match_id,
-                    group_id=grp.id,
-                    home_score=1,
-                    away_score=0,
-                ))
+            db_session.flush()
+            db_session.add(Prediction(
+                user_id=multi_user.id,
+                match_id=match_id,
+                home_score=1,
+                away_score=0,
+            ))
             db_session.commit()
 
             _auth_client(app, client, seed_user.id)

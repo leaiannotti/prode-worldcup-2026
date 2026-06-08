@@ -69,7 +69,7 @@ class TestScoringService:
             db_session.commit()
             
             match = seed_matches[0]
-            pred = Prediction(user_id=seed_user.id, match_id=match.id, group_id=group.id, home_score=2, away_score=1)
+            pred = Prediction(user_id=seed_user.id, match_id=match.id, home_score=2, away_score=1)
             db_session.add(pred)
             db_session.commit()
             
@@ -98,7 +98,7 @@ class TestScoringService:
             db_session.commit()
             
             match = seed_matches[0]
-            pred = Prediction(user_id=seed_user.id, match_id=match.id, group_id=group.id, home_score=2, away_score=1)
+            pred = Prediction(user_id=seed_user.id, match_id=match.id, home_score=2, away_score=1)
             db_session.add(pred)
             db_session.commit()
             

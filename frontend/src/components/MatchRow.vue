@@ -37,6 +37,10 @@
           <span class="text-xs font-bold text-on-surface tabular-nums">{{ match.home_score }}-{{ match.away_score }}</span>
           <span class="text-[8px] uppercase tracking-wide text-on-surface-variant">Final</span>
         </template>
+        <template v-else-if="isPendingResult">
+          <span class="text-[9px] font-medium text-on-surface-variant/60 leading-tight text-center">Procesando</span>
+          <span class="text-[8px] text-on-surface-variant/40">resultado</span>
+        </template>
         <template v-else>
           <span class="text-[10px] font-medium text-on-surface-variant">{{ formatTime(match.kickoff_at) }}</span>
           <span class="text-[9px] text-on-surface-variant/70">{{ formatDay(match.kickoff_at) }}</span>
@@ -85,6 +89,10 @@
             <span class="text-sm font-bold text-on-surface tabular-nums">{{ match.home_score }} - {{ match.away_score }}</span>
             <span class="text-[9px] uppercase tracking-wide text-on-surface-variant">Final</span>
           </template>
+          <template v-else-if="isPendingResult">
+            <span class="text-[10px] font-medium text-on-surface-variant/60 leading-tight text-center">Procesando</span>
+            <span class="text-[9px] text-on-surface-variant/40">resultado</span>
+          </template>
           <template v-else>
             <span class="text-xs font-medium text-on-surface-variant">VS</span>
           </template>
@@ -131,16 +139,24 @@ import type { Prediction } from '@/stores/predictions'
 import MatchCountdownBadge from './MatchCountdownBadge.vue'
 import { formatDay, formatTime } from '@/composables/useDateFormat'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   match: Match
   prediction?: Prediction | null
   clickable?: boolean
   disabled?: boolean
   showCountdown?: boolean
   showAddIcon?: boolean
-}>()
+}>(), {
+  clickable: true,
+  disabled: false,
+})
 
-const emit = defineEmits<{ (e: 'click', matchId: number): void }>()
+const emit = defineEmits<{ (e: 'select', matchId: number): void }>()
+
+const isPendingResult = computed(() =>
+  props.match.home_score === null &&
+  new Date() > new Date(props.match.prediction_deadline_at)
+)
 
 const homeWon = computed(() =>
   props.match.status === 'finished' &&
@@ -158,7 +174,7 @@ const awayWon = computed(() =>
 
 function handleClick() {
   if (!props.disabled && props.clickable !== false) {
-    emit('click', props.match.id)
+    emit('select', props.match.id)
   }
 }
 

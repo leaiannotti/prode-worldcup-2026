@@ -1,6 +1,17 @@
 <template>
   <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant">
-    <h2 class="font-headline-md text-headline-md text-primary mb-4">Mis Posiciones</h2>
+    <RouterLink
+      to="/grupos"
+      class="group flex items-center justify-between mb-4"
+    >
+      <h2 class="font-headline-md text-headline-md text-primary">Mis Ligas</h2>
+      <span class="flex items-center gap-1 text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors">
+        Ver ligas
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+    </RouterLink>
 
     <!-- Loading -->
     <div v-if="scoresStore.isLoading" class="space-y-3">
@@ -13,8 +24,22 @@
     </div>
 
     <!-- Empty -->
-    <div v-else-if="scoresStore.myStanding.length === 0" class="text-on-surface-variant font-body-md text-center py-6">
-      No perteneces a ninguna liga aún
+    <div v-else-if="scoresStore.myStanding.length === 0" class="flex flex-col items-center text-center py-6 gap-4">
+      <p class="font-body-md text-on-surface-variant">No pertenecés a ninguna liga aún.</p>
+      <div class="flex gap-2">
+        <button
+          @click="emit('create-league')"
+          class="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-semibold text-sm hover:opacity-90 transition-all active:scale-95"
+        >
+          Crear liga
+        </button>
+        <button
+          @click="emit('join-league')"
+          class="px-5 py-2.5 bg-surface-container text-on-surface rounded-xl font-semibold text-sm hover:bg-surface-container-high transition-all active:scale-95 border border-outline-variant"
+        >
+          Unirse con código
+        </button>
+      </div>
     </div>
 
     <!-- Cards -->
@@ -54,9 +79,15 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+
 import { useScoresStore } from '@/stores/scores'
 
 const scoresStore = useScoresStore()
+
+const emit = defineEmits<{
+  (e: 'create-league'): void
+  (e: 'join-league'): void
+}>()
 
 onMounted(() => {
   scoresStore.fetchMyStanding()

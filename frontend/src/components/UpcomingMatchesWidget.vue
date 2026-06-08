@@ -1,6 +1,17 @@
 <template>
   <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant">
-    <h2 class="font-headline-md text-headline-md text-primary mb-4">Próximos Partidos</h2>
+    <RouterLink
+      to="/partidos"
+      class="group flex items-center justify-between mb-4"
+    >
+      <h2 class="font-headline-md text-headline-md text-primary">Próximos Partidos</h2>
+      <span class="flex items-center gap-1 text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors">
+        Ver todos
+        <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </span>
+    </RouterLink>
 
     <div v-if="matchesStore.isLoading" class="space-y-2">
       <div v-for="i in 3" :key="i" class="h-14 bg-surface-container animate-pulse rounded-lg"></div>
@@ -23,7 +34,7 @@
         :disabled="isDeadlinePassed(match.prediction_deadline_at)"
         :show-countdown="true"
         :show-add-icon="true"
-        @click="emit('open-prediction', $event)"
+        @select="emit('open-prediction', $event)"
       />
     </div>
   </div>
@@ -31,6 +42,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useMatchesStore } from '@/stores/matches'
 import { usePredictionsStore } from '@/stores/predictions'
 import MatchRow from './MatchRow.vue'

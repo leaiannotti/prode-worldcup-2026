@@ -52,7 +52,7 @@
               :disabled="isDeadlinePassed(match.prediction_deadline_at)"
               :show-countdown="true"
               :show-add-icon="!isDeadlinePassed(match.prediction_deadline_at)"
-              @click="onMatchClick(matchesStore.matches.find(m => m.id === $event)!)"
+              @select="onMatchClick(matchesStore.matches.find(m => m.id === $event)!)"
             />
           </div>
         </section>

@@ -57,7 +57,6 @@ class TestLeaderboardBasics:
         pred1 = Prediction(
             user_id=seed_user.id,
             match_id=match.id,
-            group_id=group.id,
             home_score=2,
             away_score=1
         )
@@ -70,7 +69,6 @@ class TestLeaderboardBasics:
         pred2 = Prediction(
             user_id=user2.id,
             match_id=match.id,
-            group_id=group.id,
             home_score=1,
             away_score=0
         )
@@ -126,7 +124,7 @@ class TestLeaderboardBasics:
         
         # All three users get 3 points (same score)
         for user in [seed_user, user2, user3]:
-            pred = Prediction(user_id=user.id, match_id=match.id, group_id=group.id, home_score=2, away_score=1)
+            pred = Prediction(user_id=user.id, match_id=match.id, home_score=2, away_score=1)
             db_session.add(pred)
             db_session.flush()
             score = PredictionScore(prediction_id=pred.id, points=3, score_type="exact")

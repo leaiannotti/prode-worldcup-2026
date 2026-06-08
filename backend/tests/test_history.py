@@ -41,7 +41,6 @@ class TestHistoryBasics:
         pred = Prediction(
             user_id=seed_user.id,
             match_id=match.id,
-            group_id=group.id,
             home_score=2,
             away_score=1
         )
@@ -84,14 +83,14 @@ class TestHistoryBasics:
         match1.home_score = 2
         match1.away_score = 1
         
-        pred1 = Prediction(user_id=seed_user.id, match_id=match1.id, group_id=group.id, home_score=2, away_score=1)
+        pred1 = Prediction(user_id=seed_user.id, match_id=match1.id, home_score=2, away_score=1)
         db_session.add(pred1)
         db_session.flush()
         score1 = PredictionScore(prediction_id=pred1.id, points=3, score_type="exact")
         db_session.add(score1)
         
         # Match 2: pending (no score)
-        pred2 = Prediction(user_id=seed_user.id, match_id=match2.id, group_id=group.id, home_score=1, away_score=0)
+        pred2 = Prediction(user_id=seed_user.id, match_id=match2.id, home_score=1, away_score=0)
         db_session.add(pred2)
         db_session.commit()
         
@@ -167,7 +166,7 @@ class TestHistoryBasics:
             match.home_score = i
             match.away_score = 0
             
-            pred = Prediction(user_id=seed_user.id, match_id=match.id, group_id=group.id, home_score=i, away_score=0)
+            pred = Prediction(user_id=seed_user.id, match_id=match.id, home_score=i, away_score=0)
             db_session.add(pred)
             db_session.flush()
             score = PredictionScore(prediction_id=pred.id, points=3, score_type="exact")
@@ -185,5 +184,5 @@ class TestHistoryBasics:
         history = response.get_json()["history"]
         
         # Verify chronological order
-        kickoffs = [h["match"]["kickoff_at"] for h in history]
-        assert kickoffs == sorted(kickoffs)
+        kickoffs = [h["match"]["kickoff_utc"] for h in history]
+        assert kickoffs == sorted(kickoffs, reverse=True)

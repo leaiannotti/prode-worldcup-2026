@@ -1,9 +1,16 @@
 <template>
   <div class="bg-surface-container-lowest rounded-xl p-4 border border-outline-variant hover:border-primary transition-all">
-    <!-- Name + members -->
-    <div class="mb-3">
-      <h3 class="font-headline-sm text-headline-sm text-primary">{{ group.name }}</h3>
-      <p class="text-xs text-on-surface-variant mt-0.5">{{ group.member_count ?? 0 }} miembros</p>
+    <!-- Name + members + rank -->
+    <div class="flex items-start justify-between mb-3 gap-2">
+      <div class="min-w-0">
+        <h3 class="font-headline-sm text-headline-sm text-primary">{{ group.name }}</h3>
+        <p class="text-xs text-on-surface-variant mt-0.5">{{ group.member_count ?? 0 }} miembros</p>
+      </div>
+      <div v-if="standing" class="flex-shrink-0 flex flex-col items-center bg-primary-container rounded-lg px-3 py-1.5 min-w-[3.5rem]">
+        <span class="text-[10px] font-medium text-on-primary-container uppercase tracking-wide leading-none">Puesto</span>
+        <span class="text-xl font-bold text-primary leading-tight tabular-nums">#{{ standing.rank }}</span>
+        <span class="text-[10px] text-on-surface-variant leading-none">de {{ standing.member_count }}</span>
+      </div>
     </div>
 
     <!-- Prizes preview -->
@@ -19,6 +26,12 @@
       </span>
     </div>
 
+    <!-- Points row (if standing available) -->
+    <div v-if="standing" class="flex items-center gap-1.5 mb-3">
+      <span class="text-xs text-on-surface-variant">Mis puntos:</span>
+      <span class="text-sm font-bold text-primary tabular-nums">{{ standing.total_points }} pts</span>
+    </div>
+
     <!-- View Details button -->
     <button
       @click="emit('open-detail', group)"
@@ -31,8 +44,12 @@
 
 <script setup lang="ts">
 import type { Group } from '@/stores/groups'
+import type { MyStandingItem } from '@/stores/scores'
 
-defineProps<{ group: Group }>()
+defineProps<{
+  group: Group
+  standing?: MyStandingItem | null
+}>()
 
 const emit = defineEmits<{
   (e: 'open-detail', group: Group): void

@@ -142,7 +142,6 @@ class TestMyStanding:
             pred1 = Prediction(
                 user_id=seed_user.id,
                 match_id=match.id,
-                group_id=group.id,
                 home_score=1,
                 away_score=0,
             )
@@ -150,7 +149,6 @@ class TestMyStanding:
             pred2 = Prediction(
                 user_id=user2.id,
                 match_id=match.id,
-                group_id=group.id,
                 home_score=2,
                 away_score=0,
             )
@@ -210,7 +208,6 @@ class TestMyStanding:
                 pred = Prediction(
                     user_id=u.id,
                     match_id=match.id,
-                    group_id=group.id,
                     home_score=1,
                     away_score=0,
                 )

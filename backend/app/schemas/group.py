@@ -61,6 +61,7 @@ class GroupResponse(BaseModel):
     invite_code: str = Field(..., description="Invite code")
     created_at: datetime = Field(..., description="Creation timestamp")
     creator_id: Optional[str] = Field(None, description="Creator user ID")
+    member_count: int = Field(default=0, description="Number of members in the group")
     prizes: List[PrizeResponse] = Field(default_factory=list, description="Prize tiers")
 
 

@@ -38,6 +38,14 @@ def _is_group_owner(user_id: str, group_id: str) -> bool:
     return group.creator_id == user_id
 
 
+def _group_to_response(group: PredictionGroup) -> GroupResponse:
+    """Build a GroupResponse including the live member count."""
+    member_count = GroupMembership.query.filter_by(group_id=group.id).count()
+    response = GroupResponse.model_validate(group)
+    response.member_count = member_count
+    return response
+
+
 @bp.route("", methods=["POST"])
 @jwt_required
 def create_group():
@@ -108,7 +116,7 @@ def create_group():
     db.session.commit()
 
     # Return group response
-    response = GroupResponse.model_validate(group)
+    response = _group_to_response(group)
     return jsonify(response.model_dump()), 201
 
 
@@ -160,7 +168,7 @@ def join_group():
     )
     db.session.commit()
 
-    response = GroupResponse.model_validate(group)
+    response = _group_to_response(group)
     return jsonify(response.model_dump()), 200
 
 
@@ -169,16 +177,16 @@ def join_group():
 def list_groups():
     """List user's groups. GET /api/groups"""
     user_id = g.current_user.id
-    
+
     # Get all groups user is member of
     memberships = GroupMembership.query.filter_by(user_id=user_id).all()
     group_ids = [m.group_id for m in memberships]
-    
+
     groups = PredictionGroup.query.filter(
         PredictionGroup.id.in_(group_ids)
     ).all() if group_ids else []
-    
-    responses = [GroupResponse.model_validate(g).model_dump() for g in groups]
+
+    responses = [_group_to_response(g).model_dump() for g in groups]
     return jsonify(responses), 200
 
 

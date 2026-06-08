@@ -130,7 +130,6 @@ class TestWebhookResultIngestion:
             pred = Prediction(
                 user_id=seed_user.id,
                 match_id=match.id,
-                group_id=group.id,
                 home_score=2,
                 away_score=1,
                 is_frozen=False,

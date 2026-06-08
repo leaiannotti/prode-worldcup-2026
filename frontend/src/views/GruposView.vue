@@ -27,30 +27,11 @@
       </div>
 
       <!-- No groups -->
-      <div v-if="groupsStore.groups.length === 0" class="text-center py-16 space-y-4">
-        <p class="font-body-md text-on-surface-variant">No perteneces a ninguna liga aún.</p>
-        <button @click="showCreate = true" class="px-6 py-3 bg-primary text-on-primary rounded-xl font-semibold text-sm hover:opacity-90 transition-all">
-          Crear tu primera liga
-        </button>
+      <div v-if="groupsStore.groups.length === 0" class="text-center py-16">
+        <p class="font-body-md text-on-surface-variant">No pertenecés a ninguna liga aún. Creá una o unite con un código.</p>
       </div>
 
       <template v-else>
-        <!-- Mis Grupos -->
-        <section class="space-y-3">
-          <h2 class="font-headline-md text-headline-md text-on-surface">Mis Ligas</h2>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <GroupCard
-              v-for="group in groupsStore.groups"
-              :key="group.id"
-              :group="group"
-              @open-detail="detailGroup = $event"
-            />
-          </div>
-        </section>
-
-        <!-- Divider -->
-        <div class="border-t border-outline-variant"></div>
-
         <!-- Posiciones -->
         <section class="space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -155,6 +136,23 @@
             <p class="font-body-md">Todavía no hay posiciones para esta liga.</p>
           </div>
         </section>
+
+        <!-- Divider -->
+        <div class="border-t border-outline-variant"></div>
+
+        <!-- Mis Ligas -->
+        <section class="space-y-3">
+          <h2 class="font-headline-md text-headline-md text-on-surface">Mis Ligas</h2>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <GroupCard
+              v-for="group in groupsStore.groups"
+              :key="group.id"
+              :group="group"
+              :standing="getStanding(group.id)"
+              @open-detail="detailGroup = $event"
+            />
+          </div>
+        </section>
       </template>
     </div>
 
@@ -183,6 +181,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useGroupsStore } from '@/stores/groups'
 import { useLeaderboardStore } from '@/stores/leaderboard'
+import { useScoresStore } from '@/stores/scores'
 import AppLayout from '@/components/AppLayout.vue'
 import GroupCard from '@/components/GroupCard.vue'
 import GroupDialogs from '@/components/GroupDialogs.vue'
@@ -192,6 +191,7 @@ import type { Group } from '@/stores/groups'
 const route = useRoute()
 const groupsStore = useGroupsStore()
 const leaderboardStore = useLeaderboardStore()
+const scoresStore = useScoresStore()
 
 const selectedGroupId = ref<string>('')
 const showCreate = ref(false)
@@ -202,6 +202,7 @@ onMounted(async () => {
   if (groupsStore.groups.length === 0) {
     await groupsStore.fetchGroups()
   }
+  await scoresStore.fetchMyStanding()
   if (groupsStore.groups.length > 0) {
     const fromQuery = route.query.group as string | undefined
     const valid = fromQuery && groupsStore.groups.some(g => g.id === fromQuery)
@@ -209,6 +210,10 @@ onMounted(async () => {
     await leaderboardStore.fetchLeaderboard(selectedGroupId.value)
   }
 })
+
+function getStanding(groupId: string) {
+  return scoresStore.myStanding.find(s => s.group_id === groupId) ?? null
+}
 
 async function onGroupChange() {
   if (selectedGroupId.value) {

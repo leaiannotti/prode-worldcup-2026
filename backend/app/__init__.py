@@ -61,12 +61,13 @@ def create_app(config_name=None):
         """Create tables if they don't exist (for dev)."""
         db.create_all()
 
-    # Auto-seed on first run if the DB has no match data
-    with app.app_context():
-        db.create_all()
-        from app.models import Match
-        if db.session.query(Match).count() == 0:
-            from app.seed import load_seed_data
-            load_seed_data(db.session)
+    # Auto-seed on first run if the DB has no match data (skipped in testing)
+    if config_name != "testing":
+        with app.app_context():
+            db.create_all()
+            from app.models import Match
+            if db.session.query(Match).count() == 0:
+                from app.seed import load_seed_data
+                load_seed_data(db.session)
 
     return app

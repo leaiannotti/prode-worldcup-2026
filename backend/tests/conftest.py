@@ -5,16 +5,14 @@ from app.models import User, WorldCupGroup, Team, Match
 from datetime import datetime, timedelta
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def app():
-    """Create application for testing."""
-    app = create_app("testing")
-    
-    with app.app_context():
-        # Create all tables before tests
+    """Create application for testing with a clean DB per test."""
+    _app = create_app("testing")
+
+    with _app.app_context():
         db.create_all()
-        yield app
-        # Clean up after tests
+        yield _app
         db.session.remove()
         db.drop_all()
 
@@ -27,9 +25,8 @@ def client(app):
 
 @pytest.fixture
 def db_session(app):
-    """Database session for tests."""
-    with app.app_context():
-        yield db.session
+    """Database session for tests — same context as the app fixture."""
+    yield db.session
 
 
 @pytest.fixture
@@ -76,20 +73,20 @@ def seed_teams(db_session, seed_groups):
         "ROU", "SVK", "GRC", "BIH",
         "ISL", "ALB", "AUT", "HUN",
     ]
-    
+
     # Create 4 teams for each of 12 groups
     for idx, group in enumerate(seed_groups):
         group_start = idx * 4
         group_end = group_start + 4
         group_codes = team_codes[group_start:group_end]
-        
+
         for code in group_codes:
             team = Team(
                 code=code,
                 world_cup_group_id=group.id
             )
             teams.append(team)
-    
+
     db_session.add_all(teams)
     db_session.commit()
     return teams
@@ -105,10 +102,10 @@ def seed_matches(db_session, seed_groups, seed_teams):
     # Make kickoff sufficiently far in future so deadline is also in future
     # deadline_utc = kickoff_utc - 24h, so we need kickoff > now + 24h
     kickoff = datetime.utcnow() + timedelta(days=2)
-    
+
     for group in seed_groups:
         teams_in_group = [t for t in seed_teams if t.world_cup_group_id == group.id]
-        
+
         # Create round-robin matches for this group (4 teams = 6 matches)
         for i, home_team in enumerate(teams_in_group):
             for away_team in teams_in_group[i+1:]:
@@ -123,7 +120,7 @@ def seed_matches(db_session, seed_groups, seed_teams):
                 matches.append(match)
                 match_count += 1
                 kickoff += timedelta(hours=1)
-    
+
     db_session.add_all(matches)
     db_session.commit()
     return matches
