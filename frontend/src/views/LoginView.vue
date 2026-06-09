@@ -41,7 +41,7 @@
       <div class="w-full space-y-6 mt-2">
         <!-- Google OAuth Button -->
         <a
-          :href="(import.meta.env.VITE_API_URL ?? '') + '/api/auth/login'"
+          :href="apiBase + '/api/auth/login'"
           class="w-full flex items-center justify-center gap-3 bg-white border border-gray-200 py-4 px-6 rounded-xl font-title-md text-base transition-all active:scale-95 duration-150 group"
           style="color: #191c1d; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
           onmouseover="this.style.boxShadow='0 4px 12px rgba(0,19,77,0.15)'; this.style.borderColor='#b7c4ff'"
@@ -184,6 +184,7 @@ import { setLocale } from '@/i18n'
 
 const { t, locale } = useI18n()
 const router = useRouter()
+const apiBase = import.meta.env.VITE_API_URL ?? ''
 
 const langOptions = [
   { value: 'es', label: 'Español (ES)' },
@@ -210,7 +211,6 @@ async function submitEmailForm() {
   emailError.value = ''
   emailLoading.value = true
   try {
-    const apiBase = import.meta.env.VITE_API_URL ?? ''
     const url = emailTab.value === 'login' ? `${apiBase}/api/auth/login-email` : `${apiBase}/api/auth/register`
     const body: Record<string, string> = {
       email: emailForm.value.email,
