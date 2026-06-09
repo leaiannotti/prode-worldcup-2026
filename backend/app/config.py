@@ -39,3 +39,4 @@ class ProductionConfig(BaseConfig):
     TESTING = False
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_ECHO = False
+    OAUTH_REDIRECT_URI = os.getenv("OAUTH_REDIRECT_URI")
