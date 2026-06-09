@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from app.extensions import db, migrate, oauth
+from app.extensions import db, migrate, oauth, cors
 
 
 def create_app(config_name=None):
@@ -25,6 +25,14 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
     oauth.init_app(app)
+    cors.init_app(app, resources={r"/api/*": {
+        "origins": [
+            app.config.get("FRONTEND_URL", "http://localhost:5173"),
+            "https://prodescaloneta.online",
+            "http://prodescaloneta.online",
+        ],
+        "supports_credentials": True,
+    }})
     
     # Configure Google OAuth
     oauth.register(
