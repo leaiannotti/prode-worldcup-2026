@@ -1,7 +1,7 @@
 <template>
   <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant">
     <RouterLink
-      to="/partidos"
+      to="/matches"
       class="group flex items-center justify-between mb-4"
     >
       <h2 class="font-headline-md text-headline-md text-primary">{{ t('upcomingMatches.title') }}</h2>
