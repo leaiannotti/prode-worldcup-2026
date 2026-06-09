@@ -148,6 +148,80 @@ def get_match(match_id):
     }), 200
 
 
+@bp.route("/community-insights", methods=["GET"])
+@jwt_required
+def get_community_insights():
+    """GET /api/matches/community-insights
+
+    Returns outcome distribution (home_win/draw/away_win) for upcoming matches
+    that have at least one prediction. Shows live data before deadline — intended
+    for the community insights dashboard section.
+
+    Query params:
+    - limit: max number of upcoming matches to include (default 10)
+    """
+    now = datetime.utcnow()
+    limit_val = request.args.get("limit", 10, type=int)
+
+    upcoming = (
+        Match.query
+        .filter(Match.status == "scheduled", Match.deadline_utc > now)
+        .order_by(Match.kickoff_utc.asc())
+        .limit(limit_val)
+        .all()
+    )
+
+    result = []
+    for match in upcoming:
+        subq = (
+            db.session.query(
+                Prediction.user_id,
+                func.min(Prediction.home_score).label("home_score"),
+                func.min(Prediction.away_score).label("away_score"),
+            )
+            .filter(Prediction.match_id == match.id)
+            .group_by(Prediction.user_id)
+            .subquery()
+        )
+
+        total = db.session.query(func.count()).select_from(subq).scalar() or 0
+
+        if total == 0:
+            result.append({
+                "match_id": match.id,
+                "home_team": {"code": match.home_team.code, "name": match.home_team.name, "flag_url": match.home_team.flag_url},
+                "away_team": {"code": match.away_team.code, "name": match.away_team.name, "flag_url": match.away_team.flag_url},
+                "kickoff_at": match.kickoff_utc.isoformat() + "Z",
+                "has_data": False,
+                "total_predictions": 0,
+            })
+            continue
+
+        home_wins = db.session.query(func.count()).select_from(subq).filter(
+            subq.c.home_score > subq.c.away_score
+        ).scalar() or 0
+
+        draws = db.session.query(func.count()).select_from(subq).filter(
+            subq.c.home_score == subq.c.away_score
+        ).scalar() or 0
+
+        away_wins = total - home_wins - draws
+
+        result.append({
+            "match_id": match.id,
+            "home_team": {"code": match.home_team.code, "name": match.home_team.name, "flag_url": match.home_team.flag_url},
+            "away_team": {"code": match.away_team.code, "name": match.away_team.name, "flag_url": match.away_team.flag_url},
+            "kickoff_at": match.kickoff_utc.isoformat() + "Z",
+            "has_data": True,
+            "total_predictions": total,
+            "home_win_pct": round(home_wins / total * 100, 1),
+            "draw_pct": round(draws / total * 100, 1),
+            "away_win_pct": round(away_wins / total * 100, 1),
+        })
+
+    return jsonify(result), 200
+
+
 @bp.route("/<int:match_id>/distribution", methods=["GET"])
 @jwt_required
 def get_distribution(match_id):

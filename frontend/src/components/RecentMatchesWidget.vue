@@ -10,7 +10,7 @@
       No hay partidos finalizados aún
     </div>
 
-    <div v-else class="divide-y divide-outline-variant">
+    <div v-else class="divide-y divide-outline-variant max-h-[400px] overflow-y-auto">
       <MatchRow
         v-for="match in matches"
         :key="match.id"
@@ -38,7 +38,7 @@ const isLoading = ref(false)
 onMounted(async () => {
   isLoading.value = true
   try {
-    const res = await apiClient.get('/api/matches?status=closed&limit=4')
+    const res = await apiClient.get('/api/matches?status=closed')
     matches.value = res.data
   } catch (e) {
     console.error('Error loading recent matches', e)

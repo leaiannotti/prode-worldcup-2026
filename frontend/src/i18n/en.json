@@ -8,13 +8,20 @@
     "lightMode": "Switch to light mode",
     "darkMode": "Switch to dark mode",
     "recentActivity": "Recent activity",
-    "noActivity": "No recent activity"
+    "noActivity": "No recent activity",
+    "profile": "Profile"
   },
   "login": {
     "tagline": "Start your road to glory",
     "subtitle": "Join the world's greatest predictions competition.",
     "withGoogle": "Sign in with Google",
     "orWith": "or sign in with",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "namePlaceholder": "Your name",
+    "emailPlaceholder": "Your email",
+    "passwordPlaceholder": "Password (min. 6 chars)",
+    "loading": "Loading...",
     "footer": "© 2026 Prode World Cup Platform. All rights reserved.",
     "rules": "Rules",
     "privacy": "Privacy",
@@ -148,6 +155,15 @@
     "draw": "Draw",
     "awayWin": "{team} win",
     "error": "Error loading distribution"
+  },
+  "communityInsights": {
+    "title": "Community Insights",
+    "homeWin": "Home Win",
+    "draw": "Draw",
+    "awayWin": "Away Win",
+    "votes": "{n} predictions",
+    "noMatches": "No upcoming matches.",
+    "error": "Failed to load insights."
   },
   "common": {
     "pts": "pts",

@@ -3,6 +3,30 @@ from functools import wraps
 from flask import request, jsonify, g
 from app.services.auth_service import get_current_user
 
+ADMIN_EMAILS = {"leandro.iannotti87@gmail.com"}
+
+
+def admin_required(f):
+    """Decorator to require admin privileges.
+
+    Must be used AFTER @jwt_required so g.current_user is set.
+    Returns 403 if the user is not in ADMIN_EMAILS.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.cookies.get("jwt_token")
+        if not token:
+            return jsonify({"error": "missing_token"}), 401
+        try:
+            user = get_current_user(token)
+            g.current_user = user
+        except ValueError as e:
+            return jsonify({"error": str(e)}), 401
+        if user.email not in ADMIN_EMAILS:
+            return jsonify({"error": "forbidden"}), 403
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 def jwt_required(f):
     """Decorator to require a valid JWT token.

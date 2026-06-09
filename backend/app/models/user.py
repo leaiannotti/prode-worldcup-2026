@@ -10,10 +10,11 @@ class User(db.Model):
     __tablename__ = "users"
     
     id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    google_sub = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    google_sub = db.Column(db.String(255), unique=True, nullable=True, index=True)
     email = db.Column(db.String(255), unique=True, nullable=False, index=True)
     name = db.Column(db.String(255), nullable=False)
     picture_url = db.Column(db.String(500))
+    password_hash = db.Column(db.String(255), nullable=True)
     last_login_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     

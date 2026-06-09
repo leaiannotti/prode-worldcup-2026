@@ -22,6 +22,9 @@
       <!-- Activity Feed -->
       <ActivityFeedWidget />
 
+      <!-- Community Insights -->
+      <CommunityInsights ref="communityInsightsRef" />
+
 
     </div>
 
@@ -46,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, type ComponentPublicInstance } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '@/stores/groups'
@@ -60,6 +63,7 @@ import ActivityFeedWidget from '@/components/ActivityFeedWidget.vue'
 import RecentMatchesWidget from '@/components/RecentMatchesWidget.vue'
 import PredictionModal from '@/components/PredictionModal.vue'
 import GroupDialogs from '@/components/GroupDialogs.vue'
+import CommunityInsights from '@/components/CommunityInsights.vue'
 
 const { t } = useI18n()
 const authStore = useAuthStore()
@@ -72,6 +76,7 @@ const showCreate = ref(false)
 const showJoin = ref(false)
 const isPredictionModalOpen = ref(false)
 const selectedMatch = ref<any>(null)
+const communityInsightsRef = ref<{ refresh: () => void } | null>(null)
 
 function openPrediction(matchId: number) {
   const match = matchesStore.matches.find(m => m.id === matchId)
@@ -89,6 +94,7 @@ function closePrediction() {
 function onPredictionSaved() {
   predictionsStore.fetchMyPredictions()
   activityStore.fetchActivity(10)
+  communityInsightsRef.value?.refresh()
 }
 
 onMounted(async () => {

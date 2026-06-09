@@ -4,7 +4,7 @@
     <img
       ref="bgImage"
       alt="Stadium background"
-      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGS5lRhcrh11DY4xaqzDoCVzGSYBPUe1vBPth__RSeBe9wwUnXNoWiHZW4G6AdKW05KfViI48aUYC_2vRFjJIs8qQJlZ8Spbee475vLCybNN8aBhb0TnxFOb3Wrc2IJBTnN6FvC3dwxQxm8hI9Io4LCuKIWhmlskbR1fOQJJ-FjyqPbhXYI8U0sHEZMeqYPkmx6Zh-H68NFZvUSO_Xl951SBA0Q7VvDDQgIpdgYh9O9mIXer6ltg_7YeUnyIJ9Kc54PBIClT--GvcZ"
+      src="/hero-argentina.jpg"
       class="w-full h-full object-cover scale-105"
     />
     <div class="absolute inset-0 stadium-overlay" />
@@ -14,7 +14,7 @@
   <main class="relative z-10 flex-1 flex flex-col items-center justify-center px-5 min-h-screen">
     <!-- Branding -->
     <header class="mb-10 text-center">
-      <h1 class="font-display-lg text-display-lg text-primary-fixed-dim drop-shadow-2xl uppercase italic tracking-tighter">
+      <h1 class="font-display-lg text-display-lg text-primary-fixed-dim drop-shadow-2xl uppercase tracking-wider">
         PRODE 2026
       </h1>
     </header>
@@ -63,30 +63,63 @@
           <div class="h-px flex-1 bg-outline-variant" />
         </div>
 
-        <!-- Alternative Methods -->
-        <div class="grid grid-cols-2 gap-4">
-          <button
-            class="flex items-center justify-center gap-2 py-4 border border-gray-200 rounded-xl font-title-md text-base transition-all active:scale-95"
-            style="color: #191c1d; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
-            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,19,77,0.15)'; this.style.borderColor='#b7c4ff'"
-            onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'; this.style.borderColor='#e5e7eb'"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="#236391" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            Email
-          </button>
-          <button
-            class="flex items-center justify-center gap-2 py-4 border border-gray-200 rounded-xl font-title-md text-base transition-all active:scale-95"
-            style="color: #191c1d; box-shadow: 0 1px 3px rgba(0,0,0,0.08);"
-            onmouseover="this.style.boxShadow='0 4px 12px rgba(0,19,77,0.15)'; this.style.borderColor='#b7c4ff'"
-            onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'; this.style.borderColor='#e5e7eb'"
-          >
-            <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
-            </svg>
-            Apple
-          </button>
+        <!-- Email form tabs -->
+        <div>
+          <!-- Tab switcher -->
+          <div class="flex rounded-lg overflow-hidden border border-outline-variant mb-4">
+            <button
+              type="button"
+              class="flex-1 py-2 font-label-md text-sm transition-colors"
+              :class="emailTab === 'login' ? 'bg-primary text-on-primary' : 'bg-surface text-on-surface-variant hover:bg-surface-container'"
+              @click="emailTab = 'login'"
+            >{{ t('login.signIn') }}</button>
+            <button
+              type="button"
+              class="flex-1 py-2 font-label-md text-sm transition-colors"
+              :class="emailTab === 'register' ? 'bg-primary text-on-primary' : 'bg-surface text-on-surface-variant hover:bg-surface-container'"
+              @click="emailTab = 'register'"
+            >{{ t('login.signUp') }}</button>
+          </div>
+
+          <form class="space-y-3" @submit.prevent="submitEmailForm">
+            <!-- Name field (register only) -->
+            <input
+              v-if="emailTab === 'register'"
+              v-model="emailForm.name"
+              type="text"
+              :placeholder="t('login.namePlaceholder')"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 font-body-md text-sm outline-none focus:border-primary transition-colors"
+              style="color: #191c1d; background: white;"
+            />
+            <input
+              v-model="emailForm.email"
+              type="email"
+              :placeholder="t('login.emailPlaceholder')"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 font-body-md text-sm outline-none focus:border-primary transition-colors"
+              style="color: #191c1d; background: white;"
+            />
+            <input
+              v-model="emailForm.password"
+              type="password"
+              :placeholder="t('login.passwordPlaceholder')"
+              required
+              class="w-full px-4 py-3 rounded-xl border border-gray-200 font-body-md text-sm outline-none focus:border-primary transition-colors"
+              style="color: #191c1d; background: white;"
+            />
+
+            <p v-if="emailError" class="text-xs font-body-md" style="color: #ba1a1a">{{ emailError }}</p>
+
+            <button
+              type="submit"
+              :disabled="emailLoading"
+              class="w-full py-3 rounded-xl font-label-md text-sm text-white transition-all active:scale-95 disabled:opacity-60"
+              style="background: #00134d;"
+            >
+              {{ emailLoading ? t('login.loading') : (emailTab === 'login' ? t('login.signIn') : t('login.signUp')) }}
+            </button>
+          </form>
         </div>
       </div>
 
@@ -146,9 +179,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { setLocale } from '@/i18n'
 
 const { t, locale } = useI18n()
+const router = useRouter()
 
 const langOptions = [
   { value: 'es', label: 'Español (ES)' },
@@ -158,6 +193,49 @@ const langOptions = [
 const langOpen = ref(false)
 const cardRef = ref<HTMLElement | null>(null)
 const bgImage = ref<HTMLImageElement | null>(null)
+
+// Email form state
+const emailTab = ref<'login' | 'register'>('login')
+const emailLoading = ref(false)
+const emailError = ref('')
+const emailForm = ref({ name: '', email: '', password: '' })
+
+const errorMessages: Record<string, string> = {
+  email_already_registered: 'Ese email ya está registrado.',
+  invalid_credentials: 'Email o contraseña incorrectos.',
+  invalid_request: 'Datos inválidos. Revisá el formulario.',
+}
+
+async function submitEmailForm() {
+  emailError.value = ''
+  emailLoading.value = true
+  try {
+    const url = emailTab.value === 'login' ? '/api/auth/login-email' : '/api/auth/register'
+    const body: Record<string, string> = {
+      email: emailForm.value.email,
+      password: emailForm.value.password,
+    }
+    if (emailTab.value === 'register') body.name = emailForm.value.name
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(body),
+    })
+
+    if (res.ok) {
+      router.push('/dashboard')
+    } else {
+      const data = await res.json().catch(() => ({}))
+      emailError.value = errorMessages[data.error] ?? 'Ocurrió un error. Intentá de nuevo.'
+    }
+  } catch {
+    emailError.value = 'No se pudo conectar. Revisá tu conexión.'
+  } finally {
+    emailLoading.value = false
+  }
+}
 
 const currentLangLabel = computed(
   () => langOptions.find((o) => o.value === locale.value)?.label ?? ''
@@ -193,7 +271,7 @@ if (typeof window !== 'undefined') {
 
 <style scoped>
 .stadium-overlay {
-  background: linear-gradient(to bottom, rgba(0, 36, 125, 0.5), rgba(0, 19, 77, 0.85));
+  background: linear-gradient(to bottom, rgba(0, 53, 128, 0.45), rgba(0, 19, 77, 0.88));
 }
 
 .glass-card {

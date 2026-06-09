@@ -2,8 +2,8 @@
 from flask import Blueprint, jsonify, redirect, request, current_app, url_for
 from app.extensions import oauth, db
 from app.middleware.auth import jwt_required
-from app.services.auth_service import upsert_user, issue_jwt, set_jwt_cookie
-from app.schemas.auth import UserResponse
+from app.services.auth_service import upsert_user, issue_jwt, set_jwt_cookie, register_email_user, login_email_user
+from app.schemas.auth import UserResponse, EmailRegisterRequest, EmailLoginRequest
 from app import create_app
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/api/auth")
@@ -73,6 +73,56 @@ def me():
     })
     
     return jsonify(schema.model_dump()), 200
+
+
+@auth_bp.route("/register", methods=["POST"])
+def register():
+    """Register a new user with email and password."""
+    try:
+        body = EmailRegisterRequest.model_validate(request.get_json() or {})
+    except Exception as e:
+        return jsonify({"error": "invalid_request", "detail": str(e)}), 400
+
+    try:
+        user = register_email_user(body.email, body.password, body.name)
+    except ValueError as e:
+        if str(e) == "email_already_registered":
+            return jsonify({"error": "email_already_registered"}), 409
+        return jsonify({"error": str(e)}), 400
+
+    jwt_token = issue_jwt(user.id)
+    response = jsonify(UserResponse.model_validate({
+        "id": user.id,
+        "email": user.email,
+        "name": user.name,
+        "picture": user.picture_url,
+    }).model_dump())
+    set_jwt_cookie(response, jwt_token)
+    return response, 201
+
+
+@auth_bp.route("/login-email", methods=["POST"])
+def login_email():
+    """Authenticate with email and password."""
+    try:
+        body = EmailLoginRequest.model_validate(request.get_json() or {})
+    except Exception as e:
+        return jsonify({"error": "invalid_request", "detail": str(e)}), 400
+
+    try:
+        user = login_email_user(body.email, body.password)
+    except ValueError:
+        return jsonify({"error": "invalid_credentials"}), 401
+
+    jwt_token = issue_jwt(user.id)
+    response = jsonify(UserResponse.model_validate({
+        "id": user.id,
+        "email": user.email,
+        "name": user.name,
+        "picture": user.picture_url,
+    }).model_dump())
+    set_jwt_cookie(response, jwt_token)
+    return response, 200
 
 
 @auth_bp.route("/logout", methods=["POST"])

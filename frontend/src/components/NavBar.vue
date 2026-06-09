@@ -68,7 +68,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
-            <span v-if="activityStore.events.length > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
+            <span v-if="hasUnread" class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full"></span>
           </button>
 
           <!-- Activity dropdown -->
@@ -134,30 +134,63 @@
           {{ locale === 'es' ? 'EN' : 'ES' }}
         </button>
 
-        <!-- Avatar -->
-        <div v-if="authStore.user" class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary flex-shrink-0">
-          <img
-            v-if="authStore.user.picture && !avatarError"
-            :src="authStore.user.picture"
-            :alt="authStore.user.name"
-            class="w-full h-full object-cover"
-            @error="avatarError = true"
-          />
-          <div v-else class="w-full h-full bg-primary flex items-center justify-center">
-            <span class="text-on-primary text-[10px] font-bold">{{ initials(authStore.user.name) }}</span>
-          </div>
-        </div>
+        <!-- Avatar + profile dropdown -->
+        <div v-if="authStore.user" class="relative" ref="avatarRef">
+          <button
+            @click="avatarMenuOpen = !avatarMenuOpen"
+            class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+          >
+            <img
+              v-if="authStore.user.picture && !avatarError"
+              :src="authStore.user.picture"
+              :alt="authStore.user.name"
+              class="w-full h-full object-cover"
+              @error="avatarError = true"
+            />
+            <div v-else class="w-full h-full bg-primary flex items-center justify-center">
+              <span class="text-on-primary text-[10px] font-bold">{{ initials(authStore.user.name) }}</span>
+            </div>
+          </button>
 
-        <!-- Logout (desktop only) -->
-        <button
-          @click="handleLogout"
-          class="hidden md:flex p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors cursor-pointer"
-          :title="t('nav.logoutFull')"
-        >
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-        </button>
+          <Transition name="dropdown">
+            <div
+              v-if="avatarMenuOpen"
+              class="absolute right-0 top-full mt-2 w-56 bg-surface rounded-xl border border-outline-variant shadow-lg overflow-hidden z-50"
+            >
+              <!-- User info -->
+              <div class="px-4 py-3 border-b border-outline-variant">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary flex-shrink-0">
+                    <img
+                      v-if="authStore.user.picture && !avatarError"
+                      :src="authStore.user.picture"
+                      :alt="authStore.user.name"
+                      class="w-full h-full object-cover"
+                    />
+                    <div v-else class="w-full h-full bg-primary flex items-center justify-center">
+                      <span class="text-on-primary text-xs font-bold">{{ initials(authStore.user.name) }}</span>
+                    </div>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-sm font-semibold text-on-surface truncate">{{ authStore.user.name }}</p>
+                    <p class="text-xs text-on-surface-variant truncate">{{ authStore.user.email }}</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Logout -->
+              <button
+                @click="handleLogout"
+                class="w-full flex items-center gap-2 px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                {{ t('nav.logoutFull') }}
+              </button>
+            </div>
+          </Transition>
+        </div>
       </div>
     </div>
   </header>
@@ -187,15 +220,23 @@
         <span class="text-[10px] font-medium">{{ link.label }}</span>
       </RouterLink>
 
-      <!-- Logout on mobile bottom nav -->
+      <!-- Avatar / logout on mobile bottom nav -->
       <button
-        @click="handleLogout"
+        @click="avatarMenuOpen = !avatarMenuOpen"
         class="flex-1 flex flex-col items-center justify-center gap-0.5 text-on-surface-variant transition-colors cursor-pointer"
       >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        <span class="text-[10px] font-medium">{{ t('nav.logout') }}</span>
+        <div class="w-6 h-6 rounded-full overflow-hidden border border-primary">
+          <img
+            v-if="authStore.user?.picture && !avatarError"
+            :src="authStore.user.picture"
+            :alt="authStore.user?.name"
+            class="w-full h-full object-cover"
+          />
+          <div v-else class="w-full h-full bg-primary flex items-center justify-center">
+            <span class="text-on-primary text-[8px] font-bold">{{ initials(authStore.user?.name ?? '') }}</span>
+          </div>
+        </div>
+        <span class="text-[10px] font-medium">{{ t('nav.profile') }}</span>
       </button>
     </div>
   </nav>
@@ -243,6 +284,9 @@ const notifOpen = ref(false)
 const notifRef = ref<HTMLElement | null>(null)
 const pointsDrawerOpen = ref(false)
 const avatarError = ref(false)
+const avatarMenuOpen = ref(false)
+const avatarRef = ref<HTMLElement | null>(null)
+const hasUnread = ref(false)
 
 function initials(name: string): string {
   return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
@@ -255,6 +299,7 @@ onMounted(async () => {
     scoresStore.fetchMyTotal(),
     activityStore.fetchActivity(10),
   ])
+  if (activityStore.events.length > 0) hasUnread.value = true
   document.addEventListener('click', onClickOutside)
 })
 
@@ -264,11 +309,15 @@ onUnmounted(() => {
 
 function toggleNotif() {
   notifOpen.value = !notifOpen.value
+  if (notifOpen.value) hasUnread.value = false
 }
 
 function onClickOutside(e: MouseEvent) {
   if (notifRef.value && !notifRef.value.contains(e.target as Node)) {
     notifOpen.value = false
+  }
+  if (avatarRef.value && !avatarRef.value.contains(e.target as Node)) {
+    avatarMenuOpen.value = false
   }
 }
 

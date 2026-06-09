@@ -8,21 +8,28 @@
     "lightMode": "Cambiar a modo claro",
     "darkMode": "Cambiar a modo oscuro",
     "recentActivity": "Actividad reciente",
-    "noActivity": "No hay actividad reciente"
+    "noActivity": "No hay actividad reciente",
+    "profile": "Perfil"
   },
   "login": {
-    "tagline": "Comienza tu camino a la gloria",
-    "subtitle": "Únete a la mayor competencia de predicciones del mundo.",
-    "withGoogle": "Iniciar sesión con Google",
-    "orWith": "o accede con",
-    "footer": "© 2026 Prode World Cup Platform. Todos los derechos reservados.",
+    "tagline": "¡Vamos Argentina, carajo!",
+    "subtitle": "Predecí, competí y demostrá que la viste de arriba.",
+    "withGoogle": "Entrar con Google",
+    "orWith": "o también con",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "namePlaceholder": "Tu nombre",
+    "emailPlaceholder": "Tu email",
+    "passwordPlaceholder": "Contraseña (mín. 6 caracteres)",
+    "loading": "Cargando...",
+    "footer": "© 2026 Prode Mundial. Todos los derechos reservados.",
     "rules": "Reglas",
     "privacy": "Privacidad",
     "support": "Soporte"
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Bienvenido, {name}"
+    "welcome": "¡Buenas, {name}!"
   },
   "matches": {
     "title": "Partidos",
@@ -35,27 +42,27 @@
     "pendingResult": "resultado"
   },
   "prediction": {
-    "save": "Guardar predicción",
-    "update": "Actualizar predicción",
+    "save": "¡Me la juego así!",
+    "update": "Cambiar predicción",
     "saving": "Guardando...",
     "closed": "Predicción cerrada",
-    "closedError": "El plazo para esta predicción ya cerró.",
+    "closedError": "El plazo para esta predicción ya cerró. ¡La próxima!",
     "saveError": "Error al guardar. Intentá de nuevo.",
     "closesIn": "Cierra en",
     "closedLabel": "cerrado"
   },
   "leagues": {
     "title": "Ligas",
-    "subtitle": "Gestioná tus ligas y seguí las posiciones",
+    "subtitle": "Armá tu grupo de cracks y seguí las posiciones",
     "create": "Crear liga",
     "join": "Unirse",
-    "noLeagues": "No pertenecés a ninguna liga aún. Creá una o unite con un código.",
+    "noLeagues": "Todavía no estás en ninguna liga. ¡Armá una con los pibes o unite con un código!",
     "standings": "Posiciones",
     "myLeagues": "Mis Ligas",
     "noStandings": "Todavía no hay posiciones para esta liga.",
     "errorStandings": "Error al cargar la tabla",
     "viewLeagues": "Ver ligas",
-    "members": "{count} miembros",
+    "members": "{count} cracks",
     "myPoints": "Mis puntos:",
     "rank": "Puesto",
     "rankOf": "de {total}"
@@ -66,7 +73,7 @@
   "groupDialog": {
     "createTitle": "Crear Liga",
     "leagueName": "Nombre de la liga",
-    "leagueNamePlaceholder": "Ej: Los Cracks del Mundial",
+    "leagueNamePlaceholder": "Ej: Los Cracks del Monumental",
     "prizes": "Premios (opcional)",
     "cancel": "Cancelar",
     "creating": "Creando...",
@@ -78,12 +85,12 @@
     "joinBtn": "Unirse",
     "invalidCode": "Código inválido.",
     "joinError": "Error al unirse. Intentá de nuevo.",
-    "prize1Placeholder": "Ej: Pizza para el ganador",
-    "prize2Placeholder": "Ej: Cerveza para el segundo",
-    "prize3Placeholder": "Ej: Nada para el tercero"
+    "prize1Placeholder": "Ej: Pizza para el campeón",
+    "prize2Placeholder": "Ej: Birra para el segundo",
+    "prize3Placeholder": "Ej: Nada y que aguante la vergüenza"
   },
   "leagueDetail": {
-    "members": "miembros",
+    "members": "cracks",
     "inviteCode": "Código de invitación",
     "copied": "¡Copiado!",
     "copy": "Copiar",
@@ -97,30 +104,30 @@
     "myLeagues": "Mis Ligas",
     "viewLeagues": "Ver ligas",
     "error": "Error al cargar posición",
-    "noLeagues": "No pertenecés a ninguna liga aún.",
+    "noLeagues": "Todavía no estás en ninguna liga.",
     "createLeague": "Crear liga",
     "joinCode": "Unirse con código",
-    "members": "miembros"
+    "members": "cracks"
   },
   "upcomingMatches": {
-    "title": "Próximos Partidos",
+    "title": "Los próximos partidos",
     "viewAll": "Ver todos",
     "error": "Error al cargar partidos",
     "noMatches": "No hay partidos próximos"
   },
   "recentMatches": {
-    "title": "Partidos Recientes"
+    "title": "Últimos resultados"
   },
   "activity": {
-    "title": "Actividad Reciente",
+    "title": "Lo que pasó",
     "error": "Error al cargar actividad",
-    "empty": "No hay actividad reciente",
+    "empty": "Nada por acá todavía",
     "moreAbove": "{count} más arriba",
-    "predictionSubmitted": "Predijiste {score} en {match}",
-    "predictionUpdated": "Actualizaste tu predicción a {score} en {match}",
-    "scoreCalculated": "Acumulaste {points} pt{plural} en {match} — {type}",
+    "predictionSubmitted": "Jugaste {score} en {match}",
+    "predictionUpdated": "Cambiaste tu apuesta a {score} en {match}",
+    "scoreCalculated": "Sumaste {points} pt{plural} en {match} — {type}",
     "groupCreated": "Creaste la liga \"{name}\"",
-    "groupJoined": "Te uniste a la liga \"{name}\"",
+    "groupJoined": "Te sumaste a la liga \"{name}\"",
     "unknown": "Actividad desconocida",
     "aMatch": "un partido",
     "exact": "marcador exacto",
@@ -131,23 +138,32 @@
   "points": {
     "title": "Mis puntos",
     "noPoints": "Todavía no sumaste puntos",
-    "noPointsHint": "Los puntos se calculan cuando el admin carga los resultados",
+    "noPointsHint": "Los puntos se cargan cuando terminan los partidos",
     "pending": "Pendientes de resultado",
     "myPred": "Tu pred:",
     "waiting": "esperando",
-    "exact": "Exacto",
+    "exact": "¡Exacto!",
     "outcome": "Resultado",
     "noScore": "Sin puntos"
   },
   "distribution": {
-    "title": "Distribución de Predicciones",
-    "preClosed": "Las predicciones se mostrarán después del cierre",
+    "title": "¿Cómo la jugaron?",
+    "preClosed": "Las predicciones se muestran después del cierre",
     "deadline": "Cierre:",
     "predictions": "{count} predicciones",
-    "homeWin": "Victoria {team}",
+    "homeWin": "Gana {team}",
     "draw": "Empate",
-    "awayWin": "Victoria {team}",
+    "awayWin": "Gana {team}",
     "error": "Error al cargar distribución"
+  },
+  "communityInsights": {
+    "title": "¿Cómo la ve la gente?",
+    "homeWin": "Gana el local",
+    "draw": "Empate",
+    "awayWin": "Gana el visitante",
+    "votes": "{n} se la jugaron",
+    "noMatches": "No hay próximos partidos.",
+    "error": "Error al cargar insights."
   },
   "common": {
     "pts": "pts",

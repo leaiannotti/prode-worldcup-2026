@@ -51,6 +51,12 @@ const routes: RouteRecordRaw[] = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('../views/AdminView.vue'),
+    meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
     path: '/',
     redirect: '/dashboard'
   }
@@ -62,20 +68,25 @@ const router = createRouter({
 })
 
 // Route guard for auth check
+const ADMIN_EMAIL = 'leandro.iannotti87@gmail.com'
+
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
   const requiresAuth = to.meta.requiresAuth
 
   if (requiresAuth) {
-    // Check if user is authenticated by fetching /api/auth/me
     if (!authStore.isAuthenticated) {
       const isAuthenticated = await authStore.fetchMe()
       if (!isAuthenticated) {
-        // Not authenticated, redirect to login
         next({ name: 'Login' })
         return
       }
     }
+  }
+
+  if (to.meta.requiresAdmin && authStore.user?.email !== ADMIN_EMAIL) {
+    next({ name: 'Dashboard' })
+    return
   }
 
   next()

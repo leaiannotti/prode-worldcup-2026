@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from typing import Dict, Any
 import jwt
 from flask import current_app, Flask
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.extensions import db
 from app.models import User
 
@@ -86,6 +87,59 @@ def set_jwt_cookie(response, token: str):
         samesite="Lax",
         max_age=int(7 * 24 * 60 * 60)  # 7 days in seconds
     )
+
+
+def register_email_user(email: str, password: str, name: str) -> User:
+    """Register a new user with email and password.
+
+    Args:
+        email: User email address
+        password: Plain-text password (will be hashed)
+        name: Display name
+
+    Returns:
+        Newly created User object
+
+    Raises:
+        ValueError: If email is already registered
+    """
+    existing = db.session.query(User).filter_by(email=email).first()
+    if existing:
+        raise ValueError("email_already_registered")
+
+    user = User(
+        email=email,
+        name=name,
+        password_hash=generate_password_hash(password),
+        last_login_at=datetime.utcnow(),
+    )
+    db.session.add(user)
+    db.session.commit()
+    return user
+
+
+def login_email_user(email: str, password: str) -> User:
+    """Authenticate a user with email and password.
+
+    Args:
+        email: User email address
+        password: Plain-text password
+
+    Returns:
+        Authenticated User object
+
+    Raises:
+        ValueError: If credentials are invalid
+    """
+    user = db.session.query(User).filter_by(email=email).first()
+    if not user or not user.password_hash:
+        raise ValueError("invalid_credentials")
+    if not check_password_hash(user.password_hash, password):
+        raise ValueError("invalid_credentials")
+
+    user.last_login_at = datetime.utcnow()
+    db.session.commit()
+    return user
 
 
 def validate_jwt(token: str) -> Dict[str, Any]:
