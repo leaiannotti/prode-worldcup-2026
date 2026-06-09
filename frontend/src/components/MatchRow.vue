@@ -35,11 +35,11 @@
       <div class="flex-shrink-0 flex flex-col items-center justify-center w-10">
         <template v-if="match.status === 'finished' && match.home_score !== null">
           <span class="text-xs font-bold text-on-surface tabular-nums">{{ match.home_score }}-{{ match.away_score }}</span>
-          <span class="text-[8px] uppercase tracking-wide text-on-surface-variant">Final</span>
+          <span class="text-[8px] uppercase tracking-wide text-on-surface-variant">{{ t('common.final') }}</span>
         </template>
         <template v-else-if="isPendingResult">
-          <span class="text-[9px] font-medium text-on-surface-variant/60 leading-tight text-center">Procesando</span>
-          <span class="text-[8px] text-on-surface-variant/40">resultado</span>
+          <span class="text-[9px] font-medium text-on-surface-variant/60 leading-tight text-center">{{ t('matches.pending') }}</span>
+          <span class="text-[8px] text-on-surface-variant/40">{{ t('matches.pendingResult') }}</span>
         </template>
         <template v-else>
           <span class="text-[10px] font-medium text-on-surface-variant">{{ formatTime(match.kickoff_at) }}</span>
@@ -87,11 +87,11 @@
         <div class="flex-shrink-0 w-12 flex flex-col items-center">
           <template v-if="match.status === 'finished' && match.home_score !== null">
             <span class="text-sm font-bold text-on-surface tabular-nums">{{ match.home_score }} - {{ match.away_score }}</span>
-            <span class="text-[9px] uppercase tracking-wide text-on-surface-variant">Final</span>
+            <span class="text-[9px] uppercase tracking-wide text-on-surface-variant">{{ t('common.final') }}</span>
           </template>
           <template v-else-if="isPendingResult">
-            <span class="text-[10px] font-medium text-on-surface-variant/60 leading-tight text-center">Procesando</span>
-            <span class="text-[9px] text-on-surface-variant/40">resultado</span>
+            <span class="text-[10px] font-medium text-on-surface-variant/60 leading-tight text-center">{{ t('matches.pending') }}</span>
+            <span class="text-[9px] text-on-surface-variant/40">{{ t('matches.pendingResult') }}</span>
           </template>
           <template v-else>
             <span class="text-xs font-medium text-on-surface-variant">VS</span>
@@ -138,6 +138,7 @@ import type { Match } from '@/stores/matches'
 import type { Prediction } from '@/stores/predictions'
 import MatchCountdownBadge from './MatchCountdownBadge.vue'
 import { formatDay, formatTime } from '@/composables/useDateFormat'
+import { useI18n } from 'vue-i18n'
 
 const props = withDefaults(defineProps<{
   match: Match
@@ -151,6 +152,7 @@ const props = withDefaults(defineProps<{
   disabled: false,
 })
 
+const { t } = useI18n()
 const emit = defineEmits<{ (e: 'select', matchId: number): void }>()
 
 const isPendingResult = computed(() =>

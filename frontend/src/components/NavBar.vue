@@ -47,7 +47,7 @@
         <button
           @click="themeStore.toggle()"
           class="p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors cursor-pointer"
-          :title="themeStore.isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+          :title="themeStore.isDark ? t('nav.lightMode') : t('nav.darkMode')"
         >
           <!-- Sun (show in dark mode to switch to light) -->
           <svg v-if="themeStore.isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@
               class="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-2rem))] bg-surface rounded-xl border border-outline-variant shadow-lg overflow-hidden z-50"
             >
               <div class="px-4 py-3 border-b border-outline-variant flex items-center justify-between">
-                <p class="text-sm font-semibold text-on-surface">Actividad reciente</p>
+                <p class="text-sm font-semibold text-on-surface">{{ t('nav.recentActivity') }}</p>
                 <button @click="notifOpen = false" class="text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -91,8 +91,8 @@
               </div>
 
               <div v-else-if="activityStore.events.length === 0" class="px-4 py-6 text-center text-sm text-on-surface-variant">
-                No hay actividad reciente
-              </div>
+                 {{ t('nav.noActivity') }}
+               </div>
 
               <div v-else class="divide-y divide-outline-variant max-h-72 overflow-y-auto">
                 <div
@@ -125,16 +125,34 @@
           </Transition>
         </div>
 
+        <!-- Language toggle -->
+        <button
+          @click="switchLocale"
+          class="hidden sm:flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
+          :title="locale === 'es' ? 'Switch to English' : 'Cambiar a Español'"
+        >
+          {{ locale === 'es' ? 'EN' : 'ES' }}
+        </button>
+
         <!-- Avatar -->
         <div v-if="authStore.user" class="w-8 h-8 rounded-full overflow-hidden border-2 border-primary flex-shrink-0">
-          <img :src="authStore.user.picture || ''" :alt="authStore.user.name" class="w-full h-full object-cover" />
+          <img
+            v-if="authStore.user.picture && !avatarError"
+            :src="authStore.user.picture"
+            :alt="authStore.user.name"
+            class="w-full h-full object-cover"
+            @error="avatarError = true"
+          />
+          <div v-else class="w-full h-full bg-primary flex items-center justify-center">
+            <span class="text-on-primary text-[10px] font-bold">{{ initials(authStore.user.name) }}</span>
+          </div>
         </div>
 
         <!-- Logout (desktop only) -->
         <button
           @click="handleLogout"
           class="hidden md:flex p-2 text-on-surface-variant hover:bg-surface-container rounded-full transition-colors cursor-pointer"
-          title="Cerrar sesión"
+          :title="t('nav.logoutFull')"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -177,7 +195,7 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
-        <span class="text-[10px] font-medium">Salir</span>
+        <span class="text-[10px] font-medium">{{ t('nav.logout') }}</span>
       </button>
     </div>
   </nav>
@@ -199,6 +217,10 @@ import { useActivityStore } from '@/stores/activity'
 import { useThemeStore } from '@/stores/theme'
 import PointsDrawer from '@/components/PointsDrawer.vue'
 import { formatRelativeTime } from '@/composables/useDateFormat'
+import { useI18n } from 'vue-i18n'
+import { setLocale } from '@/i18n'
+
+const { t, locale } = useI18n()
 
 const authStore = useAuthStore()
 const scoresStore = useScoresStore()
@@ -206,15 +228,25 @@ const activityStore = useActivityStore()
 const themeStore = useThemeStore()
 const router = useRouter()
 
-const navLinks = [
-  { to: '/dashboard', label: 'Dashboard' },
-  { to: '/matches', label: 'Partidos' },
-  { to: '/grupos', label: 'Ligas' },
-]
+const navLinks = computed(() => [
+  { to: '/dashboard', label: t('nav.dashboard') },
+  { to: '/matches', label: t('nav.matches') },
+  { to: '/grupos', label: t('nav.leagues') },
+])
+
+function switchLocale() {
+  const next = locale.value === 'es' ? 'en' : 'es'
+  setLocale(next as 'es' | 'en')
+}
 
 const notifOpen = ref(false)
 const notifRef = ref<HTMLElement | null>(null)
 const pointsDrawerOpen = ref(false)
+const avatarError = ref(false)
+
+function initials(name: string): string {
+  return name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
+}
 
 const totalPoints = computed(() => scoresStore.myTotalPoints)
 
@@ -254,22 +286,19 @@ function iconColor(type: string): string {
 
 function eventText(event: any): string {
   const p = event.payload || {}
+  const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : t('activity.aMatch')
   switch (event.event_type) {
-    case 'prediction_submitted': {
-      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
-      return `Predijiste ${p.home_score}-${p.away_score} en ${match}`
-    }
-    case 'prediction_updated': {
-      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
-      return `Actualizaste a ${p.home_score}-${p.away_score} en ${match}`
-    }
+    case 'prediction_submitted':
+      return t('activity.predictionSubmitted', { score: `${p.home_score}-${p.away_score}`, match })
+    case 'prediction_updated':
+      return t('activity.predictionUpdated', { score: `${p.home_score}-${p.away_score}`, match })
     case 'score_calculated': {
-      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
-      return `${p.points} pt${p.points !== 1 ? 's' : ''} en ${match}`
+      const plural = p.points !== 1 ? 's' : ''
+      return t('activity.scoreCalculated', { points: p.points, plural, match, type: '' }).replace(' — ', '')
     }
-    case 'group_created': return `Creaste la liga "${p.group_name || 'nueva'}"`
-    case 'group_joined': return `Te uniste a la liga "${p.group_name || 'una liga'}"`
-    default: return 'Actividad'
+    case 'group_created': return t('activity.groupCreated', { name: p.group_name || t('activity.aLeague') })
+    case 'group_joined': return t('activity.groupJoined', { name: p.group_name || t('activity.aLeague') })
+    default: return t('activity.unknown')
   }
 }
 

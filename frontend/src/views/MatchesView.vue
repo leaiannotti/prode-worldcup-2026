@@ -5,8 +5,8 @@
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 class="font-headline-lg text-headline-lg text-primary">Partidos</h1>
-          <p class="font-body-md text-on-surface-variant mt-1">Mundial 2026 — todos los partidos de la fase de grupos</p>
+          <h1 class="font-headline-lg text-headline-lg text-primary">{{ t('matches.title') }}</h1>
+          <p class="font-body-md text-on-surface-variant mt-1">{{ t('matches.subtitle') }}</p>
         </div>
 
         <!-- Filter -->
@@ -16,8 +16,8 @@
             @change="load"
             class="appearance-none w-full sm:w-44 px-4 py-2.5 pr-10 bg-surface-container-low border border-outline-variant rounded-xl text-sm font-medium text-on-surface focus:border-primary focus:ring-1 focus:ring-primary outline-none cursor-pointer"
           >
-            <option value="">Todos los grupos</option>
-            <option v-for="g in WORLD_CUP_GROUPS" :key="g" :value="g">Grupo {{ g }}</option>
+            <option value="">{{ t('matches.allGroups') }}</option>
+            <option v-for="g in WORLD_CUP_GROUPS" :key="g" :value="g">{{ t('matches.group', { name: g }) }}</option>
           </select>
           <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-variant pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -38,7 +38,7 @@
         <section v-for="group in groupedMatches" :key="group.name">
           <!-- Group header -->
           <div class="flex items-center gap-3 mb-2">
-            <span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Grupo {{ group.name }}</span>
+            <span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">{{ t('matches.group', { name: group.name }) }}</span>
             <div class="flex-1 h-px bg-outline-variant"></div>
           </div>
 
@@ -60,7 +60,7 @@
 
       <!-- Empty -->
       <div v-else class="text-center py-12 text-on-surface-variant">
-        <p class="font-body-md">No hay partidos para este grupo.</p>
+        <p class="font-body-md">{{ t('matches.noMatches') }}</p>
       </div>
     </div>
 
@@ -76,6 +76,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useMatchesStore } from '@/stores/matches'
 import { usePredictionsStore } from '@/stores/predictions'
 import { useActivityStore } from '@/stores/activity'
@@ -86,6 +87,7 @@ import type { Match } from '@/stores/matches'
 
 const WORLD_CUP_GROUPS = ['A','B','C','D','E','F','G','H','I','J','K','L']
 
+const { t } = useI18n()
 const matchesStore = useMatchesStore()
 const predictionsStore = usePredictionsStore()
 const activityStore = useActivityStore()

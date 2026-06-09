@@ -3,15 +3,15 @@
     <!-- Create League Dialog -->
     <div v-if="showCreate" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" @click.self="emit('close-create')">
       <div class="bg-surface text-on-surface rounded-xl border border-outline-variant p-6 max-w-md w-full shadow-xl space-y-5">
-        <h3 class="font-headline-sm text-headline-sm text-primary">Crear Liga</h3>
+        <h3 class="font-headline-sm text-headline-sm text-primary">{{ t('groupDialog.createTitle') }}</h3>
 
         <!-- Name -->
         <div class="space-y-1.5">
-          <label class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Nombre de la liga</label>
+          <label class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('groupDialog.leagueName') }}</label>
           <input
             v-model="newGroupName"
             type="text"
-            placeholder="Ej: Los Cracks del Mundial"
+            :placeholder="t('groupDialog.leagueNamePlaceholder')"
             class="w-full px-4 py-2.5 bg-surface-container-low text-on-surface border border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none text-sm placeholder:text-on-surface-variant/50"
             @keyup.enter="handleCreate"
           />
@@ -20,7 +20,7 @@
         <!-- Prizes -->
         <div class="space-y-3">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Premios (opcional)</label>
+            <label class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('groupDialog.prizes') }}</label>
             <div class="flex items-center gap-1">
               <button
                 v-for="n in [0, 1, 2, 3]"
@@ -54,14 +54,14 @@
 
         <div class="flex gap-2">
           <button @click="emit('close-create')" class="flex-1 px-4 py-2.5 bg-surface-container-low text-on-surface border border-outline-variant rounded-lg font-semibold text-sm hover:bg-surface-container transition-all cursor-pointer">
-            Cancelar
+            {{ t('groupDialog.cancel') }}
           </button>
           <button
             @click="handleCreate"
             :disabled="isCreating || !newGroupName.trim()"
             class="flex-1 px-4 py-2.5 bg-primary text-on-primary rounded-lg font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-40 cursor-pointer"
           >
-            {{ isCreating ? 'Creando...' : 'Crear' }}
+            {{ isCreating ? t('groupDialog.creating') : t('groupDialog.create') }}
           </button>
         </div>
       </div>
@@ -70,9 +70,9 @@
     <!-- Join League Dialog -->
     <div v-if="showJoin" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" @click.self="emit('close-join')">
       <div class="bg-surface text-on-surface rounded-xl border border-outline-variant p-6 max-w-md w-full shadow-xl space-y-4">
-        <h3 class="font-headline-sm text-headline-sm text-primary">Unirse a una Liga</h3>
+        <h3 class="font-headline-sm text-headline-sm text-primary">{{ t('groupDialog.joinTitle') }}</h3>
         <div class="space-y-1.5">
-          <label class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Código de invitación</label>
+          <label class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('groupDialog.inviteCode') }}</label>
           <input
             v-model="inviteCode"
             type="text"
@@ -84,14 +84,14 @@
         <p v-if="joinError" class="text-error text-sm">{{ joinError }}</p>
         <div class="flex gap-2">
           <button @click="emit('close-join')" class="flex-1 px-4 py-2.5 bg-surface-container-low text-on-surface border border-outline-variant rounded-lg font-semibold text-sm hover:bg-surface-container transition-all cursor-pointer">
-            Cancelar
+            {{ t('groupDialog.cancel') }}
           </button>
           <button
             @click="handleJoin"
             :disabled="isJoining || !inviteCode.trim()"
             class="flex-1 px-4 py-2.5 bg-secondary text-on-secondary rounded-lg font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-40 cursor-pointer"
           >
-            {{ isJoining ? 'Uniendo...' : 'Unirse' }}
+            {{ isJoining ? t('groupDialog.joining') : t('groupDialog.joinBtn') }}
           </button>
         </div>
       </div>
@@ -103,6 +103,7 @@
 import { ref, watch } from 'vue'
 import { useGroupsStore } from '@/stores/groups'
 import type { Prize } from '@/stores/groups'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   showCreate: boolean
@@ -116,6 +117,7 @@ const emit = defineEmits<{
   (e: 'joined'): void
 }>()
 
+const { t } = useI18n()
 const groupsStore = useGroupsStore()
 
 const newGroupName = ref('')
@@ -154,7 +156,7 @@ async function handleCreate() {
     emit('created')
     emit('close-create')
   } catch {
-    createError.value = 'Error al crear la liga. Intentá de nuevo.'
+    createError.value = t('groupDialog.createError')
   } finally {
     isCreating.value = false
   }
@@ -169,7 +171,7 @@ async function handleJoin() {
     emit('joined')
     emit('close-join')
   } catch (err: any) {
-    joinError.value = err.response?.status === 404 ? 'Código inválido.' : 'Error al unirse. Intentá de nuevo.'
+    joinError.value = err.response?.status === 404 ? t('groupDialog.invalidCode') : t('groupDialog.joinError')
   } finally {
     isJoining.value = false
   }
@@ -182,9 +184,9 @@ function rankStyle(rank: number): string {
 }
 
 function rankPlaceholder(rank: number): string {
-  if (rank === 1) return 'Ej: Pizza para el ganador'
-  if (rank === 2) return 'Ej: Cerveza para el segundo'
-  return 'Ej: Nada para el tercero 😅'
+  if (rank === 1) return t('groupDialog.prize1Placeholder')
+  if (rank === 2) return t('groupDialog.prize2Placeholder')
+  return t('groupDialog.prize3Placeholder')
 }
 </script>
 

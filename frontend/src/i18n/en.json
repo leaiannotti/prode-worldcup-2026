@@ -1,0 +1,157 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "matches": "Matches",
+    "leagues": "Leagues",
+    "logout": "Sign out",
+    "logoutFull": "Sign out",
+    "lightMode": "Switch to light mode",
+    "darkMode": "Switch to dark mode",
+    "recentActivity": "Recent activity",
+    "noActivity": "No recent activity"
+  },
+  "login": {
+    "tagline": "Start your road to glory",
+    "subtitle": "Join the world's greatest predictions competition.",
+    "withGoogle": "Sign in with Google",
+    "orWith": "or sign in with",
+    "footer": "© 2026 Prode World Cup Platform. All rights reserved.",
+    "rules": "Rules",
+    "privacy": "Privacy",
+    "support": "Support"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome, {name}"
+  },
+  "matches": {
+    "title": "Matches",
+    "subtitle": "World Cup 2026 — all group stage matches",
+    "allGroups": "All groups",
+    "group": "Group {name}",
+    "noMatches": "No matches for this group.",
+    "viewAll": "View all",
+    "pending": "Processing",
+    "pendingResult": "result"
+  },
+  "prediction": {
+    "save": "Save prediction",
+    "update": "Update prediction",
+    "saving": "Saving...",
+    "closed": "Prediction closed",
+    "closedError": "The deadline for this prediction has passed.",
+    "saveError": "Error saving. Please try again.",
+    "closesIn": "Closes in",
+    "closedLabel": "closed"
+  },
+  "leagues": {
+    "title": "Leagues",
+    "subtitle": "Manage your leagues and track standings",
+    "create": "Create league",
+    "join": "Join",
+    "noLeagues": "You don't belong to any league yet. Create one or join with a code.",
+    "standings": "Standings",
+    "myLeagues": "My Leagues",
+    "noStandings": "No standings yet for this league.",
+    "errorStandings": "Error loading standings",
+    "viewLeagues": "View leagues",
+    "members": "{count} members",
+    "myPoints": "My points:",
+    "rank": "Rank",
+    "rankOf": "of {total}"
+  },
+  "groupCard": {
+    "viewDetail": "View details"
+  },
+  "groupDialog": {
+    "createTitle": "Create League",
+    "leagueName": "League name",
+    "leagueNamePlaceholder": "E.g.: The World Cup Legends",
+    "prizes": "Prizes (optional)",
+    "cancel": "Cancel",
+    "creating": "Creating...",
+    "create": "Create",
+    "createError": "Error creating league. Please try again.",
+    "joinTitle": "Join a League",
+    "inviteCode": "Invite code",
+    "joining": "Joining...",
+    "joinBtn": "Join",
+    "invalidCode": "Invalid code.",
+    "joinError": "Error joining. Please try again.",
+    "prize1Placeholder": "E.g.: Pizza for the winner",
+    "prize2Placeholder": "E.g.: Drinks for second place",
+    "prize3Placeholder": "E.g.: Nothing for third place"
+  },
+  "leagueDetail": {
+    "members": "members",
+    "inviteCode": "Invite code",
+    "copied": "Copied!",
+    "copy": "Copy",
+    "prizes": "Prizes",
+    "noPrizes": "No prizes configured",
+    "leaving": "Leaving...",
+    "leave": "Leave league",
+    "leaveError": "Error leaving. Please try again."
+  },
+  "standing": {
+    "myLeagues": "My Leagues",
+    "viewLeagues": "View leagues",
+    "error": "Error loading position",
+    "noLeagues": "You don't belong to any league yet.",
+    "createLeague": "Create league",
+    "joinCode": "Join with code",
+    "members": "members"
+  },
+  "upcomingMatches": {
+    "title": "Upcoming Matches",
+    "viewAll": "View all",
+    "error": "Error loading matches",
+    "noMatches": "No upcoming matches"
+  },
+  "recentMatches": {
+    "title": "Recent Matches"
+  },
+  "activity": {
+    "title": "Recent Activity",
+    "error": "Error loading activity",
+    "empty": "No recent activity",
+    "moreAbove": "{count} more above",
+    "predictionSubmitted": "You predicted {score} in {match}",
+    "predictionUpdated": "You updated your prediction to {score} in {match}",
+    "scoreCalculated": "You earned {points} pt{plural} in {match} — {type}",
+    "groupCreated": "You created league \"{name}\"",
+    "groupJoined": "You joined league \"{name}\"",
+    "unknown": "Unknown activity",
+    "aMatch": "a match",
+    "exact": "exact score",
+    "outcome": "correct outcome",
+    "noPoints": "no points",
+    "aLeague": "a league"
+  },
+  "points": {
+    "title": "My points",
+    "noPoints": "No points yet",
+    "noPointsHint": "Points are calculated when the admin enters results",
+    "pending": "Pending results",
+    "myPred": "My pred:",
+    "waiting": "waiting",
+    "exact": "Exact",
+    "outcome": "Outcome",
+    "noScore": "No points"
+  },
+  "distribution": {
+    "title": "Prediction Distribution",
+    "preClosed": "Predictions will be shown after the deadline",
+    "deadline": "Deadline:",
+    "predictions": "{count} predictions",
+    "homeWin": "{team} win",
+    "draw": "Draw",
+    "awayWin": "{team} win",
+    "error": "Error loading distribution"
+  },
+  "common": {
+    "pts": "pts",
+    "vs": "VS",
+    "final": "Final"
+  }
+}

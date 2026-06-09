@@ -4,9 +4,9 @@
 
       <!-- Hero Section -->
       <section>
-        <h1 class="font-headline-lg text-headline-lg text-primary mb-1">Dashboard</h1>
+        <h1 class="font-headline-lg text-headline-lg text-primary mb-1">{{ t('dashboard.title') }}</h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant">
-          Bienvenido, {{ authStore.user?.name }}
+          {{ t('dashboard.welcome', { name: authStore.user?.name }) }}
         </p>
       </section>
 
@@ -48,6 +48,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '@/stores/groups'
 import { useMatchesStore } from '@/stores/matches'
 import { usePredictionsStore } from '@/stores/predictions'
@@ -60,6 +61,7 @@ import RecentMatchesWidget from '@/components/RecentMatchesWidget.vue'
 import PredictionModal from '@/components/PredictionModal.vue'
 import GroupDialogs from '@/components/GroupDialogs.vue'
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 const groupsStore = useGroupsStore()
 const matchesStore = useMatchesStore()

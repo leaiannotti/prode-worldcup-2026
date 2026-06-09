@@ -15,7 +15,7 @@
           <!-- Header -->
           <div class="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
             <div>
-              <p class="text-xs font-medium uppercase tracking-widest text-on-surface-variant">Mis puntos</p>
+              <p class="text-xs font-medium uppercase tracking-widest text-on-surface-variant">{{ t('points.title') }}</p>
               <p class="text-2xl font-bold text-primary tabular-nums mt-0.5">{{ totalPoints ?? '—' }} pts</p>
             </div>
             <button @click="emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant">
@@ -35,8 +35,8 @@
 
             <!-- Empty -->
             <div v-else-if="!scoredHistory.length" class="flex flex-col items-center justify-center h-48 text-on-surface-variant">
-              <p class="text-sm">Todavía no sumaste puntos</p>
-              <p class="text-xs mt-1">Los puntos se calculan cuando el admin carga los resultados</p>
+              <p class="text-sm">{{ t('points.noPoints') }}</p>
+              <p class="text-xs mt-1">{{ t('points.noPointsHint') }}</p>
             </div>
 
             <!-- Scored predictions -->
@@ -67,7 +67,7 @@
                     <span class="text-on-surface-variant/30 text-xs">·</span>
                     <!-- My prediction -->
                     <span class="text-xs text-on-surface-variant">
-                      Tu pred: {{ entry.prediction.home_score }}-{{ entry.prediction.away_score }}
+                      {{ t('points.myPred') }} {{ entry.prediction.home_score }}-{{ entry.prediction.away_score }}
                     </span>
                   </div>
                 </div>
@@ -82,7 +82,7 @@
             <!-- Pending predictions (no score yet) -->
             <div v-if="pendingHistory.length" class="border-t border-outline-variant">
               <p class="px-5 py-3 text-[10px] uppercase tracking-widest text-on-surface-variant font-medium">
-                Pendientes de resultado
+                {{ t('points.pending') }}
               </p>
               <div class="divide-y divide-outline-variant">
                 <div
@@ -93,9 +93,9 @@
                   <div class="w-10 h-10 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center text-xs text-on-surface-variant">?</div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm text-on-surface">{{ entry.match.home_team_code }} vs {{ entry.match.away_team_code }}</p>
-                    <p class="text-xs text-on-surface-variant mt-0.5">Tu pred: {{ entry.prediction.home_score }}-{{ entry.prediction.away_score }}</p>
+                    <p class="text-xs text-on-surface-variant mt-0.5">{{ t('points.myPred') }} {{ entry.prediction.home_score }}-{{ entry.prediction.away_score }}</p>
                   </div>
-                  <span class="text-[10px] text-on-surface-variant uppercase tracking-wide">esperando</span>
+                  <span class="text-[10px] text-on-surface-variant uppercase tracking-wide">{{ t('points.waiting') }}</span>
                 </div>
               </div>
             </div>
@@ -109,6 +109,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { apiClient } from '@/lib/api'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   isOpen: boolean
@@ -116,6 +117,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{ (e: 'close'): void }>()
+const { t } = useI18n()
 
 interface HistoryEntry {
   match: { id: number; home_team_code: string; away_team_code: string; kickoff_utc: string; status: string }
@@ -159,9 +161,9 @@ function typeColor(points: number | null): string {
 }
 
 function scoreLabel(points: number | null): string {
-  if (points === 3) return 'Exacto'
-  if (points === 1) return 'Resultado'
-  return 'Sin puntos'
+  if (points === 3) return t('points.exact')
+  if (points === 1) return t('points.outcome')
+  return t('points.noScore')
 }
 </script>
 

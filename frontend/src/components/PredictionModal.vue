@@ -65,7 +65,7 @@
             <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
             </svg>
-            Cierra en {{ timeLeft }}
+            {{ t('prediction.closesIn') }} {{ timeLeft }}
           </div>
 
           <!-- Score inputs -->
@@ -114,10 +114,10 @@
             :disabled="isSubmitting || isDeadlinePassed"
             class="w-full py-3 bg-primary text-on-primary rounded-xl font-bold text-sm hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-40"
           >
-            <span v-if="isSubmitting">Guardando...</span>
-            <span v-else-if="isDeadlinePassed">Predicción cerrada</span>
-            <span v-else-if="existingPrediction">Actualizar predicción</span>
-            <span v-else>Guardar predicción</span>
+            <span v-if="isSubmitting">{{ t('prediction.saving') }}</span>
+            <span v-else-if="isDeadlinePassed">{{ t('prediction.closed') }}</span>
+            <span v-else-if="existingPrediction">{{ t('prediction.update') }}</span>
+            <span v-else>{{ t('prediction.save') }}</span>
           </button>
         </div>
       </div>
@@ -130,6 +130,7 @@ import { ref, computed, watch } from 'vue'
 import { usePredictionsStore } from '@/stores/predictions'
 import type { Match } from '@/stores/matches'
 import { formatDay, formatTime } from '@/composables/useDateFormat'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   isOpen: boolean
@@ -141,6 +142,7 @@ const emit = defineEmits<{
   (e: 'saved'): void
 }>()
 
+const { t } = useI18n()
 const predictionsStore = usePredictionsStore()
 
 const homeScore = ref(0)
@@ -183,9 +185,9 @@ const isDeadlineSoon = computed(() => {
 const timeLeft = computed(() => {
   if (!props.match) return ''
   const ms = new Date(props.match.prediction_deadline_at).getTime() - Date.now()
-  if (ms <= 0) return 'cerrado'
   const h = Math.floor(ms / 3600000)
   const m = Math.floor((ms % 3600000) / 60000)
+  if (ms <= 0) return t('prediction.closedLabel')
   return h > 0 ? `${h}h ${m}m` : `${m}m`
 })
 
@@ -203,9 +205,9 @@ async function submit() {
     emit('close')
   } catch (err: any) {
     if (err.status === 423) {
-      errorMsg.value = 'El plazo para esta predicción ya cerró.'
+      errorMsg.value = t('prediction.closedError')
     } else {
-      errorMsg.value = 'Error al guardar. Intentá de nuevo.'
+      errorMsg.value = t('prediction.saveError')
     }
   } finally {
     isSubmitting.value = false

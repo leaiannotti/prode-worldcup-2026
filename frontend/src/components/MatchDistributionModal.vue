@@ -3,7 +3,7 @@
     <div class="bg-surface rounded-xl p-6 max-w-md w-full space-y-4">
       <!-- Header -->
       <div class="flex items-center justify-between">
-        <h3 class="font-headline-sm text-headline-sm text-primary">Distribución de Predicciones</h3>
+        <h3 class="font-headline-sm text-headline-sm text-primary">{{ t('distribution.title') }}</h3>
         <button @click="close" class="text-on-surface-variant hover:text-on-surface">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -30,23 +30,23 @@
       <!-- Pre-deadline -->
       <div v-else-if="distribution && !distribution.available" class="text-center py-6">
         <p class="font-body-md text-on-surface-variant">
-          Las predicciones se mostrarán después del cierre
+          {{ t('distribution.preClosed') }}
         </p>
         <p class="font-label-sm text-on-surface-variant mt-1">
-          Cierre: {{ formatDate(match?.prediction_deadline_at) }}
+          {{ t('distribution.deadline') }} {{ formatDate(match?.prediction_deadline_at) }}
         </p>
       </div>
 
       <!-- Distribution -->
       <div v-else-if="distribution && distribution.available" class="space-y-4">
         <p class="font-label-md text-on-surface-variant text-center">
-          {{ distribution.total_predictions }} predicciones
+          {{ t('distribution.predictions', { count: distribution.total_predictions }) }}
         </p>
 
         <!-- Home Win -->
         <div class="space-y-1">
           <div class="flex justify-between font-body-md">
-            <span>Victoria {{ match?.home_team.name }}</span>
+            <span>{{ t('distribution.homeWin', { team: match?.home_team.name }) }}</span>
             <span class="font-bold">{{ distribution.home_win_pct }}%</span>
           </div>
           <div class="h-4 bg-surface-container rounded-full overflow-hidden">
@@ -57,7 +57,7 @@
         <!-- Draw -->
         <div class="space-y-1">
           <div class="flex justify-between font-body-md">
-            <span>Empate</span>
+            <span>{{ t('distribution.draw') }}</span>
             <span class="font-bold">{{ distribution.draw_pct }}%</span>
           </div>
           <div class="h-4 bg-surface-container rounded-full overflow-hidden">
@@ -68,7 +68,7 @@
         <!-- Away Win -->
         <div class="space-y-1">
           <div class="flex justify-between font-body-md">
-            <span>Victoria {{ match?.away_team.name }}</span>
+            <span>{{ t('distribution.awayWin', { team: match?.away_team.name }) }}</span>
             <span class="font-bold">{{ distribution.away_win_pct }}%</span>
           </div>
           <div class="h-4 bg-surface-container rounded-full overflow-hidden">
@@ -88,6 +88,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { apiClient } from '@/lib/api'
+import { useI18n } from 'vue-i18n'
 
 interface Distribution {
   available: boolean
@@ -109,6 +110,7 @@ const emit = defineEmits<{
   (e: 'close'): void
 }>()
 
+const { t } = useI18n()
 const distribution = ref<Distribution | null>(null)
 const isLoading = ref(false)
 const error = ref<string | null>(null)
@@ -126,7 +128,7 @@ async function loadDistribution(matchId: number) {
     const response = await apiClient.get(`/api/matches/${matchId}/distribution`)
     distribution.value = response.data
   } catch (err: any) {
-    error.value = err.message || 'Error al cargar distribución'
+        error.value = err.message || t('distribution.error')
   } finally {
     isLoading.value = false
   }

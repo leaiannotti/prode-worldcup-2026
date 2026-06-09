@@ -5,9 +5,9 @@
       <!-- Header -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 class="font-headline-lg text-headline-lg text-primary">Ligas</h1>
+          <h1 class="font-headline-lg text-headline-lg text-primary">{{ t('leagues.title') }}</h1>
           <p class="font-body-md text-on-surface-variant mt-1">
-            Gestioná tus ligas y seguí las posiciones
+            {{ t('leagues.subtitle') }}
           </p>
         </div>
         <div class="flex items-center gap-2">
@@ -15,27 +15,27 @@
             @click="showCreate = true"
             class="px-4 py-2.5 bg-primary text-on-primary rounded-xl font-semibold text-sm hover:opacity-90 transition-all active:scale-95 whitespace-nowrap"
           >
-            Crear liga
+            {{ t('leagues.create') }}
           </button>
           <button
             @click="showJoin = true"
             class="px-4 py-2.5 border border-outline-variant text-on-surface rounded-xl font-semibold text-sm hover:bg-surface-container transition-all active:scale-95 whitespace-nowrap"
           >
-            Unirse
+            {{ t('leagues.join') }}
           </button>
         </div>
       </div>
 
       <!-- No groups -->
       <div v-if="groupsStore.groups.length === 0" class="text-center py-16">
-        <p class="font-body-md text-on-surface-variant">No pertenecés a ninguna liga aún. Creá una o unite con un código.</p>
+        <p class="font-body-md text-on-surface-variant">{{ t('leagues.noLeagues') }}</p>
       </div>
 
       <template v-else>
         <!-- Posiciones -->
         <section class="space-y-4">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <h2 class="font-headline-md text-headline-md text-on-surface">Posiciones</h2>
+            <h2 class="font-headline-md text-headline-md text-on-surface">{{ t('leagues.standings') }}</h2>
 
             <!-- Group selector -->
             <div class="relative">
@@ -61,7 +61,7 @@
 
           <!-- Error -->
           <div v-else-if="leaderboardStore.error" class="text-center py-8 text-error font-body-md">
-            Error al cargar la tabla
+            {{ t('leagues.errorStandings') }}
           </div>
 
           <!-- Table -->
@@ -133,7 +133,7 @@
 
           <!-- Empty standings -->
           <div v-else class="text-center py-10 text-on-surface-variant">
-            <p class="font-body-md">Todavía no hay posiciones para esta liga.</p>
+            <p class="font-body-md">{{ t('leagues.noStandings') }}</p>
           </div>
         </section>
 
@@ -142,7 +142,7 @@
 
         <!-- Mis Ligas -->
         <section class="space-y-3">
-          <h2 class="font-headline-md text-headline-md text-on-surface">Mis Ligas</h2>
+          <h2 class="font-headline-md text-headline-md text-on-surface">{{ t('leagues.myLeagues') }}</h2>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <GroupCard
               v-for="group in groupsStore.groups"
@@ -179,6 +179,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '@/stores/groups'
 import { useLeaderboardStore } from '@/stores/leaderboard'
 import { useScoresStore } from '@/stores/scores'
@@ -188,6 +189,7 @@ import GroupDialogs from '@/components/GroupDialogs.vue'
 import LeagueDetailModal from '@/components/LeagueDetailModal.vue'
 import type { Group } from '@/stores/groups'
 
+const { t } = useI18n()
 const route = useRoute()
 const groupsStore = useGroupsStore()
 const leaderboardStore = useLeaderboardStore()

@@ -4,9 +4,9 @@
       to="/grupos"
       class="group flex items-center justify-between mb-4"
     >
-      <h2 class="font-headline-md text-headline-md text-primary">Mis Ligas</h2>
+      <h2 class="font-headline-md text-headline-md text-primary">{{ t('standing.myLeagues') }}</h2>
       <span class="flex items-center gap-1 text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors">
-        Ver ligas
+        {{ t('standing.viewLeagues') }}
         <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
@@ -20,24 +20,24 @@
 
     <!-- Error -->
     <div v-else-if="scoresStore.error" class="text-error font-body-md">
-      Error al cargar posición
+      {{ t('standing.error') }}
     </div>
 
     <!-- Empty -->
     <div v-else-if="scoresStore.myStanding.length === 0" class="flex flex-col items-center text-center py-6 gap-4">
-      <p class="font-body-md text-on-surface-variant">No pertenecés a ninguna liga aún.</p>
+      <p class="font-body-md text-on-surface-variant">{{ t('standing.noLeagues') }}</p>
       <div class="flex gap-2">
         <button
           @click="emit('create-league')"
           class="px-5 py-2.5 bg-primary text-on-primary rounded-xl font-semibold text-sm hover:opacity-90 transition-all active:scale-95"
         >
-          Crear liga
+          {{ t('standing.createLeague') }}
         </button>
         <button
           @click="emit('join-league')"
           class="px-5 py-2.5 bg-surface-container text-on-surface rounded-xl font-semibold text-sm hover:bg-surface-container-high transition-all active:scale-95 border border-outline-variant"
         >
-          Unirse con código
+          {{ t('standing.joinCode') }}
         </button>
       </div>
     </div>
@@ -61,7 +61,7 @@
         <!-- Group info -->
         <div class="flex-1 min-w-0">
           <p class="font-body-md text-on-surface font-semibold truncate">{{ item.group_name }}</p>
-          <p class="text-[11px] text-on-surface-variant mt-0.5">{{ item.member_count }} miembros</p>
+          <p class="text-[11px] text-on-surface-variant mt-0.5">{{ item.member_count }} {{ t('standing.members') }}</p>
         </div>
 
           <!-- Arrow -->
@@ -79,9 +79,11 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 import { useScoresStore } from '@/stores/scores'
 
+const { t } = useI18n()
 const scoresStore = useScoresStore()
 
 const emit = defineEmits<{

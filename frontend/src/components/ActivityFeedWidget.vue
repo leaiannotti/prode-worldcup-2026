@@ -1,6 +1,6 @@
 <template>
   <div class="bg-surface-container-lowest rounded-xl p-5 border border-outline-variant">
-    <h2 class="font-headline-md text-headline-md text-primary mb-4">Actividad Reciente</h2>
+    <h2 class="font-headline-md text-headline-md text-primary mb-4">{{ t('activity.title') }}</h2>
 
     <!-- Loading -->
     <div v-if="activityStore.isLoading" class="space-y-3">
@@ -9,12 +9,12 @@
 
     <!-- Error -->
     <div v-else-if="activityStore.error" class="text-error font-body-md">
-      Error al cargar actividad
+      {{ t('activity.error') }}
     </div>
 
     <!-- Empty -->
     <div v-else-if="activityStore.events.length === 0" class="text-on-surface-variant font-body-md text-center py-4">
-      No hay actividad reciente
+      {{ t('activity.empty') }}
     </div>
 
     <!-- List: first 3 visible, rest scrollable -->
@@ -73,7 +73,7 @@
 
       <!-- Scroll hint -->
       <p v-if="activityStore.events.length > 3" class="text-[10px] text-on-surface-variant/50 text-center mt-2">
-        {{ activityStore.events.length - 3 }} más arriba
+        {{ t('activity.moreAbove', { count: activityStore.events.length - 3 }) }}
       </p>
     </div>
   </div>
@@ -83,7 +83,9 @@
 import { onMounted } from 'vue'
 import { useActivityStore } from '@/stores/activity'
 import { formatRelativeTime } from '@/composables/useDateFormat'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const activityStore = useActivityStore()
 
 onMounted(() => {
@@ -133,33 +135,27 @@ function eventStyle(type: string) {
 
 function eventText(event: any): string {
   const p = event.payload || {}
-
+  const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : t('activity.aMatch')
   switch (event.event_type) {
-    case 'prediction_submitted': {
-      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
-      return `Predijiste ${p.home_score}-${p.away_score} en ${match}`
-    }
-    case 'prediction_updated': {
-      const match = p.home_team && p.away_team ? `${p.home_team} vs ${p.away_team}` : 'un partido'
-      return `Actualizaste tu predicción a ${p.home_score}-${p.away_score} en ${match}`
-    }
+    case 'prediction_submitted':
+      return t('activity.predictionSubmitted', { score: `${p.home_score}-${p.away_score}`, match })
+    case 'prediction_updated':
+      return t('activity.predictionUpdated', { score: `${p.home_score}-${p.away_score}`, match })
     case 'score_calculated': {
-      const match = p.home_team && p.away_team
-        ? `${p.home_team} vs ${p.away_team}`
-        : 'un partido'
       const typeLabel = p.score_type === 'exact'
-        ? 'marcador exacto'
+        ? t('activity.exact')
         : p.score_type === 'outcome'
-        ? 'resultado correcto'
-        : 'sin puntos'
-      return `Acumulaste ${p.points} pt${p.points !== 1 ? 's' : ''} en ${match} — ${typeLabel}`
+        ? t('activity.outcome')
+        : t('activity.noPoints')
+      const plural = p.points !== 1 ? 's' : ''
+      return t('activity.scoreCalculated', { points: p.points, plural, match, type: typeLabel })
     }
     case 'group_created':
-      return `Creaste la liga "${p.group_name || 'nueva'}"`
+      return t('activity.groupCreated', { name: p.group_name || t('activity.aLeague') })
     case 'group_joined':
-      return `Te uniste a la liga "${p.group_name || 'una liga'}"`
+      return t('activity.groupJoined', { name: p.group_name || t('activity.aLeague') })
     default:
-      return 'Actividad desconocida'
+      return t('activity.unknown')
   }
 }
 

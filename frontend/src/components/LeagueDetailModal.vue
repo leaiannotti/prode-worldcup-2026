@@ -9,7 +9,7 @@
             <div class="flex items-start justify-between gap-3">
               <div>
                 <h3 class="font-headline-sm text-headline-sm text-primary">{{ group.name }}</h3>
-                <p class="text-xs text-on-surface-variant mt-0.5">{{ group.member_count ?? 0 }} miembros</p>
+                <p class="text-xs text-on-surface-variant mt-0.5">{{ group.member_count ?? 0 }} {{ t('leagueDetail.members') }}</p>
               </div>
               <button @click="emit('close')" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-container transition-colors text-on-surface-variant flex-shrink-0 cursor-pointer">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -22,7 +22,7 @@
           <div class="px-6 py-5 space-y-5">
             <!-- Invite code -->
             <div class="space-y-1.5">
-              <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Código de invitación</p>
+              <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('leagueDetail.inviteCode') }}</p>
               <div class="flex items-center gap-3 bg-surface-container-low rounded-xl px-4 py-3">
                 <code class="flex-1 text-lg font-bold tracking-widest text-primary">{{ group.invite_code }}</code>
                 <button
@@ -35,14 +35,14 @@
                   <svg v-else class="w-4 h-4 text-tertiary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
-                  {{ copied ? '¡Copiado!' : 'Copiar' }}
+                  {{ copied ? t('leagueDetail.copied') : t('leagueDetail.copy') }}
                 </button>
               </div>
             </div>
 
             <!-- Prizes -->
             <div v-if="group.prizes && group.prizes.length > 0" class="space-y-1.5">
-              <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">Premios</p>
+              <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('leagueDetail.prizes') }}</p>
               <div class="space-y-2">
                 <div
                   v-for="prize in sortedPrizes"
@@ -57,7 +57,7 @@
                 </div>
               </div>
             </div>
-            <div v-else class="text-xs text-on-surface-variant/60 italic">Sin premios configurados</div>
+            <div v-else class="text-xs text-on-surface-variant/60 italic">{{ t('leagueDetail.noPrizes') }}</div>
 
             <!-- Actions -->
             <div class="pt-1 space-y-2">
@@ -67,7 +67,7 @@
                 :disabled="isLeaving"
                 class="w-full py-2.5 border border-error text-error rounded-xl font-semibold text-sm hover:bg-error/5 transition-all active:scale-[0.98] disabled:opacity-40 cursor-pointer"
               >
-                {{ isLeaving ? 'Abandonando...' : 'Abandonar liga' }}
+                {{ isLeaving ? t('leagueDetail.leaving') : t('leagueDetail.leave') }}
               </button>
               <p v-if="leaveError" class="text-error text-xs text-center">{{ leaveError }}</p>
             </div>
@@ -83,6 +83,7 @@ import { ref, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useGroupsStore } from '@/stores/groups'
 import type { Group } from '@/stores/groups'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
   isOpen: boolean
@@ -94,6 +95,7 @@ const emit = defineEmits<{
   (e: 'left'): void
 }>()
 
+const { t } = useI18n()
 const authStore = useAuthStore()
 const groupsStore = useGroupsStore()
 
@@ -130,7 +132,7 @@ async function handleLeave() {
     emit('left')
     emit('close')
   } catch {
-    leaveError.value = 'Error al abandonar. Intentá de nuevo.'
+    leaveError.value = t('leagueDetail.leaveError')
   } finally {
     isLeaving.value = false
   }

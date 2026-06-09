@@ -4,9 +4,9 @@
       to="/partidos"
       class="group flex items-center justify-between mb-4"
     >
-      <h2 class="font-headline-md text-headline-md text-primary">Próximos Partidos</h2>
+      <h2 class="font-headline-md text-headline-md text-primary">{{ t('upcomingMatches.title') }}</h2>
       <span class="flex items-center gap-1 text-xs font-medium text-on-surface-variant group-hover:text-primary transition-colors">
-        Ver todos
+        {{ t('upcomingMatches.viewAll') }}
         <svg class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
@@ -18,11 +18,11 @@
     </div>
 
     <div v-else-if="matchesStore.error" class="text-error font-body-md">
-      Error al cargar partidos
+      {{ t('upcomingMatches.error') }}
     </div>
 
     <div v-else-if="upcomingMatches.length === 0" class="text-on-surface-variant font-body-md text-center py-4">
-      No hay partidos próximos
+      {{ t('upcomingMatches.noMatches') }}
     </div>
 
     <div v-else class="divide-y divide-outline-variant">
@@ -46,7 +46,9 @@ import { RouterLink } from 'vue-router'
 import { useMatchesStore } from '@/stores/matches'
 import { usePredictionsStore } from '@/stores/predictions'
 import MatchRow from './MatchRow.vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const matchesStore = useMatchesStore()
 const predictionsStore = usePredictionsStore()
 

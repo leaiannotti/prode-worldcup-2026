@@ -1,0 +1,157 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "matches": "Partidos",
+    "leagues": "Ligas",
+    "logout": "Salir",
+    "logoutFull": "Cerrar sesión",
+    "lightMode": "Cambiar a modo claro",
+    "darkMode": "Cambiar a modo oscuro",
+    "recentActivity": "Actividad reciente",
+    "noActivity": "No hay actividad reciente"
+  },
+  "login": {
+    "tagline": "Comienza tu camino a la gloria",
+    "subtitle": "Únete a la mayor competencia de predicciones del mundo.",
+    "withGoogle": "Iniciar sesión con Google",
+    "orWith": "o accede con",
+    "footer": "© 2026 Prode World Cup Platform. Todos los derechos reservados.",
+    "rules": "Reglas",
+    "privacy": "Privacidad",
+    "support": "Soporte"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Bienvenido, {name}"
+  },
+  "matches": {
+    "title": "Partidos",
+    "subtitle": "Mundial 2026 — todos los partidos de la fase de grupos",
+    "allGroups": "Todos los grupos",
+    "group": "Grupo {name}",
+    "noMatches": "No hay partidos para este grupo.",
+    "viewAll": "Ver todos",
+    "pending": "Procesando",
+    "pendingResult": "resultado"
+  },
+  "prediction": {
+    "save": "Guardar predicción",
+    "update": "Actualizar predicción",
+    "saving": "Guardando...",
+    "closed": "Predicción cerrada",
+    "closedError": "El plazo para esta predicción ya cerró.",
+    "saveError": "Error al guardar. Intentá de nuevo.",
+    "closesIn": "Cierra en",
+    "closedLabel": "cerrado"
+  },
+  "leagues": {
+    "title": "Ligas",
+    "subtitle": "Gestioná tus ligas y seguí las posiciones",
+    "create": "Crear liga",
+    "join": "Unirse",
+    "noLeagues": "No pertenecés a ninguna liga aún. Creá una o unite con un código.",
+    "standings": "Posiciones",
+    "myLeagues": "Mis Ligas",
+    "noStandings": "Todavía no hay posiciones para esta liga.",
+    "errorStandings": "Error al cargar la tabla",
+    "viewLeagues": "Ver ligas",
+    "members": "{count} miembros",
+    "myPoints": "Mis puntos:",
+    "rank": "Puesto",
+    "rankOf": "de {total}"
+  },
+  "groupCard": {
+    "viewDetail": "Ver detalle"
+  },
+  "groupDialog": {
+    "createTitle": "Crear Liga",
+    "leagueName": "Nombre de la liga",
+    "leagueNamePlaceholder": "Ej: Los Cracks del Mundial",
+    "prizes": "Premios (opcional)",
+    "cancel": "Cancelar",
+    "creating": "Creando...",
+    "create": "Crear",
+    "createError": "Error al crear la liga. Intentá de nuevo.",
+    "joinTitle": "Unirse a una Liga",
+    "inviteCode": "Código de invitación",
+    "joining": "Uniendo...",
+    "joinBtn": "Unirse",
+    "invalidCode": "Código inválido.",
+    "joinError": "Error al unirse. Intentá de nuevo.",
+    "prize1Placeholder": "Ej: Pizza para el ganador",
+    "prize2Placeholder": "Ej: Cerveza para el segundo",
+    "prize3Placeholder": "Ej: Nada para el tercero"
+  },
+  "leagueDetail": {
+    "members": "miembros",
+    "inviteCode": "Código de invitación",
+    "copied": "¡Copiado!",
+    "copy": "Copiar",
+    "prizes": "Premios",
+    "noPrizes": "Sin premios configurados",
+    "leaving": "Abandonando...",
+    "leave": "Abandonar liga",
+    "leaveError": "Error al abandonar. Intentá de nuevo."
+  },
+  "standing": {
+    "myLeagues": "Mis Ligas",
+    "viewLeagues": "Ver ligas",
+    "error": "Error al cargar posición",
+    "noLeagues": "No pertenecés a ninguna liga aún.",
+    "createLeague": "Crear liga",
+    "joinCode": "Unirse con código",
+    "members": "miembros"
+  },
+  "upcomingMatches": {
+    "title": "Próximos Partidos",
+    "viewAll": "Ver todos",
+    "error": "Error al cargar partidos",
+    "noMatches": "No hay partidos próximos"
+  },
+  "recentMatches": {
+    "title": "Partidos Recientes"
+  },
+  "activity": {
+    "title": "Actividad Reciente",
+    "error": "Error al cargar actividad",
+    "empty": "No hay actividad reciente",
+    "moreAbove": "{count} más arriba",
+    "predictionSubmitted": "Predijiste {score} en {match}",
+    "predictionUpdated": "Actualizaste tu predicción a {score} en {match}",
+    "scoreCalculated": "Acumulaste {points} pt{plural} en {match} — {type}",
+    "groupCreated": "Creaste la liga \"{name}\"",
+    "groupJoined": "Te uniste a la liga \"{name}\"",
+    "unknown": "Actividad desconocida",
+    "aMatch": "un partido",
+    "exact": "marcador exacto",
+    "outcome": "resultado correcto",
+    "noPoints": "sin puntos",
+    "aLeague": "una liga"
+  },
+  "points": {
+    "title": "Mis puntos",
+    "noPoints": "Todavía no sumaste puntos",
+    "noPointsHint": "Los puntos se calculan cuando el admin carga los resultados",
+    "pending": "Pendientes de resultado",
+    "myPred": "Tu pred:",
+    "waiting": "esperando",
+    "exact": "Exacto",
+    "outcome": "Resultado",
+    "noScore": "Sin puntos"
+  },
+  "distribution": {
+    "title": "Distribución de Predicciones",
+    "preClosed": "Las predicciones se mostrarán después del cierre",
+    "deadline": "Cierre:",
+    "predictions": "{count} predicciones",
+    "homeWin": "Victoria {team}",
+    "draw": "Empate",
+    "awayWin": "Victoria {team}",
+    "error": "Error al cargar distribución"
+  },
+  "common": {
+    "pts": "pts",
+    "vs": "VS",
+    "final": "Final"
+  }
+}
