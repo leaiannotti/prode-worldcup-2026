@@ -129,11 +129,13 @@ const items = ref<InsightItem[]>([])
 const loading = ref(true)
 const error = ref(false)
 
+const apiBase = import.meta.env.VITE_API_URL ?? ''
+
 async function fetchInsights() {
   loading.value = true
   error.value = false
   try {
-    const res = await fetch('/api/matches/community-insights?limit=6', {
+    const res = await fetch(`${apiBase}/api/matches/community-insights?limit=6`, {
       credentials: 'include',
     })
     if (!res.ok) throw new Error()

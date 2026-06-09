@@ -266,6 +266,8 @@ import { ref, computed, onMounted } from 'vue'
 import AppLayout from '@/components/AppLayout.vue'
 import { formatRelativeTime } from '@/composables/useDateFormat'
 
+const apiBase = import.meta.env.VITE_API_URL ?? ''
+
 // ── Stats ─────────────────────────────────────────────────────────────────────
 const stats = ref([
   { label: 'Usuarios', value: 0, color: 'var(--color-primary)', loading: true },
@@ -274,7 +276,7 @@ const stats = ref([
 ])
 
 async function fetchStats() {
-  const res = await fetch('/api/admin/stats', { credentials: 'include' })
+  const res = await fetch(`${apiBase}/api/admin/stats`, { credentials: 'include' })
   if (!res.ok) return
   const data = await res.json()
   stats.value[0].value = data.users
@@ -306,7 +308,7 @@ const filteredMatches = computed(() =>
 
 async function fetchMatches() {
   matchesLoading.value = true
-  const res = await fetch('/api/admin/matches', { credentials: 'include' })
+  const res = await fetch(`${apiBase}/api/admin/matches`, { credentials: 'include' })
   if (res.ok) matches.value = await res.json()
   matchesLoading.value = false
 }
@@ -364,7 +366,7 @@ async function submitResult() {
   m.error = ''
   m.success = false
 
-  const res = await fetch(`/api/admin/matches/${m.match.id}/result`, {
+  const res = await fetch(`${apiBase}/api/admin/matches/${m.match.id}/result`, {
     method: 'POST',
     credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -397,7 +399,7 @@ const auditLoading = ref(false)
 
 async function fetchAuditLog() {
   auditLoading.value = true
-  const res = await fetch('/api/admin/audit-log?limit=50', { credentials: 'include' })
+  const res = await fetch(`${apiBase}/api/admin/audit-log?limit=50`, { credentials: 'include' })
   if (res.ok) auditEvents.value = await res.json()
   auditLoading.value = false
 }
