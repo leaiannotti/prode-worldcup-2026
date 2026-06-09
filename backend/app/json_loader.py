@@ -14,15 +14,22 @@ from pathlib import Path
 
 
 def _get_json_dir():
-    """Get the jsons directory path (relative to project root)."""
-    # Walk up from backend/app to project root
-    # __file__ = /path/to/backend/app/json_loader.py
-    # .parent = /path/to/backend/app
-    # .parent = /path/to/backend
-    # .parent = /path/to (project root)
-    app_dir = Path(__file__).parent
-    backend_dir = app_dir.parent
-    project_root = backend_dir.parent
+    """Get the jsons directory path.
+
+    Supports two layouts:
+    1. Development: jsons/ at project root (two levels up from backend/app/)
+    2. Production: jsons/ inside backend/ (one level up from backend/app/)
+    """
+    app_dir = Path(__file__).parent       # backend/app/
+    backend_dir = app_dir.parent          # backend/
+    project_root = backend_dir.parent     # project root
+
+    # Production: jsons/ lives inside backend/
+    backend_jsons = backend_dir / "jsons"
+    if backend_jsons.exists():
+        return backend_jsons
+
+    # Development: jsons/ lives at project root
     return project_root / "jsons"
 
 
