@@ -8,6 +8,7 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JWT_SECRET = os.getenv("JWT_SECRET", "jwt-secret-key")
     JWT_EXPIRATION = timedelta(days=7)
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 
 class DevelopmentConfig(BaseConfig):
