@@ -13,8 +13,10 @@ import PageLoader from '@/components/PageLoader.vue'
 const router = useRouter()
 const isNavigating = ref(false)
 
-router.beforeEach(() => {
-  isNavigating.value = true
+router.beforeEach((to) => {
+  if (to.name !== 'Login') {
+    isNavigating.value = true
+  }
 })
 
 router.afterEach(() => {
