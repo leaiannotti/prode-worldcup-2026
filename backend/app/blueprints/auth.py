@@ -49,7 +49,9 @@ def callback():
     jwt_token = issue_jwt(user.id)
     
     # Create response and set cookie
-    response = redirect(f"{current_app.config.get('FRONTEND_URL', 'http://localhost:5173')}/dashboard")
+    frontend_url = current_app.config.get('FRONTEND_URL', 'http://localhost:5173')
+    print(f"DEBUG FRONTEND_URL: {frontend_url}", flush=True)
+    response = redirect(f"{frontend_url}/dashboard")
     set_jwt_cookie(response, jwt_token)
     
     return response
