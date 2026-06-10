@@ -97,8 +97,8 @@ onMounted(() => {
 
 function rankStyle(rank: number): string {
   if (rank === 1) return 'bg-amber-400 text-amber-950'
-  if (rank === 2) return 'bg-slate-300 text-slate-800'
-  if (rank === 3) return 'bg-orange-300 text-orange-900'
-  return 'bg-surface-container text-on-surface-variant'
+  if (rank === 2) return 'bg-slate-400 text-slate-950'
+  if (rank === 3) return 'bg-orange-400 text-orange-950'
+  return 'bg-primary-container text-on-primary-fixed'
 }
 </script>

@@ -123,6 +123,11 @@ export const useGroupsStore = defineStore('groups', () => {
     groups.value = groups.value.filter(g => g.id !== id)
   }
 
+  async function deleteGroup(id: string): Promise<void> {
+    await apiClient.delete(`/api/groups/${id}`)
+    groups.value = groups.value.filter(g => g.id !== id)
+  }
+
   return {
     groups,
     currentGroup,
@@ -133,5 +138,6 @@ export const useGroupsStore = defineStore('groups', () => {
     joinGroup,
     setPrizes,
     leaveGroup,
+    deleteGroup,
   }
 })

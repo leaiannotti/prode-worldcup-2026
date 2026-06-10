@@ -334,3 +334,29 @@ def leave_group(group_id):
     db.session.commit()
 
     return jsonify({"success": True}), 200
+
+
+@bp.route("/<group_id>", methods=["DELETE"])
+@jwt_required
+def delete_group(group_id):
+    """DELETE /api/groups/:id — delete a group (admin only)."""
+    user_id = g.current_user.id
+
+    group = PredictionGroup.query.get(group_id)
+    if not group:
+        return jsonify({"error": "not_found"}), 404
+
+    membership = GroupMembership.query.filter_by(
+        user_id=user_id, group_id=group_id
+    ).first()
+    if not membership or membership.role != "admin":
+        return jsonify({"error": "forbidden"}), 403
+
+    # Cascade delete everything related
+    from app.models import GroupPrize, GroupMembership as GM, Prediction
+    GroupPrize.query.filter_by(group_id=group_id).delete()
+    GM.query.filter_by(group_id=group_id).delete()
+    db.session.delete(group)
+    db.session.commit()
+
+    return jsonify({"success": True}), 200

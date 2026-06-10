@@ -61,6 +61,7 @@
 
             <!-- Actions -->
             <div class="pt-1 space-y-2">
+              <!-- Leave (non-admin) -->
               <button
                 v-if="!isAdmin"
                 @click="handleLeave"
@@ -69,6 +70,38 @@
               >
                 {{ isLeaving ? t('leagueDetail.leaving') : t('leagueDetail.leave') }}
               </button>
+
+              <!-- Delete (admin) -->
+              <template v-if="isAdmin">
+                <div v-if="!confirmDelete">
+                  <button
+                    @click="confirmDelete = true"
+                    class="w-full py-2.5 border border-error text-error rounded-xl font-semibold text-sm hover:bg-error/5 transition-all active:scale-[0.98] cursor-pointer"
+                  >
+                    Eliminar liga
+                  </button>
+                </div>
+                <div v-else class="bg-error/10 rounded-xl p-4 space-y-3">
+                  <p class="text-sm text-on-surface font-semibold text-center">¿Seguro que querés eliminar esta liga?</p>
+                  <p class="text-xs text-on-surface-variant text-center">Esta acción no se puede deshacer.</p>
+                  <div class="flex gap-2">
+                    <button
+                      @click="confirmDelete = false"
+                      class="flex-1 py-2 border border-outline-variant text-on-surface-variant rounded-xl text-sm transition-colors hover:bg-surface-container cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      @click="handleDelete"
+                      :disabled="isDeleting"
+                      class="flex-1 py-2 bg-error text-on-error rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-60 cursor-pointer"
+                    >
+                      {{ isDeleting ? 'Eliminando...' : 'Sí, eliminar' }}
+                    </button>
+                  </div>
+                </div>
+              </template>
+
               <p v-if="leaveError" class="text-error text-xs text-center">{{ leaveError }}</p>
             </div>
           </div>
@@ -93,6 +126,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'left'): void
+  (e: 'deleted'): void
 }>()
 
 const { t } = useI18n()
@@ -102,9 +136,11 @@ const groupsStore = useGroupsStore()
 const copied = ref(false)
 const isLeaving = ref(false)
 const leaveError = ref<string | null>(null)
+const confirmDelete = ref(false)
+const isDeleting = ref(false)
 
 watch(() => props.isOpen, (v) => {
-  if (v) { copied.value = false; leaveError.value = null }
+  if (v) { copied.value = false; leaveError.value = null; confirmDelete.value = false }
 })
 
 const isAdmin = computed(() => {
@@ -135,6 +171,20 @@ async function handleLeave() {
     leaveError.value = t('leagueDetail.leaveError')
   } finally {
     isLeaving.value = false
+  }
+}
+
+async function handleDelete() {
+  if (!props.group || isDeleting.value) return
+  isDeleting.value = true
+  try {
+    await groupsStore.deleteGroup(props.group.id)
+    emit('deleted')
+    emit('close')
+  } catch {
+    leaveError.value = 'Error al eliminar. Intentá de nuevo.'
+  } finally {
+    isDeleting.value = false
   }
 }
 

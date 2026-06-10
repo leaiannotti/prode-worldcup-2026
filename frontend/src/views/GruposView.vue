@@ -172,6 +172,7 @@
       :group="detailGroup"
       @close="detailGroup = null"
       @left="onGroupCreatedOrJoined"
+      @deleted="onGroupCreatedOrJoined"
     />
   </AppLayout>
 </template>
