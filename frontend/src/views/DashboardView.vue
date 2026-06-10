@@ -42,8 +42,8 @@
       :show-join="showJoin"
       @close-create="showCreate = false"
       @close-join="showJoin = false"
-      @created="groupsStore.fetchGroups()"
-      @joined="groupsStore.fetchGroups()"
+      @created="groupsStore.fetchGroups(); scoresStore.fetchMyStanding()"
+      @joined="groupsStore.fetchGroups(); scoresStore.fetchMyStanding()"
     />
   </AppLayout>
 </template>
@@ -56,6 +56,7 @@ import { useGroupsStore } from '@/stores/groups'
 import { useMatchesStore } from '@/stores/matches'
 import { usePredictionsStore } from '@/stores/predictions'
 import { useActivityStore } from '@/stores/activity'
+import { useScoresStore } from '@/stores/scores'
 import AppLayout from '@/components/AppLayout.vue'
 import UpcomingMatchesWidget from '@/components/UpcomingMatchesWidget.vue'
 import MyStandingWidget from '@/components/MyStandingWidget.vue'
@@ -71,6 +72,7 @@ const groupsStore = useGroupsStore()
 const matchesStore = useMatchesStore()
 const predictionsStore = usePredictionsStore()
 const activityStore = useActivityStore()
+const scoresStore = useScoresStore()
 
 const showCreate = ref(false)
 const showJoin = ref(false)
