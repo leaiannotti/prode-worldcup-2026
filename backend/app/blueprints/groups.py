@@ -353,7 +353,9 @@ def delete_group(group_id):
         return jsonify({"error": "forbidden"}), 403
 
     # Cascade delete everything related
-    from app.models import GroupPrize, GroupMembership as GM, Prediction
+    from app.models import GroupPrize, GroupMembership as GM, Prediction, ActivityEvent
+    # Preserve historical activity events but detach them from the deleted group
+    ActivityEvent.query.filter_by(group_id=group_id).update({"group_id": None})
     GroupPrize.query.filter_by(group_id=group_id).delete()
     GM.query.filter_by(group_id=group_id).delete()
     db.session.delete(group)

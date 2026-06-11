@@ -23,12 +23,12 @@ class ActivityEvent(db.Model):
     event_type = db.Column(db.String(50), nullable=False, index=True)
     group_id = db.Column(
         db.String(36),
-        db.ForeignKey("prediction_groups.id"),
+        db.ForeignKey("prediction_groups.id", ondelete="SET NULL"),
         nullable=True,
     )
     match_id = db.Column(
         db.Integer,
-        db.ForeignKey("matches.id"),
+        db.ForeignKey("matches.id", ondelete="SET NULL"),
         nullable=True,
     )
     payload = db.Column(db.JSON, nullable=True)
