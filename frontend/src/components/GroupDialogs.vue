@@ -77,7 +77,11 @@
             v-model="inviteCode"
             type="text"
             placeholder="ABC123"
+            autocomplete="off"
+            autocapitalize="characters"
+            spellcheck="false"
             class="w-full px-4 py-2.5 bg-surface-container-low text-on-surface border border-outline-variant rounded-lg focus:border-primary focus:ring-1 focus:ring-primary outline-none uppercase text-sm tracking-widest placeholder:text-on-surface-variant/50"
+            @input="inviteCode = ($event.target as HTMLInputElement).value.toUpperCase()"
             @keyup.enter="handleJoin"
           />
         </div>
@@ -163,11 +167,12 @@ async function handleCreate() {
 }
 
 async function handleJoin() {
-  if (!inviteCode.value.trim() || isJoining.value) return
+  const code = inviteCode.value.trim().toUpperCase()
+  if (!code || isJoining.value) return
   isJoining.value = true
   joinError.value = null
   try {
-    await groupsStore.joinGroup(inviteCode.value.trim())
+    await groupsStore.joinGroup(code)
     emit('joined')
     emit('close-join')
   } catch (err: any) {

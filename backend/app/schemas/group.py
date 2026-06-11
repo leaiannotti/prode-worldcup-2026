@@ -1,5 +1,5 @@
 """Group schemas for prediction groups."""
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, field_validator
 from typing import Optional, List
 from datetime import datetime
 
@@ -13,8 +13,21 @@ class CreateGroupRequest(BaseModel):
 
 class JoinGroupRequest(BaseModel):
     """Request to join a group via invite code."""
-    
+
     invite_code: str = Field(..., min_length=6, max_length=8, description="Group invite code")
+
+    @field_validator("invite_code", mode="before")
+    @classmethod
+    def normalize_invite_code(cls, v):
+        """Normalize invite codes: strip whitespace and uppercase.
+
+        Invite codes are always stored in uppercase (see _generate_invite_code).
+        Accepting any casing makes the API forgiving for any client (web, mobile,
+        future integrations) without leaking that detail into every caller.
+        """
+        if not isinstance(v, str):
+            return v
+        return v.strip().upper()
 
 
 class PrizeRequest(BaseModel):
