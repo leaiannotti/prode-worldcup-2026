@@ -68,6 +68,11 @@ def create_app(config_name=None):
     from app.seed import seed_command
     app.cli.add_command(seed_command)
 
+    @app.route("/health", methods=["GET"])
+    def health():
+        """Health endpoint for smoke tests (T-12-ter)."""
+        return {"status": "ok"}, 200
+
     @app.before_request
     def before_request():
         """Create tables if they don't exist (for dev)."""
