@@ -82,13 +82,13 @@ jobs:
     needs: release
     runs-on: ubuntu-latest
     steps:
-      - name: Notify Coolify
+      - name: Notify Coolify (backend)
         env:
-          WEBHOOK_URL: ${{ secrets.COOLIFY_WEBHOOK_URL }}
+          WEBHOOK_URL: ${{ secrets.COOLIFY_BACKEND_WEBHOOK_URL }}
           WEBHOOK_TOKEN: ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}
         run: |
           if [ -z "$WEBHOOK_URL" ]; then
-            echo "::warning::COOLIFY_WEBHOOK_URL not set; skipping deploy notification"
+            echo "::warning::COOLIFY_BACKEND_WEBHOOK_URL not set; skipping backend deploy notification"
             exit 0
           fi
           echo "::add-mask::$WEBHOOK_URL"
@@ -97,7 +97,26 @@ jobs:
             -X POST \
             -H "Authorization: Bearer $WEBHOOK_TOKEN" \
             "$WEBHOOK_URL")
-          echo "Coolify response: $response_code"
+          echo "Coolify backend response: $response_code"
+          if [ "$response_code" -lt 200 ] || [ "$response_code" -ge 300 ]; then
+            exit 1
+          fi
+      - name: Notify Coolify (frontend)
+        env:
+          WEBHOOK_URL: ${{ secrets.COOLIFY_FRONTEND_WEBHOOK_URL }}
+          WEBHOOK_TOKEN: ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}
+        run: |
+          if [ -z "$WEBHOOK_URL" ]; then
+            echo "::warning::COOLIFY_FRONTEND_WEBHOOK_URL not set; skipping frontend deploy notification"
+            exit 0
+          fi
+          echo "::add-mask::$WEBHOOK_URL"
+          echo "::add-mask::$WEBHOOK_TOKEN"
+          response_code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST \
+            -H "Authorization: Bearer $WEBHOOK_TOKEN" \
+            "$WEBHOOK_URL")
+          echo "Coolify frontend response: $response_code"
           if [ "$response_code" -lt 200 ] || [ "$response_code" -ge 300 ]; then
             exit 1
           fi
