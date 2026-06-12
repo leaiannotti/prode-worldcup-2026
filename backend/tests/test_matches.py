@@ -28,7 +28,7 @@ class TestMatchFiltering:
                 away_team_id=seed_teams[1].id,
                 world_cup_group_id=seed_groups[0].id,
                 kickoff_utc=base,
-                deadline_utc=base - timedelta(hours=24),
+                deadline_utc=base - timedelta(hours=1),
                 status="scheduled",
             )
             m_fin = Match(
@@ -36,7 +36,7 @@ class TestMatchFiltering:
                 away_team_id=seed_teams[3].id,
                 world_cup_group_id=seed_groups[0].id,
                 kickoff_utc=base + timedelta(hours=1),
-                deadline_utc=base + timedelta(hours=1) - timedelta(hours=24),
+                deadline_utc=base + timedelta(hours=1) - timedelta(hours=1),
                 status="finished",
             )
             db_session.add_all([m_sched, m_fin])
@@ -70,7 +70,7 @@ class TestMatchFiltering:
                     away_team_id=seed_teams[1].id,
                     world_cup_group_id=seed_groups[0].id,
                     kickoff_utc=base + timedelta(hours=i),
-                    deadline_utc=base + timedelta(hours=i) - timedelta(hours=24),
+                    deadline_utc=base + timedelta(hours=i) - timedelta(hours=1),
                     status="scheduled",
                 )
                 db_session.add(m)
@@ -98,7 +98,7 @@ class TestMatchFiltering:
                     away_team_id=seed_teams[1].id,
                     world_cup_group_id=seed_groups[0].id,
                     kickoff_utc=base + timedelta(hours=i),
-                    deadline_utc=base + timedelta(hours=i) - timedelta(hours=24),
+                    deadline_utc=base + timedelta(hours=i) - timedelta(hours=1),
                     status=status,
                 )
                 db_session.add(m)
@@ -126,7 +126,7 @@ class TestMatchFiltering:
                 away_team_id=seed_teams[1].id,
                 world_cup_group_id=seed_groups[0].id,
                 kickoff_utc=base,
-                deadline_utc=base - timedelta(hours=24),
+                deadline_utc=base - timedelta(hours=1),
                 status="scheduled",
             )
             # Group B match — scheduled
@@ -135,7 +135,7 @@ class TestMatchFiltering:
                 away_team_id=seed_teams[5].id,
                 world_cup_group_id=seed_groups[1].id,
                 kickoff_utc=base,
-                deadline_utc=base - timedelta(hours=24),
+                deadline_utc=base - timedelta(hours=1),
                 status="scheduled",
             )
             db_session.add_all([m_a, m_b])
