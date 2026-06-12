@@ -369,3 +369,15 @@ Project capability: `strict_tdd: true` (from SDD init).
 3. Local dev defaults to `http://localhost:5173` when `FRONTEND_URL` is not set.
 
 All other tasks are configuration, documentation, or manual actions that do not have unit-testable code changes.
+
+---
+
+## Slice A Progress
+
+| Task | Status | Commit |
+|------|--------|--------|
+| T-01 | ✅ DONE | no change needed (gitignore already complete) |
+| T-03 | ✅ DONE | `ab8ffee` — chore: add husky and commitlint dependencies |
+| T-04 | ✅ DONE | `3a6d56c` — chore: add commitlint configuration |
+| T-05 | ✅ DONE | `faffbad` — chore: add commit-msg husky hook |
+| T-06 | ✅ DONE | `a46aa33` — chore: initialize VERSION at 1.1.0 |
