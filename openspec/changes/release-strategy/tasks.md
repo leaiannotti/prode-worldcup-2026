@@ -407,3 +407,10 @@ All other tasks are configuration, documentation, or manual actions that do not 
 | T-04 | ✅ DONE | `3a6d56c` — chore: add commitlint configuration |
 | T-05 | ✅ DONE | `faffbad` — chore: add commit-msg husky hook |
 | T-06 | ✅ DONE | `a46aa33` — chore: initialize VERSION at 1.1.0 |
+
+## Slice B Progress
+
+| Task | Status | Commit |
+|------|--------|--------|
+| T-07 | ✅ DONE | `ededaa7` — feat(backend): make CORS origin env-driven from FRONTEND_URL |
+| T-08 | ✅ DONE | `628fe44` — docs: document FRONTEND_URL requirement in .env.example |
