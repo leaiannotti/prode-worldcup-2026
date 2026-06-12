@@ -8,6 +8,12 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv("FLASK_ENV", "development")
     
+    # Determine CORS origin from env (REQ-7)
+    frontend_url = os.getenv("FRONTEND_URL")
+    if not frontend_url and os.getenv("FLASK_ENV") == "production":
+        raise RuntimeError("FRONTEND_URL is required in production")
+    origin = frontend_url or "http://localhost:5173"
+    
     app = Flask(__name__)
     
     # Load configuration
@@ -26,11 +32,7 @@ def create_app(config_name=None):
     migrate.init_app(app, db)
     oauth.init_app(app)
     cors.init_app(app, resources={r"/api/*": {
-        "origins": [
-            app.config.get("FRONTEND_URL", "http://localhost:5173"),
-            "https://prodescaloneta.online",
-            "http://prodescaloneta.online",
-        ],
+        "origins": [origin],
         "supports_credentials": True,
     }})
     
@@ -65,6 +67,11 @@ def create_app(config_name=None):
     # Register CLI commands
     from app.seed import seed_command
     app.cli.add_command(seed_command)
+
+    @app.route("/health", methods=["GET"])
+    def health():
+        """Health endpoint for smoke tests (T-12-ter)."""
+        return {"status": "ok"}, 200
 
     @app.before_request
     def before_request():
