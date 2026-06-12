@@ -431,3 +431,12 @@ All other tasks are configuration, documentation, or manual actions that do not 
 | T-12-bis | ✅ DONE | (folded into T-12) |
 | T-12-ter | ✅ DONE | `691b032` — feat(backend): add /health endpoint for smoke tests |
 | T-13 | ✅ DONE | `fabbbae` — build: add release helper script |
+
+## Slice E Progress
+
+| Task | Status | Commit |
+|------|--------|--------|
+| T-15 | ✅ DONE | docs: add release runbook |
+| T-15-bis | ✅ DONE | (folded into T-15) rollback runbook section |
+| T-15-ter | ✅ DONE | (folded into T-15) secrets rotation runbook section |
+| T-16 | ⏸ DEFERRED | manual execution after release-strategy → main merge |
