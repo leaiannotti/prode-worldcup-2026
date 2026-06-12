@@ -420,3 +420,14 @@ All other tasks are configuration, documentation, or manual actions that do not 
 | Task | Status | Commit |
 |------|--------|--------|
 | T-09 | ✅ DONE | `918489e` — ci: add PR test gate workflow for main and release-strategy |
+
+## Slice D Progress
+
+| Task | Status | Commit |
+|------|--------|--------|
+| T-10 | ✅ DONE | `de6fafc` — chore: add git-cliff changelog configuration |
+| T-11 | ✅ DONE | `47f7ddd` — docs: add initial CHANGELOG.md with v1.0.0..v1.1.0 entries |
+| T-12 | ✅ DONE | `8b61a48` — ci: add tag-triggered release workflow with smoke test |
+| T-12-bis | ✅ DONE | (folded into T-12) |
+| T-12-ter | ✅ DONE | `691b032` — feat(backend): add /health endpoint for smoke tests |
+| T-13 | ✅ DONE | `fabbbae` — build: add release helper script |
