@@ -76,8 +76,11 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDeadlineGuard } from '@/composables/useDeadlineGuard'
 import { usePredictionsStore } from '@/stores/predictions'
+
+const { t } = useI18n()
 
 interface Props {
   deadlineUtc: string
@@ -133,9 +136,9 @@ async function handleSubmit() {
     emit('success', formData.value.homeScore, formData.value.awayScore)
   } catch (error: any) {
     if (error.status === 423) {
-      errorMessage.value = 'Predicción cerrada'
+      errorMessage.value = t('prediction.closed')
     } else {
-      errorMessage.value = error.message || 'Error submitting prediction'
+      errorMessage.value = error.message || t('prediction.submitError')
     }
     emit('error', error)
   } finally {

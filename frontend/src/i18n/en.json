@@ -48,6 +48,7 @@
     "closed": "Prediction closed",
     "closedError": "The deadline for this prediction has passed.",
     "saveError": "Error saving. Please try again.",
+    "submitError": "Error submitting prediction",
     "closesIn": "Closes in",
     "closedLabel": "closed"
   },
@@ -116,7 +117,8 @@
     "noMatches": "No upcoming matches"
   },
   "recentMatches": {
-    "title": "Recent Matches"
+    "title": "Recent Matches",
+    "noMatches": "No finished matches yet"
   },
   "activity": {
     "title": "Recent Activity",

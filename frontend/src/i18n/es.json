@@ -48,6 +48,7 @@
     "closed": "Predicción cerrada",
     "closedError": "El plazo para esta predicción ya cerró. ¡La próxima!",
     "saveError": "Error al guardar. Intentá de nuevo.",
+    "submitError": "Error al enviar la predicción",
     "closesIn": "Cierra en",
     "closedLabel": "cerrado"
   },
@@ -116,7 +117,8 @@
     "noMatches": "No hay partidos próximos"
   },
   "recentMatches": {
-    "title": "Últimos resultados"
+    "title": "Últimos resultados",
+    "noMatches": "Todavía no hay partidos finalizados"
   },
   "activity": {
     "title": "Lo que pasó",
