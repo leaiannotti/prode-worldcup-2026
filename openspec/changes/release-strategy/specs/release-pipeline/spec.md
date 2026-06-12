@@ -144,3 +144,79 @@ MUST support hotfix cuts within ~10 minutes.
 - GIVEN critical fix merged to `main`
 - WHEN tag `v1.2.1-hotfix` pushed
 - THEN workflow runs immediately; deploys to production within ~10 minutes
+
+### REQ-11: Rollback Policy
+
+MUST enforce forward-fix for database migrations, manual code rollback via Coolify UI, post-deploy smoke tests, and GitHub Releases as the single source of deployment truth.
+
+#### Scenario: Non-destructive migration requires no special procedure
+
+- GIVEN a release includes a non-destructive migration (add nullable column, add table, add index)
+- WHEN released to production
+- THEN `entrypoint.sh` runs the migration on container start without additional operator action
+
+#### Scenario: Destructive migration requires backup and flagging
+
+- GIVEN a release includes a destructive migration (drop column, drop table, NOT NULL on existing column with data, type change with data loss)
+- WHEN preparing to release
+- THEN operator MUST take a DB backup via Coolify UI before pushing the tag, AND the release notes MUST flag the destructive change
+
+#### Scenario: Broken destructive migration follows forward-fix path
+
+- GIVEN a destructive migration was deployed and broke production
+- WHEN rolling back
+- THEN operator MUST follow the forward-fix path by writing a new migration that restores prior behavior and shipping it as a new release; operator MUST NOT use `flask db downgrade`
+
+#### Scenario: Code rollback via Coolify UI
+
+- GIVEN release `v1.2.0` is deployed and broken
+- WHEN operator decides to rollback
+- THEN operator opens Coolify UI, selects the previous stable tag (e.g. `v1.1.0`) from deployment history, and clicks redeploy
+
+#### Scenario: Rollback succeeds without destructive migration
+
+- GIVEN the previous stable tag did not include a destructive migration
+- WHEN re-deployed
+- THEN rollback completes successfully within approximately two minutes
+
+#### Scenario: Rollback with destructive migration requires manual DB restore
+
+- GIVEN the broken release included a destructive migration
+- WHEN operator rolls back the code via Coolify UI
+- THEN the database may be in a forward-incompatible state; operator MUST manually restore the backup taken before the destructive migration
+
+#### Scenario: Post-deploy smoke test runs after Coolify notification
+
+- GIVEN `release.yml` finishes notifying Coolify
+- WHEN smoke test job starts after approximately 90 seconds
+- THEN workflow MUST `curl` critical endpoints (at minimum `/health` returns 200, plus one to two additional endpoints defined during design)
+
+#### Scenario: Smoke test failure triggers notification
+
+- GIVEN smoke test fails (non-2xx response or timeout)
+- WHEN workflow processes the failure
+- THEN workflow MUST report failure clearly, AND a follow-up step with `if: failure()` MUST notify the operator by opening a GitHub issue or posting a comment on the release
+
+#### Scenario: Smoke test success marks release complete
+
+- GIVEN smoke test passes
+- WHEN workflow finishes
+- THEN release is considered deployed and smoke-tested OK; no additional automation runs
+
+#### Scenario: GitHub Releases is the single source of deployment truth
+
+- GIVEN operator needs to identify which tag is currently deployed
+- WHEN checking GitHub Releases page
+- THEN the most recent release MUST reflect the currently deployed tag; there is no `stable` floating tag, no `STABLE_VERSION` file, and no manual deployment log in `docs/RELEASE.md`
+
+#### Scenario: Rolled-back tag may appear as latest release
+
+- GIVEN a rollback was performed via Coolify UI to an older tag
+- WHEN GitHub Releases page is checked
+- THEN the latest GitHub Release may temporarily show the rolled-back tag; operator MAY use `gh release edit <tag> --latest` to correct it in calm time
+
+#### Scenario: Release changelog contains grouped changes
+
+- GIVEN operator wants to know what was included in a previous release
+- WHEN viewing the release on GitHub
+- THEN the changelog body MUST contain the conventional-commit-grouped changes since the prior tag

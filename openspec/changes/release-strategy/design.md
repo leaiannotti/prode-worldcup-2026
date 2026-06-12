@@ -210,9 +210,39 @@ jobs:
           echo "::add-mask::${{ secrets.COOLIFY_WEBHOOK_URL }}"
           curl -X POST -H "Authorization: Bearer ${{ secrets.COOLIFY_WEBHOOK_TOKEN }}" \
             ${{ secrets.COOLIFY_WEBHOOK_URL }} -fsS
+  smoke-test:
+    needs: notify
+    runs-on: ubuntu-latest
+    steps:
+      - run: sleep 90
+      - name: Health probe
+        run: |
+          curl -fsS -o /dev/null -w "%{http_code}" https://prodescaloneta.online/health | grep -q '^200$'
+      - name: Auth layer probe (expects 401 without token)
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" https://prodescaloneta.online/api/auth/me)
+          test "$code" = "401"
+  notify-failure:
+    needs: smoke-test
+    if: failure()
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Open incident issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh issue create \
+            --title "🚨 Smoke test failed for ${{ github.ref_name }}" \
+            --body "The release workflow completed but post-deploy smoke tests failed. Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}. Inspect the deploy in Coolify and consider rolling back to the previous stable tag." \
+            --label "release,incident"
 ```
 
 **Secrets**: `COOLIFY_WEBHOOK_URL`, `COOLIFY_WEBHOOK_TOKEN` (optional, depending on Coolify config).
+
+*Note: The exact smoke endpoints are configurable during implementation; the design nails down probe types and failure behavior.*
 
 ## 5. Conventional Commit Enforcement
 
@@ -275,6 +305,7 @@ Outline:
 4. Migration safety checklist (Section 9).
 5. Coolify deploy troubleshooting (webhook failure, manual redeploy).
 6. Secrets rotation runbook (how to rotate, where to update).
+7. Rollback runbook (Section 14.4 of design).
 
 ## 12. Implementation Order
 
@@ -299,3 +330,64 @@ Outline:
 | First auto-generated changelog is messy | Hand-curate first `CHANGELOG.md` entry; auto-generate from `v1.1.0` onward |
 | Tag/VERSION mismatch panics developer | `scripts/release.sh` handles bump, commit, and tag atomically |
 | CORS fail-fast breaks prod deploy | `FRONTEND_URL` env var documented in `.env.example` and Coolify setup checklist |
+| Operator does destructive migration without backup | Section 14.3 checklist in release runbook is mandatory before destructive tags |
+| Smoke test probes a slow-warming endpoint | 90s sleep before first probe; endpoint choice avoids cold paths |
+| GitHub Releases "Latest" marker becomes wrong after manual Coolify rollback | `gh release edit <tag> --latest` step in runbook |
+
+## 14. Rollback Policy
+
+### 14.1 Strategy Decisions
+
+| Dimension | Decision | Why |
+|---|---|---|
+| DB rollback | Forward-fix only + manual backup for destructive | Solo dev, low schema churn, downgrade scripts hard to maintain |
+| Code rollback | Manual via Coolify UI | Fastest under stress, no automation to fail |
+| Detection | Smoke test post-deploy + GitHub issue on failure | Catches catastrophic bugs in <2 min after deploy |
+| Traceability | GitHub Releases | Already exists, no extra moving parts |
+
+### 14.2 Expand-Contract Migration Pattern
+
+**Concrete example: rename column `users.username` to `users.handle`**
+
+- **Wrong way**: one migration drops `username` and adds `handle`. Destructive — code rollback cannot read the old column.
+- **Right way**:
+  - Release N: add `handle` column; write to **both** on every update; backfill `handle` from `username`; keep both columns readable
+  - Release N+1 (after monitoring confirms no code reads `username`): drop `username` in a new migration
+- Each release is independently rollback-safe by the code-rollback path.
+
+### 14.3 Pre-Release Migration Classification Checklist
+
+Run before cutting a tag that includes migrations:
+
+```bash
+git diff $(git describe --tags --abbrev=0)..HEAD -- backend/migrations/
+```
+
+Classify every changed migration into one of three buckets:
+
+- **Additive (safe)**: new table, new nullable column, new index, new constraint marked `NOT VALID`, idempotent data backfill
+- **Restrictive (caution)**: `NOT NULL` on existing column (needs prior backfill), unique constraint on existing column (needs dedupe), column type narrowing
+- **Destructive (manual backup required)**: `DROP COLUMN`, `DROP TABLE`, `DROP INDEX` touching live data, data deletion in upgrade step
+
+**Rule**: for any "Restrictive" or "Destructive" migration, the operator MUST take a DB backup via Coolify UI before pushing the tag.
+
+### 14.4 Rollback Procedure (5-Step Runbook)
+
+1. Identify the broken release tag and the last known-good tag from the GitHub Releases page.
+2. Coolify UI → project → deployments → click the previous good tag → **Redeploy**.
+3. Wait for Coolify to redeploy (~2 min); verify with a manual `curl` to `/health`.
+4. If the broken release included a destructive migration, **restore the DB backup** taken before the destructive migration via Coolify UI.
+5. Post-mortem (cold): in calm time, optionally run `gh release edit <good-tag> --latest` to fix the "Latest" marker; write a forward-fix PR; document the incident.
+
+### 14.5 Smoke Test Design
+
+The smoke test runs as a job after the `notify` job in `release.yml` (see Section 4 for YAML sketch).
+
+- **Warm-up**: sleeps 90 seconds before the first probe to give Coolify time to redeploy and warm.
+- **Probes** (minimum set):
+  - `GET https://prodescaloneta.online/health` → expects `200`
+  - `GET https://prodescaloneta.online/api/auth/me` → expects `401` (proves auth layer is up; no token attached on purpose)
+- **Optional probes** (worth considering during implementation): `GET /api/groups/standings` (public-ish endpoint with DB read)
+- **Configuration**: smoke endpoints list lives in a `SMOKE_TEST_URLS` workflow env variable to allow changes without editing YAML.
+- **Failure behavior**: on any probe failure the `smoke-test` job fails, and a follow-up `notify-failure` job with `if: failure()` runs `gh issue create` with title "Smoke test failed for <tag>" and body containing the workflow run URL.
+- **Important**: even if the smoke test fails, the GitHub Release stays published. The operator manually rolls back via Coolify UI based on the issue notification.

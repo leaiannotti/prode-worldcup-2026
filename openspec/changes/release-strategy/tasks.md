@@ -4,12 +4,12 @@
 
 | Field | Value |
 |-------|-------|
-| Estimated changed lines | ~445 |
+| Estimated changed lines | ~555 |
 | 400-line budget risk | High |
 | Chained PRs recommended | Yes |
 | Suggested split | 5 slices (see below) |
 | Delivery strategy | ask-always |
-| Chain strategy | pending |
+| Chain strategy | feature-branch-chain |
 
 Decision needed before apply: Yes
 Chained PRs recommended: Yes
@@ -23,8 +23,8 @@ Chain strategy: pending
 | A | T-01, T-03–T-06 | PR 1 | Hygiene + foundations (gitignore, Husky, commitlint, VERSION) | ~24 |
 | B | T-07, T-08 | PR 2 | Backend env-driven CORS | ~13 |
 | C | T-09 | PR 3 | CI workflow | ~40 |
-| D | T-10–T-13 | PR 4 | Release pipeline + changelog + release.sh | ~165 |
-| E | T-15, T-16 | PR 5 | Docs + e2e test | ~200 |
+| D | T-10–T-13, T-12-bis | PR 4 | Release pipeline + changelog + release.sh + smoke test | ~195 |
+| E | T-15, T-15-bis, T-16 | PR 5 | Docs + rollback runbook + e2e test | ~280 |
 
 **Manual actions** (T-02, T-14) run outside PRs and must complete before Slice E.
 
@@ -197,6 +197,17 @@ Chain strategy: pending
 - **Manual or automated**: AUTOMATED
 - **Commit message**: `ci: add tag-triggered release workflow`
 
+### T-12-bis: Add smoke-test + notify-failure jobs to release.yml
+- **Files**: `.github/workflows/release.yml`
+- **Depends on**: T-12
+- **Spec coverage**: REQ-11 (sub-area C — smoke test detection)
+- **Verification**:
+  - `actionlint` passes; workflow includes `smoke-test` job with 90s sleep + curl probes
+  - `notify-failure` job with `if: failure()` creates GitHub issue
+- **Estimated changed lines**: ~30
+- **Manual or automated**: AUTOMATED
+- **Commit message**: `ci: add post-deploy smoke test and incident notification`
+
 ### T-13: Create scripts/release.sh
 - **Files**: `scripts/release.sh` (new)
 - **Depends on**: T-12
@@ -245,6 +256,16 @@ Chain strategy: pending
 - **Manual or automated**: AUTOMATED
 - **Commit message**: `docs: add release runbook`
 
+### T-15-bis: Expand docs/RELEASE.md with rollback runbook
+- **Files**: `docs/RELEASE.md` (modify the T-15 doc to include rollback section)
+- **Depends on**: T-15
+- **Spec coverage**: REQ-11 (all sub-areas A/B/C/D)
+- **Verification**:
+  - `docs/RELEASE.md` contains: forward-fix migration policy, expand-contract example, pre-release migration classification checklist (3 buckets), 5-step rollback runbook, smoke test failure response
+- **Estimated changed lines**: ~80
+- **Manual or automated**: AUTOMATED
+- **Commit message**: `docs: add rollback runbook to release docs`
+
 ## Phase 11: End-to-End Verification
 
 ### T-16: End-to-end test: cut v1.1.0
@@ -266,20 +287,21 @@ Chain strategy: pending
 
 ## Section 2: Review Workload Forecast
 
-- **Total estimated changed lines**: ~445
+- **Total estimated changed lines**: ~555
 - **Risk classification**: High (exceeds 400-line budget)
 - **400-line budget risk**: High
 - **Chained PRs recommended**: Yes
 - **Decision needed before apply**: Yes
 - **Delivery strategy**: ask-always
+- **Chain strategy**: feature-branch-chain
 - **Suggested work-unit PR split**:
   - PR 1 (Slice A): Foundations — ~24 lines
   - PR 2 (Slice B): Backend CORS — ~13 lines
   - PR 3 (Slice C): CI — ~40 lines
-  - PR 4 (Slice D): Release pipeline — ~165 lines
-  - PR 5 (Slice E): Docs + E2E — ~200 lines
+  - PR 4 (Slice D): Release pipeline + smoke test — ~195 lines
+  - PR 5 (Slice E): Docs + rollback runbook + E2E — ~280 lines
 
-Manual tasks (T-02, T-14) must complete before PR 5. The largest slices are D and E, both staying under 400 lines individually.
+Manual tasks (T-02, T-14) must complete before PR 5. The largest slices are D and E, both staying under 400 lines individually. The 5-slice plan remains valid.
 
 ---
 
@@ -295,8 +317,9 @@ Manual tasks (T-02, T-14) must complete before PR 5. The largest slices are D an
 | 6 | Configure Coolify webhook | Coolify UI → Webhooks | Create endpoint; copy URL + token | Test `curl` to URL returns 2xx; Coolify deploys on trigger |
 | 7 | Add GitHub secrets | GitHub repo → Settings → Secrets and variables → Actions | `COOLIFY_WEBHOOK_URL`, `COOLIFY_WEBHOOK_TOKEN` | `release.yml` notify step succeeds; logs mask the URL |
 | 8 | E2E test cut | Local terminal | Run `scripts/release.sh patch` or push `v1.1.0` tag | GitHub Release created; Coolify deploys; app smoke test passes |
+| 9 | Verify smoke test endpoints | Local terminal / browser | Manually curl `/health` and `/api/auth/me` against prod BEFORE adding them as smoke test probes in T-12-bis | `curl` returns 200 for `/health` and 401 for `/api/auth/me` |
 
-**Important**: T-02 (secrets rotation) must be completed BEFORE T-16 (e2e test). The old `.env` values are already in git history; rotating them neutralizes the risk.
+**Important**: T-02 (secrets rotation) must be completed BEFORE T-16 (e2e test). The old `.env` values are already in git history; rotating them neutralizes the risk. Item 9 must be completed before T-12-bis so the smoke test workflow does not fail on first run.
 
 ---
 
@@ -316,16 +339,16 @@ T-06 (VERSION file) ────────────────────
                                                                                           T-10 (cliff.toml) ──→ T-11 (CHANGELOG.md)
                                                                                                   │
                                                                                                   ↓
-                                                                                          T-12 (release.yml) ──→ T-13 (release.sh)
-                                                                                                  │
-                                                                                                  ↓
-                                                                                          T-14 (Coolify webhook MANUAL)
-                                                                                                  │
-                                                                                                  ↓
-                                                                                          T-15 (docs/RELEASE.md)
-                                                                                                  │
-                                                                                                  ↓
-                                                                                          T-16 (e2e test MANUAL)
+                                                                                           T-12 (release.yml) ──→ T-12-bis (smoke test) ──→ T-13 (release.sh)
+                                                                                                   │
+                                                                                                   ↓
+                                                                                           T-14 (Coolify webhook MANUAL)
+                                                                                                   │
+                                                                                                   ↓
+                                                                                           T-15 (docs/RELEASE.md) ──→ T-15-bis (rollback runbook)
+                                                                                                   │
+                                                                                                   ↓
+                                                                                           T-16 (e2e test MANUAL)
 ```
 
 **Key dependencies**:
@@ -333,9 +356,10 @@ T-06 (VERSION file) ────────────────────
 - T-03, T-04, T-05 form a chain (Husky setup)
 - T-07, T-08 form a chain (CORS + env docs)
 - T-10, T-11 form a chain (cliff config → changelog)
-- T-12, T-13 form a chain (release workflow → helper script)
+- T-12, T-12-bis, T-13 form a chain (release workflow → smoke test → helper script)
 - T-14 must happen after T-12 because it tests the webhook defined in `release.yml`
 - T-15 is the documentation capstone; depends on T-13 (script) and T-14 (webhook)
+- T-15-bis extends T-15 with rollback runbook
 - T-16 is the final verification; depends on everything plus manual T-02
 
 ---
@@ -358,9 +382,11 @@ Project capability: `strict_tdd: true` (from SDD init).
 | T-10 | No | TOML config file | — |
 | T-11 | No | Markdown file; verified by inspection | — |
 | T-12 | No | YAML workflow; tested via dry-run | — |
+| T-12-bis | No | YAML workflow; manual dry-run | — |
 | T-13 | No | Shell script; syntax checked by `bash -n` | — |
 | T-14 | No | Manual UI configuration | — |
 | T-15 | No | Documentation file | — |
+| T-15-bis | No | Documentation | — |
 | T-16 | No | Manual end-to-end verification | — |
 
 **Only T-07 requires strict TDD**. The test should verify:
