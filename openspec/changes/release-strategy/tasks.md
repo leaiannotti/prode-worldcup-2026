@@ -414,3 +414,9 @@ All other tasks are configuration, documentation, or manual actions that do not 
 |------|--------|--------|
 | T-07 | ✅ DONE | `ededaa7` — feat(backend): make CORS origin env-driven from FRONTEND_URL |
 | T-08 | ✅ DONE | `628fe44` — docs: document FRONTEND_URL requirement in .env.example |
+
+## Slice C Progress
+
+| Task | Status | Commit |
+|------|--------|--------|
+| T-09 | ✅ DONE | `918489e` — ci: add PR test gate workflow for main and release-strategy |
