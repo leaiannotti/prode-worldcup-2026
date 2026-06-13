@@ -7,18 +7,6 @@
         <p class="font-body-lg text-body-lg text-on-surface-variant">
           {{ t('predictionsView.subtitle') }}
         </p>
-
-        <!-- Group Filter -->
-        <select
-          v-model="selectedGroup"
-          @change="fetchPredictions"
-          class="w-full md:w-64 px-4 py-2 border border-outline-variant rounded-lg focus:border-primary focus:ring-2 focus:ring-secondary-container outline-none"
-        >
-          <option value="">{{ t('predictionsView.allGroups') }}</option>
-          <option v-for="group in groupsStore.groups" :key="group.id" :value="group.id">
-            {{ group.name }}
-          </option>
-        </select>
       </section>
 
       <!-- Loading State -->
@@ -64,48 +52,31 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useGroupsStore } from '@/stores/groups'
-import { usePredictionsStore } from '@/stores/predictions'
+import { usePredictionsStore, type Prediction } from '@/stores/predictions'
 import AppLayout from '@/components/AppLayout.vue'
 
 const { t } = useI18n()
-const groupsStore = useGroupsStore()
 const predictionsStore = usePredictionsStore()
 
-const selectedGroup = ref('')
 const isLoading = ref(false)
 
 onMounted(async () => {
-  try {
-    await groupsStore.fetchGroups()
-    if (groupsStore.groups.length > 0) {
-      selectedGroup.value = groupsStore.groups[0].id
-      await fetchPredictions()
-    }
-  } catch (error) {
-    console.error('Error loading data:', error)
-  }
-})
-
-async function fetchPredictions() {
-  if (!selectedGroup.value) return
-
   isLoading.value = true
   try {
-    await predictionsStore.fetchMyPredictions(selectedGroup.value)
+    await predictionsStore.fetchMyPredictions()
   } catch (error) {
-    console.error('Error fetching predictions:', error)
+    console.error('Error loading predictions:', error)
   } finally {
     isLoading.value = false
   }
-}
+})
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr)
   return date.toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-function editPrediction(prediction: any) {
+function editPrediction(prediction: Prediction) {
   console.log('Edit prediction:', prediction)
 }
 </script>

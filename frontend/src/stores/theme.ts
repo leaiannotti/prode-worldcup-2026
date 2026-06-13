@@ -3,7 +3,7 @@
  * Persists to localStorage and syncs with <html> class.
  */
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 
 type Theme = 'light' | 'dark'
 

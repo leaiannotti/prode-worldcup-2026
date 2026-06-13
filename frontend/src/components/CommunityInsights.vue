@@ -49,57 +49,57 @@
             <div
               class="flex items-center justify-center gap-1 text-[11px] font-bold transition-all overflow-hidden"
               :style="{
-                width: item.home_win_pct > 0 ? item.home_win_pct + '%' : '0%',
-                minWidth: item.home_win_pct > 0 ? '8px' : '0',
+                width: (item.home_win_pct ?? 0) > 0 ? (item.home_win_pct ?? 0) + '%' : '0%',
+                minWidth: (item.home_win_pct ?? 0) > 0 ? '8px' : '0',
                 background: 'var(--color-primary)',
                 color: 'var(--color-on-primary)',
               }"
             >
-              <template v-if="item.home_win_pct >= 20">
+              <template v-if="(item.home_win_pct ?? 0) >= 20">
                 <span class="truncate">{{ item.home_team.code }}</span>
-                <span>{{ item.home_win_pct }}%</span>
+                <span>{{ item.home_win_pct ?? 0 }}%</span>
               </template>
-              <span v-else-if="item.home_win_pct >= 10">{{ item.home_win_pct }}%</span>
+              <span v-else-if="(item.home_win_pct ?? 0) >= 10">{{ item.home_win_pct ?? 0 }}%</span>
             </div>
             <!-- Draw -->
             <div
               class="flex items-center justify-center gap-1 text-[11px] font-bold transition-all overflow-hidden"
               :style="{
-                width: item.draw_pct > 0 ? item.draw_pct + '%' : '0%',
-                minWidth: item.draw_pct > 0 ? '8px' : '0',
+                width: (item.draw_pct ?? 0) > 0 ? (item.draw_pct ?? 0) + '%' : '0%',
+                minWidth: (item.draw_pct ?? 0) > 0 ? '8px' : '0',
                 background: 'var(--color-outline)',
                 color: 'white',
               }"
             >
-              <template v-if="item.draw_pct >= 20">
+              <template v-if="(item.draw_pct ?? 0) >= 20">
                 <span>{{ t('match.drawShort') }}</span>
-                <span>{{ item.draw_pct }}%</span>
+                <span>{{ item.draw_pct ?? 0 }}%</span>
               </template>
-              <span v-else-if="item.draw_pct >= 10">{{ item.draw_pct }}%</span>
+              <span v-else-if="(item.draw_pct ?? 0) >= 10">{{ item.draw_pct ?? 0 }}%</span>
             </div>
             <!-- Away win -->
             <div
               class="flex items-center justify-center gap-1 text-[11px] font-bold transition-all overflow-hidden"
               :style="{
-                width: item.away_win_pct > 0 ? item.away_win_pct + '%' : '0%',
-                minWidth: item.away_win_pct > 0 ? '8px' : '0',
+                width: (item.away_win_pct ?? 0) > 0 ? (item.away_win_pct ?? 0) + '%' : '0%',
+                minWidth: (item.away_win_pct ?? 0) > 0 ? '8px' : '0',
                 background: 'var(--color-secondary)',
                 color: 'var(--color-on-secondary)',
               }"
             >
-              <template v-if="item.away_win_pct >= 20">
+              <template v-if="(item.away_win_pct ?? 0) >= 20">
                 <span class="truncate">{{ item.away_team.code }}</span>
-                <span>{{ item.away_win_pct }}%</span>
+                <span>{{ item.away_win_pct ?? 0 }}%</span>
               </template>
-              <span v-else-if="item.away_win_pct >= 10">{{ item.away_win_pct }}%</span>
+              <span v-else-if="(item.away_win_pct ?? 0) >= 10">{{ item.away_win_pct ?? 0 }}%</span>
             </div>
           </div>
 
           <!-- Labels siempre visibles debajo -->
           <div class="flex justify-between mt-1.5 text-[11px] font-body-md">
-            <span class="text-primary font-bold">{{ item.home_team.code }} {{ item.home_win_pct }}%</span>
-            <span class="text-on-surface-variant">{{ t('communityInsights.draw') }} {{ item.draw_pct }}%</span>
-            <span class="text-secondary font-bold">{{ item.away_team.code }} {{ item.away_win_pct }}%</span>
+            <span class="text-primary font-bold">{{ item.home_team.code }} {{ item.home_win_pct ?? 0 }}%</span>
+            <span class="text-on-surface-variant">{{ t('communityInsights.draw') }} {{ item.draw_pct ?? 0 }}%</span>
+            <span class="text-secondary font-bold">{{ item.away_team.code }} {{ item.away_win_pct ?? 0 }}%</span>
           </div>
         </div>
       </div>

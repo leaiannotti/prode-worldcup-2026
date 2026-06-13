@@ -62,14 +62,14 @@ describe('useAuthStore', () => {
     const store = useAuthStore();
     const { apiClient } = await import('@/lib/api');
 
-    // Set initial state
+    // Set initial state (isAuthenticated is a computed getter derived from user)
     store.user = {
       id: 'user-123',
       email: 'test@example.com',
       name: 'Test User',
       picture: null,
     };
-    store.isAuthenticated = true;
+    expect(store.isAuthenticated).toBe(true);
 
     vi.mocked(apiClient.post).mockResolvedValueOnce({ status: 200 });
 
