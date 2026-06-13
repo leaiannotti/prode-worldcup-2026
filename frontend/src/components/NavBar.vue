@@ -266,6 +266,7 @@ import { useActivityStore } from '@/stores/activity'
 import { useThemeStore } from '@/stores/theme'
 import PointsDrawer from '@/components/PointsDrawer.vue'
 import { formatRelativeTime } from '@/composables/useDateFormat'
+import { formatPrizeChangedEvent } from '@/utils/activity'
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '@/i18n'
 import { useAppVersion } from '@/composables/useAppVersion'
@@ -359,6 +360,7 @@ function eventText(event: any): string {
     }
     case 'group_created': return t('activity.groupCreated', { name: p.group_name || t('activity.aLeague') })
     case 'group_joined': return t('activity.groupJoined', { name: p.group_name || t('activity.aLeague') })
+    case 'prize_changed': return formatPrizeChangedEvent(event, t)
     default: return t('activity.unknown')
   }
 }
