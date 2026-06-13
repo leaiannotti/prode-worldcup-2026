@@ -24,18 +24,31 @@ export const useActivityStore = defineStore('activity', () => {
   /**
    * Fetch activity events for current user or group
    */
-  async function fetchActivity(options?: { groupId?: string | number; eventType?: string; limit?: number }): Promise<void> {
+  async function fetchActivity(
+    limitOrOptions?: number | { groupId?: string | number; eventType?: string; limit?: number }
+  ): Promise<void> {
     isLoading.value = true
     error.value = null
     try {
       const params = new URLSearchParams()
-      const limit = options?.limit ?? 10
-      params.append('limit', String(limit))
-      if (options?.groupId !== undefined) {
-        params.append('group_id', String(options.groupId))
+      let limit = 10
+      let groupId: string | number | undefined
+      let eventType: string | undefined
+
+      if (typeof limitOrOptions === 'number') {
+        limit = limitOrOptions
+      } else if (limitOrOptions) {
+        limit = limitOrOptions.limit ?? 10
+        groupId = limitOrOptions.groupId
+        eventType = limitOrOptions.eventType
       }
-      if (options?.eventType !== undefined) {
-        params.append('event_type', options.eventType)
+
+      params.append('limit', String(limit))
+      if (groupId !== undefined) {
+        params.append('group_id', String(groupId))
+      }
+      if (eventType !== undefined) {
+        params.append('event_type', eventType)
       }
       const response = await apiClient.get(`/api/activity?${params.toString()}`)
       events.value = response.data.events
