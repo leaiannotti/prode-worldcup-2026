@@ -79,4 +79,32 @@ describe('useActivityStore — fetchActivity', () => {
 
     expect(store.events).toEqual(mockEvents);
   });
+
+  it('accepts positional limit (backward compat)', async () => {
+    const store = useActivityStore();
+    const { apiClient } = await import('@/lib/api');
+
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: { events: [] },
+    });
+
+    await store.fetchActivity(10);
+
+    expect(apiClient.get).toHaveBeenCalledTimes(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/api/activity?limit=10');
+  });
+
+  it('accepts positional limit with custom value', async () => {
+    const store = useActivityStore();
+    const { apiClient } = await import('@/lib/api');
+
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: { events: [] },
+    });
+
+    await store.fetchActivity(5);
+
+    expect(apiClient.get).toHaveBeenCalledTimes(1);
+    expect(apiClient.get).toHaveBeenCalledWith('/api/activity?limit=5');
+  });
 });
