@@ -9,6 +9,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import LeagueDetailModal from './LeagueDetailModal.vue'
 import { useAuthStore } from '@/stores/auth'
+import { useActivityStore } from '@/stores/activity'
 
 vi.mock('@/lib/api', () => ({
   apiClient: {
@@ -248,5 +249,131 @@ describe('LeagueDetailModal — prize editing', () => {
     await clickSave(wrapper)
 
     expect(wrapper.text()).toContain('No pudimos guardar los premios')
+  })
+})
+
+describe('LeagueDetailModal — audit history', () => {
+  let wrapper: any
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    const authStore = useAuthStore()
+    authStore.user = { id: 'user-1', email: 'test@example.com', name: 'Test User', picture: null }
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
+  function findButtonByText(wrapper: any, text: string) {
+    const buttons = wrapper.findAll('button')
+    return buttons.find((b: any) => b.text().includes(text)) || null
+  }
+
+  async function clickHistoryToggle(wrapper: any) {
+    const btn = findButtonByText(wrapper, 'Ver historial') || findButtonByText(wrapper, 'Ocultar historial')
+    if (!btn) throw new Error('History toggle button not found')
+    await btn.trigger('click')
+    await flushPromises()
+  }
+
+  const mockGroup = {
+    id: 'g1',
+    name: 'Test Liga',
+    invite_code: 'ABC123',
+    created_at: '2024-01-01',
+    creator_id: 'user-1',
+    member_count: 5,
+    prizes: [
+      { rank: 1, description: 'Pizza' },
+      { rank: 2, description: 'Cerveza' },
+    ],
+  }
+
+  const mockHistoryEvent = {
+    id: '1',
+    event_type: 'prize_changed',
+    group_id: 'g1',
+    match_id: null,
+    payload: { rank: 1, previous_value: 'Pizza', new_value: 'Asado', actor_is_admin: false, actor_name: 'Juan' },
+    occurred_at: '2024-01-01T00:00:00Z',
+  }
+
+  const mockHistoryEventAdmin = {
+    id: '2',
+    event_type: 'prize_changed',
+    group_id: 'g1',
+    match_id: null,
+    payload: { rank: 2, previous_value: 'Cerveza', new_value: 'Vino', actor_is_admin: true, actor_name: 'Lea' },
+    occurred_at: '2024-01-02T00:00:00Z',
+  }
+
+  it('history section is collapsed by default', () => {
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    expect(wrapper.text()).not.toContain('Ocultar historial')
+    expect(wrapper.text()).toContain('Ver historial')
+  })
+
+  it('clicking "Ver historial" expands and fetches via activityStore.fetchActivity', async () => {
+    const { apiClient } = await import('@/lib/api')
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: { events: [mockHistoryEvent] },
+    })
+
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    await clickHistoryToggle(wrapper)
+
+    expect(apiClient.get).toHaveBeenCalledTimes(1)
+    expect(apiClient.get).toHaveBeenCalledWith(
+      expect.stringContaining('/api/activity?')
+    )
+    expect(apiClient.get).toHaveBeenCalledWith(
+      expect.stringContaining('event_type=prize_changed')
+    )
+    expect(apiClient.get).toHaveBeenCalledWith(
+      expect.stringContaining('group_id=g1')
+    )
+  })
+
+  it('renders audit lines with the correct format', async () => {
+    const { apiClient } = await import('@/lib/api')
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: { events: [mockHistoryEvent] },
+    })
+
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    await clickHistoryToggle(wrapper)
+
+    expect(wrapper.text()).toContain('Juan cambió el 1° premio de «Pizza» a «Asado»')
+  })
+
+  it('renders admin marker when actor_is_admin: true', async () => {
+    const { apiClient } = await import('@/lib/api')
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: { events: [mockHistoryEventAdmin] },
+    })
+
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    await clickHistoryToggle(wrapper)
+
+    expect(wrapper.text()).toContain('Lea (admin) cambió el 2° premio de «Cerveza» a «Vino»')
+  })
+
+  it('clicking "Ocultar historial" collapses the section', async () => {
+    const { apiClient } = await import('@/lib/api')
+    vi.mocked(apiClient.get).mockResolvedValueOnce({
+      data: { events: [] },
+    })
+
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    await clickHistoryToggle(wrapper)
+    expect(wrapper.text()).toContain('Ocultar historial')
+
+    await clickHistoryToggle(wrapper)
+    expect(wrapper.text()).toContain('Ver historial')
+    expect(wrapper.text()).not.toContain('Ocultar historial')
   })
 })
