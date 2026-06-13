@@ -16,7 +16,51 @@ How to cut releases, handle hotfixes, and recover from incidents for prode-world
 
 (REQ-2)
 
-### 1.1. Developer runs the release script
+### 1.1. Write the user-facing changelog FIRST
+
+Before bumping the version, add an entry to `backend/app/changelog.json`
+with notes written **from the user's perspective**. This is what powers
+the in-app "What's New" modal — keep it readable and non-technical.
+
+Add the new entry as the **first** item in the `entries` array (newest first):
+
+```json
+{
+  "version": "1.1.1",
+  "released_at": "",
+  "translations": {
+    "es": {
+      "title": "¡Hay novedades!",
+      "new": ["..."],
+      "fixed": ["..."]
+    },
+    "en": {
+      "title": "What's new",
+      "new": ["..."],
+      "fixed": ["..."]
+    }
+  }
+}
+```
+
+- Leave `released_at` empty — the release script auto-fills it with today's UTC date.
+- `new` and `fixed` are required; `improved` is optional.
+- Both `es` and `en` are mandatory.
+
+Commit the changelog with a conventional message:
+
+```bash
+git add backend/app/changelog.json
+git commit -m "docs(changelog): add v1.1.1 release notes"
+```
+
+> The release script (`scripts/release.sh`) validates this file before
+> bumping `VERSION`. If the entry is missing or malformed, the script
+> fails and shows a copy-pasteable template. There is also a backend
+> test (`test_version_matches_repo_root_version_file`) that guards
+> against drift between `changelog.json` and `VERSION` in CI.
+
+### 1.2. Developer runs the release script
 
 Check out `main` and pull the latest changes:
 
@@ -37,12 +81,13 @@ What the script does:
 1. Verifies you are on `main` (or `release-strategy` during the change)
 2. Verifies the working tree is clean
 3. Pulls latest with `--ff-only`
-4. Reads `VERSION`, bumps the chosen component
-5. Writes the new version back to `VERSION`
-6. Commits with `chore(release): vX.Y.Z`
-7. Tags with `vX.Y.Z`
+4. Reads `VERSION`, computes the next version
+5. **Validates `backend/app/changelog.json` has a well-formed entry for the next version** (see section 1.1). Auto-fills `released_at` if empty.
+6. Writes the new version back to `VERSION`
+7. Commits with `chore(release): vX.Y.Z` (combining `VERSION` bump and any changelog auto-fill in one commit)
+8. Tags with `vX.Y.Z`
 
-### 1.2. Push the tag
+### 1.3. Push the tag
 
 ```bash
 git push --follow-tags
@@ -50,7 +95,7 @@ git push --follow-tags
 
 This pushes both the commit and the tag in one command. The `release.yml` workflow triggers on the tag push.
 
-### 1.3. Watch the release
+### 1.4. Watch the release
 
 Monitor the run at:
 `https://github.com/leaiannotti/prode-worldcup-2026/actions`
@@ -70,7 +115,7 @@ Workflow steps in order:
 7. **smoke-test** — waits 90s, then probes `GET /health` (expect `200`) and `GET /api/auth/me` (expect `401`)
 8. **notify-failure** — runs only if smoke-test fails; opens a GitHub issue with the workflow URL
 
-### 1.4. Verify the release
+### 1.5. Verify the release
 
 Check the GitHub Release page:
 `https://github.com/leaiannotti/prode-worldcup-2026/releases`
@@ -379,7 +424,8 @@ This is the end-to-end validation of the entire pipeline.
   - `COOLIFY_BACKEND_WEBHOOK_URL`
   - `COOLIFY_FRONTEND_WEBHOOK_URL`
   - `COOLIFY_WEBHOOK_TOKEN`
-- [ ] Hand-curated `CHANGELOG.md` is up-to-date
+- [ ] Hand-curated `CHANGELOG.md` is up-to-date (technical, derived from commits)
+- [ ] User-facing `backend/app/changelog.json` has an entry for the new version (see section 1.1)
 
 ### 8.2. Cutting v1.1.0
 
