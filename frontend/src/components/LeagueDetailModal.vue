@@ -136,6 +136,41 @@
               </div>
             </div>
 
+            <!-- Audit History -->
+            <div class="space-y-1.5">
+              <button
+                @click="toggleHistory"
+                class="w-full flex items-center justify-between text-xs font-semibold text-secondary hover:text-primary transition-colors cursor-pointer py-1"
+              >
+                <span>{{ isHistoryExpanded ? t('leagueDetail.hideHistory') : t('leagueDetail.viewHistory') }}</span>
+                <svg v-if="isHistoryExpanded" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                </svg>
+                <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              <div v-if="isHistoryExpanded" class="space-y-2">
+                <div v-if="isHistoryLoading" class="space-y-2">
+                  <div v-for="i in 3" :key="i" class="h-8 bg-surface-container animate-pulse rounded-lg"></div>
+                </div>
+                <div v-else-if="historyError" class="text-error text-xs text-center">{{ historyError }}</div>
+                <div v-else-if="historyEvents.length === 0" class="text-xs text-on-surface-variant/60 italic text-center">
+                  {{ t('activity.empty') }}
+                </div>
+                <div v-else class="space-y-2">
+                  <div
+                    v-for="event in historyEvents.slice(0, 10)"
+                    :key="event.id"
+                    class="text-xs text-on-surface leading-snug"
+                  >
+                    {{ formatPrizeChangedEvent(event, t) }} — {{ formatRelativeTime(event.occurred_at) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Actions -->
             <div class="pt-1 space-y-2">
               <!-- Leave (non-admin) -->
@@ -192,7 +227,10 @@
 import { ref, computed, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useGroupsStore } from '@/stores/groups'
+import { useActivityStore } from '@/stores/activity'
 import type { Group } from '@/stores/groups'
+import { formatRelativeTime } from '@/composables/useDateFormat'
+import { formatPrizeChangedEvent } from '@/utils/activity'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
@@ -209,6 +247,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const authStore = useAuthStore()
 const groupsStore = useGroupsStore()
+const activityStore = useActivityStore()
 
 const copied = ref(false)
 const isLeaving = ref(false)
@@ -221,6 +260,11 @@ const isSaving = ref(false)
 const saveError = ref<string | null>(null)
 const draftPrizes = ref({ first: '', second: '', third: '' })
 
+const isHistoryExpanded = ref(false)
+const historyEvents = ref<any[]>([])
+const isHistoryLoading = ref(false)
+const historyError = ref<string | null>(null)
+
 watch(() => props.isOpen, (v) => {
   if (v) {
     copied.value = false
@@ -228,8 +272,32 @@ watch(() => props.isOpen, (v) => {
     confirmDelete.value = false
     isEditing.value = false
     saveError.value = null
+    isHistoryExpanded.value = false
+    historyEvents.value = []
+    historyError.value = null
   }
 })
+
+async function toggleHistory() {
+  if (!props.group) return
+  isHistoryExpanded.value = !isHistoryExpanded.value
+  if (isHistoryExpanded.value && historyEvents.value.length === 0) {
+    isHistoryLoading.value = true
+    historyError.value = null
+    try {
+      await activityStore.fetchActivity({
+        groupId: props.group.id,
+        eventType: 'prize_changed',
+        limit: 10,
+      })
+      historyEvents.value = activityStore.events
+    } catch {
+      historyError.value = t('activity.error')
+    } finally {
+      isHistoryLoading.value = false
+    }
+  }
+}
 
 const isOverLimit = computed(() => {
   return (
