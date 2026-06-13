@@ -170,6 +170,94 @@
   "common": {
     "pts": "pts",
     "vs": "VS",
-    "final": "Final"
+    "final": "Final",
+    "loading": "Loading...",
+    "back": "Back",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "pending": "Pending",
+    "notFound": "Not found",
+    "backToDashboard": "Back to Dashboard",
+    "loadingImage": "Loading"
+  },
+  "match": {
+    "open": "Open",
+    "closed": "Closed",
+    "closesIn": "Closes in {time}",
+    "closingIn": "CLOSING IN {time}",
+    "closedBadge": "CLOSED",
+    "predictionClosed": "Prediction Closed",
+    "finalResult": "Final Result",
+    "addPrediction": "Add prediction form here",
+    "draw": "Draw",
+    "drawShort": "Draw",
+    "noPredictionsYet": "No predictions yet"
+  },
+  "leaderboard": {
+    "title": "Standings",
+    "rank": "Rank",
+    "player": "Player",
+    "points": "Points",
+    "prize": "Prize",
+    "empty": "No standings available yet",
+    "rankLabel": "Rank {rank}",
+    "loading": "Loading standings...",
+    "notMember": "You're not a member of this group",
+    "viewHistory": "View History",
+    "viewLeaderboard": "View Leaderboard",
+    "defaultTitle": "Leaderboard"
+  },
+  "history": {
+    "title": "My Predictions",
+    "defaultGroup": "History",
+    "loading": "Loading your predictions...",
+    "empty": "No predictions made yet",
+    "yourPrediction": "Your Prediction",
+    "actualResult": "Actual Result",
+    "pointsEarned": "Points Earned",
+    "pending": "Pending",
+    "statusUpcoming": "Upcoming",
+    "statusLive": "Live",
+    "statusFinished": "Finished"
+  },
+  "predictionsView": {
+    "title": "My Predictions",
+    "subtitle": "Track all your predictions across groups.",
+    "allGroups": "All Groups",
+    "loading": "Loading predictions...",
+    "empty": "No predictions yet.",
+    "submittedAt": "Submitted at {time}",
+    "frozen": "Frozen",
+    "canEdit": "Can Edit",
+    "edit": "Edit"
+  },
+  "groupDetail": {
+    "loading": "Loading group...",
+    "members": "{count} members",
+    "inviteCode": "Invite Code",
+    "prizes": "Prizes",
+    "rankLabel": "Rank {rank}",
+    "membersTab": "Members",
+    "matchesTab": "Matches",
+    "membersTitle": "Group Members",
+    "membersComingSoon": "Members list coming soon",
+    "matchesTitle": "Group Matches",
+    "matchesComingSoon": "Matches list coming soon",
+    "notFound": "Group not found",
+    "viewLeaderboard": "View Leaderboard"
+  },
+  "leagueDetail2": {
+    "deleteLeague": "Delete league",
+    "deleteConfirmTitle": "Are you sure you want to delete this league?",
+    "deleteConfirmWarning": "This action cannot be undone.",
+    "deleting": "Deleting...",
+    "deleteYes": "Yes, delete",
+    "cancel": "Cancel",
+    "deleteError": "Error deleting. Please try again."
+  },
+  "community": {
+    "noVotes": "No predictions yet"
   }
 }

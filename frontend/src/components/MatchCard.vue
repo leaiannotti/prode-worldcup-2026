@@ -18,7 +18,7 @@
         class="flex items-center gap-1 bg-secondary text-on-secondary px-2 py-1 rounded-full font-label-md text-label-md uppercase animate-pulse"
       >
         <span class="w-2 h-2 rounded-full bg-on-secondary" />
-        Open
+        {{ t('match.open') }}
       </div>
       <div v-else class="flex items-center gap-1 bg-error text-on-error px-2 py-1 rounded-full font-label-md text-label-md uppercase">
         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -28,7 +28,7 @@
             clip-rule="evenodd"
           />
         </svg>
-        Closed
+        {{ t('match.closed') }}
       </div>
     </div>
 
@@ -65,12 +65,12 @@
     <div v-if="match.status !== 'finished'" class="space-y-4">
       <slot name="prediction-form" :is-open="isOpen">
         <div class="p-4 bg-surface-container-low rounded-lg text-center text-on-surface-variant font-body-md">
-          Add prediction form here
+          {{ t('match.addPrediction') }}
         </div>
       </slot>
     </div>
     <div v-else class="p-4 bg-surface-container-low rounded-lg text-center">
-      <p class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Final Result</p>
+      <p class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">{{ t('match.finalResult') }}</p>
       <p class="font-headline-sm text-headline-sm text-primary">
         {{ match.home_score }} - {{ match.away_score }}
       </p>
@@ -79,18 +79,21 @@
     <!-- Time Remaining or Closed Message -->
     <div class="mt-4 text-center">
       <p v-if="isOpen" class="text-secondary font-bold font-label-md text-label-md">
-        Closes in {{ timeLeft }}
+        {{ t('match.closesIn', { time: timeLeft }) }}
       </p>
       <p v-else class="text-error font-bold font-label-md text-label-md">
-        Prediction Closed
+        {{ t('match.predictionClosed') }}
       </p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import { useDeadlineGuard } from '@/composables/useDeadlineGuard'
 import type { Match } from '@/stores/matches'
+
+const { t } = useI18n()
 
 interface Props {
   match: Match

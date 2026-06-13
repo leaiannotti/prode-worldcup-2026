@@ -3,10 +3,10 @@
     <table class="w-full border-collapse min-w-[320px]">
       <thead>
         <tr class="border-b border-outline-variant">
-          <th class="text-left py-3 px-4 text-label-md font-semibold">Rank</th>
-          <th class="text-left py-3 px-4 text-label-md font-semibold">Player</th>
-          <th class="text-right py-3 px-4 text-label-md font-semibold">Points</th>
-          <th class="text-center py-3 px-4 text-label-md font-semibold">Prize</th>
+          <th class="text-left py-3 px-4 text-label-md font-semibold">{{ t('leaderboard.rank') }}</th>
+          <th class="text-left py-3 px-4 text-label-md font-semibold">{{ t('leaderboard.player') }}</th>
+          <th class="text-right py-3 px-4 text-label-md font-semibold">{{ t('leaderboard.points') }}</th>
+          <th class="text-center py-3 px-4 text-label-md font-semibold">{{ t('leaderboard.prize') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -65,13 +65,16 @@
 
     <!-- Empty state -->
     <div v-if="standings.length === 0" class="text-center py-8 text-on-surface-variant">
-      <p class="text-body-md">No standings available yet</p>
+      <p class="text-body-md">{{ t('leaderboard.empty') }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import type { LeaderboardEntry } from '@/stores/leaderboard'
+
+const { t } = useI18n()
 
 interface Props {
   standings: LeaderboardEntry[]

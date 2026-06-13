@@ -170,6 +170,94 @@
   "common": {
     "pts": "pts",
     "vs": "VS",
-    "final": "Final"
+    "final": "Final",
+    "loading": "Cargando...",
+    "back": "Volver",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "confirm": "Confirmar",
+    "pending": "Pendiente",
+    "notFound": "No encontrado",
+    "backToDashboard": "Volver al Dashboard",
+    "loadingImage": "Cargando"
+  },
+  "match": {
+    "open": "Abierto",
+    "closed": "Cerrado",
+    "closesIn": "Cierra en {time}",
+    "closingIn": "CIERRA EN {time}",
+    "closedBadge": "CERRADO",
+    "predictionClosed": "Predicción cerrada",
+    "finalResult": "Resultado Final",
+    "addPrediction": "Formulario de predicción acá",
+    "draw": "Empate",
+    "drawShort": "Emp.",
+    "noPredictionsYet": "Sin predicciones aún"
+  },
+  "leaderboard": {
+    "title": "Posiciones",
+    "rank": "Puesto",
+    "player": "Jugador",
+    "points": "Puntos",
+    "prize": "Premio",
+    "empty": "Todavía no hay posiciones",
+    "rankLabel": "Puesto {rank}",
+    "loading": "Cargando posiciones...",
+    "notMember": "No sos miembro de este grupo",
+    "viewHistory": "Ver Historial",
+    "viewLeaderboard": "Ver Posiciones",
+    "defaultTitle": "Tabla de Posiciones"
+  },
+  "history": {
+    "title": "Mis Predicciones",
+    "defaultGroup": "Historial",
+    "loading": "Cargando tus predicciones...",
+    "empty": "Todavía no jugaste ninguna predicción",
+    "yourPrediction": "Tu Predicción",
+    "actualResult": "Resultado Real",
+    "pointsEarned": "Puntos Sumados",
+    "pending": "Pendiente",
+    "statusUpcoming": "Próximo",
+    "statusLive": "En vivo",
+    "statusFinished": "Finalizado"
+  },
+  "predictionsView": {
+    "title": "Mis Predicciones",
+    "subtitle": "Seguí todas tus predicciones en los grupos.",
+    "allGroups": "Todos los grupos",
+    "loading": "Cargando predicciones...",
+    "empty": "Todavía no hay predicciones.",
+    "submittedAt": "Enviada el {time}",
+    "frozen": "Congelada",
+    "canEdit": "Editable",
+    "edit": "Editar"
+  },
+  "groupDetail": {
+    "loading": "Cargando grupo...",
+    "members": "{count} miembros",
+    "inviteCode": "Código de Invitación",
+    "prizes": "Premios",
+    "rankLabel": "Puesto {rank}",
+    "membersTab": "Miembros",
+    "matchesTab": "Partidos",
+    "membersTitle": "Miembros del Grupo",
+    "membersComingSoon": "Lista de miembros próximamente",
+    "matchesTitle": "Partidos del Grupo",
+    "matchesComingSoon": "Lista de partidos próximamente",
+    "notFound": "Grupo no encontrado",
+    "viewLeaderboard": "Ver Posiciones"
+  },
+  "leagueDetail2": {
+    "deleteLeague": "Eliminar liga",
+    "deleteConfirmTitle": "¿Seguro que querés eliminar esta liga?",
+    "deleteConfirmWarning": "Esta acción no se puede deshacer.",
+    "deleting": "Eliminando...",
+    "deleteYes": "Sí, eliminar",
+    "cancel": "Cancelar",
+    "deleteError": "Error al eliminar. Intentá de nuevo."
+  },
+  "community": {
+    "noVotes": "Sin predicciones aún"
   }
 }
