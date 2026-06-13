@@ -70,7 +70,7 @@ const router = createRouter({
 // Route guard for auth check
 const ADMIN_EMAIL = 'leandro.iannotti87@gmail.com'
 
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const authStore = useAuthStore()
   const requiresAuth = to.meta.requiresAuth
 
