@@ -75,18 +75,25 @@
                 class="flex flex-col items-center py-4 px-3 gap-2"
               >
                 <div class="relative">
-                  <img
-                    v-if="entry.picture"
-                    :src="entry.picture"
-                    :alt="entry.name"
-                    class="w-10 h-10 rounded-full object-cover border-2"
-                    :class="medalBorder(entry.rank)"
-                  />
-                  <div v-else class="w-10 h-10 rounded-full flex items-center justify-center border-2 text-xs font-bold text-white"
-                    :class="medalBg(entry.rank)"
+                  <button
+                    type="button"
+                    class="w-11 h-11 rounded-full flex items-center justify-center p-0 border-none bg-transparent cursor-pointer hover:opacity-80 transition-opacity"
+                    :aria-label="t('friendRecentResults.ariaLabel', { name: entry.name })"
+                    @click="handleSelectUser(entry)"
                   >
-                    {{ initials(entry.name) }}
-                  </div>
+                    <img
+                      v-if="entry.picture"
+                      :src="entry.picture"
+                      :alt="entry.name"
+                      class="w-10 h-10 rounded-full object-cover border-2"
+                      :class="medalBorder(entry.rank)"
+                    />
+                    <div v-else class="w-10 h-10 rounded-full flex items-center justify-center border-2 text-xs font-bold text-white"
+                      :class="medalBg(entry.rank)"
+                    >
+                      {{ initials(entry.name) }}
+                    </div>
+                  </button>
                   <span class="absolute -bottom-1 -right-1 text-xs leading-none">{{ medalEmoji(entry.rank) }}</span>
                 </div>
                 <p class="text-xs font-semibold text-on-surface text-center truncate w-full">{{ entry.name }}</p>
@@ -108,15 +115,22 @@
                 >
                   {{ entry.rank }}
                 </div>
-                <img
-                  v-if="entry.picture"
-                  :src="entry.picture"
-                  :alt="entry.name"
-                  class="w-8 h-8 rounded-full object-cover flex-shrink-0"
-                />
-                <div v-else class="w-8 h-8 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
-                  <span class="text-on-primary text-xs font-bold">{{ initials(entry.name) }}</span>
-                </div>
+                <button
+                  type="button"
+                  class="w-11 h-11 rounded-full flex items-center justify-center p-0 border-none bg-transparent cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+                  :aria-label="t('friendRecentResults.ariaLabel', { name: entry.name })"
+                  @click="handleSelectUser(entry)"
+                >
+                  <img
+                    v-if="entry.picture"
+                    :src="entry.picture"
+                    :alt="entry.name"
+                    class="w-8 h-8 rounded-full object-cover"
+                  />
+                  <div v-else class="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
+                    <span class="text-on-primary text-xs font-bold">{{ initials(entry.name) }}</span>
+                  </div>
+                </button>
                 <span class="flex-1 font-body-md text-on-surface font-medium truncate">{{ entry.name }}</span>
                 <span
                   v-if="entry.prize_description && entry.rank <= 3"
@@ -174,11 +188,21 @@
       @left="onGroupCreatedOrJoined"
       @deleted="onGroupCreatedOrJoined"
     />
+
+    <!-- Friend Recent Results Sheet -->
+    <FriendRecentResultsSheet
+      :is-open="isRecentResultsOpen"
+      :user-name="selectedUser?.name ?? ''"
+      :history="leaderboardStore.memberRecentHistory"
+      :loading="leaderboardStore.memberRecentHistoryLoading"
+      :error="leaderboardStore.memberRecentHistoryError"
+      @close="handleCloseSheet"
+    />
   </AppLayout>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '@/stores/groups'
@@ -188,7 +212,9 @@ import AppLayout from '@/components/AppLayout.vue'
 import GroupCard from '@/components/GroupCard.vue'
 import GroupDialogs from '@/components/GroupDialogs.vue'
 import LeagueDetailModal from '@/components/LeagueDetailModal.vue'
+import FriendRecentResultsSheet from '@/components/FriendRecentResultsSheet.vue'
 import type { Group } from '@/stores/groups'
+import type { LeaderboardEntry } from '@/stores/leaderboard'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -200,6 +226,24 @@ const selectedGroupId = ref<string>('')
 const showCreate = ref(false)
 const showJoin = ref(false)
 const detailGroup = ref<Group | null>(null)
+const selectedUser = ref<LeaderboardEntry | null>(null)
+const isRecentResultsOpen = ref(false)
+
+function handleSelectUser(entry: LeaderboardEntry) {
+  selectedUser.value = entry
+  isRecentResultsOpen.value = true
+}
+
+function handleCloseSheet() {
+  isRecentResultsOpen.value = false
+  selectedUser.value = null
+}
+
+watch(isRecentResultsOpen, async (open) => {
+  if (open && selectedUser.value && selectedGroupId.value) {
+    await leaderboardStore.fetchMemberRecentHistory(selectedGroupId.value, selectedUser.value.user_id)
+  }
+})
 
 onMounted(async () => {
   if (groupsStore.groups.length === 0) {
