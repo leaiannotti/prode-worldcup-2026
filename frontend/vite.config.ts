@@ -8,7 +8,13 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'messi-copa.png'],
+      includeAssets: [
+        'favicon.ico',
+        'favicon-16x16.png',
+        'favicon-32x32.png',
+        'apple-touch-icon.png',
+        'messi-copa.png',
+      ],
       manifest: {
         name: 'Prode Mundial 2026',
         short_name: 'Prode 2026',
