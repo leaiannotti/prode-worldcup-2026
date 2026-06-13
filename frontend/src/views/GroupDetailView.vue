@@ -3,7 +3,7 @@
     <div class="px-5 py-6 max-w-7xl mx-auto space-y-6">
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-6">
-        <p class="text-on-surface-variant font-body-lg">Loading group...</p>
+        <p class="text-on-surface-variant font-body-lg">{{ t('groupDetail.loading') }}</p>
       </div>
 
       <!-- Group Detail -->
@@ -16,21 +16,21 @@
                 {{ groupsStore.currentGroup.name }}
               </h1>
               <p class="font-body-lg text-body-lg text-on-surface-variant">
-                {{ groupsStore.currentGroup.member_count || 0 }} members
+                {{ t('groupDetail.members', { count: groupsStore.currentGroup.member_count || 0 }) }}
               </p>
             </div>
             <RouterLink
               :to="`/groups/${route.params.id}/leaderboard`"
               class="px-6 py-4 bg-secondary text-on-secondary rounded-lg font-bold hover:opacity-90 transition-all"
             >
-              View Leaderboard
+              {{ t('groupDetail.viewLeaderboard') }}
             </RouterLink>
           </div>
 
           <!-- Invite Code -->
           <div class="bg-surface-container-low rounded-lg p-4 flex items-center justify-between">
             <div>
-              <p class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Invite Code</p>
+              <p class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">{{ t('groupDetail.inviteCode') }}</p>
               <code class="font-bold text-primary text-lg">{{ groupsStore.currentGroup.invite_code }}</code>
             </div>
             <button
@@ -46,14 +46,14 @@
 
         <!-- Prizes Section -->
         <section v-if="groupsStore.currentGroup.prizes && groupsStore.currentGroup.prizes.length > 0" class="space-y-4">
-          <h2 class="font-headline-md text-headline-md text-primary">Prizes</h2>
+          <h2 class="font-headline-md text-headline-md text-primary">{{ t('groupDetail.prizes') }}</h2>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div
               v-for="prize in groupsStore.currentGroup.prizes"
               :key="prize.rank"
               :class="`rounded-lg p-4 text-center ${prizeClass(prize.rank)}`"
             >
-              <p class="font-label-md text-label-md uppercase mb-1 opacity-75">Rank {{ prize.rank }}</p>
+              <p class="font-label-md text-label-md uppercase mb-1 opacity-75">{{ t('groupDetail.rankLabel', { rank: prize.rank }) }}</p>
               <p class="font-headline-sm text-headline-sm">{{ prize.description }}</p>
             </div>
           </div>
@@ -66,41 +66,41 @@
               @click="activeTab = 'members'"
               :class="`px-4 py-4 font-bold border-b-2 ${activeTab === 'members' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant'}`"
             >
-              Members
+              {{ t('groupDetail.membersTab') }}
             </button>
             <button
               @click="activeTab = 'matches'"
               :class="`px-4 py-4 font-bold border-b-2 ${activeTab === 'matches' ? 'border-primary text-primary' : 'border-transparent text-on-surface-variant'}`"
             >
-              Matches
+              {{ t('groupDetail.matchesTab') }}
             </button>
           </div>
         </section>
 
         <!-- Members Tab -->
         <section v-show="activeTab === 'members'" class="space-y-4">
-          <h3 class="font-headline-sm text-headline-sm text-primary">Group Members</h3>
+          <h3 class="font-headline-sm text-headline-sm text-primary">{{ t('groupDetail.membersTitle') }}</h3>
           <div class="space-y-2">
             <div class="text-center text-on-surface-variant py-6">
-              <p class="font-body-lg">Members list coming soon</p>
+              <p class="font-body-lg">{{ t('groupDetail.membersComingSoon') }}</p>
             </div>
           </div>
         </section>
 
         <!-- Matches Tab -->
         <section v-show="activeTab === 'matches'" class="space-y-4">
-          <h3 class="font-headline-sm text-headline-sm text-primary">Group Matches</h3>
+          <h3 class="font-headline-sm text-headline-sm text-primary">{{ t('groupDetail.matchesTitle') }}</h3>
           <div class="text-center text-on-surface-variant py-6">
-            <p class="font-body-lg">Matches list coming soon</p>
+            <p class="font-body-lg">{{ t('groupDetail.matchesComingSoon') }}</p>
           </div>
         </section>
       </div>
 
       <!-- Not Found -->
       <div v-else class="text-center py-6">
-        <p class="text-on-surface-variant font-body-lg">Group not found</p>
+        <p class="text-on-surface-variant font-body-lg">{{ t('groupDetail.notFound') }}</p>
         <RouterLink to="/dashboard" class="text-primary font-bold hover:underline">
-          Back to Dashboard
+          {{ t('common.backToDashboard') }}
         </RouterLink>
       </div>
     </div>
@@ -110,9 +110,11 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '@/stores/groups'
 import AppLayout from '@/components/AppLayout.vue'
 
+const { t } = useI18n()
 const route = useRoute()
 const groupsStore = useGroupsStore()
 
