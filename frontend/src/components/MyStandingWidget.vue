@@ -43,7 +43,11 @@
     </div>
 
     <!-- Cards -->
-    <div v-else class="space-y-3">
+    <div
+      v-else
+      class="space-y-3 overflow-y-auto"
+      :class="scoresStore.myStanding.length > 4 ? 'max-h-[356px] pr-1' : ''"
+    >
       <RouterLink
         v-for="item in scoresStore.myStanding"
         :key="item.group_id"
