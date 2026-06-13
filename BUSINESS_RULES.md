@@ -56,5 +56,4 @@
 
 ## 8. Bugs / inconsistencias conocidas a corregir
 
-- [ ] `deadline_utc` en la DB está calculado como `kickoff - 24h`. Debe ser `kickoff - 1h`.
 - [ ] El modal de predicción tiene un selector de grupo que no corresponde (la predicción es por usuario, no por grupo).

@@ -100,7 +100,7 @@ def seed_matches(db_session, seed_groups, seed_teams):
     # 4 teams per group gives C(4,2) = 6 unique match-ups
     match_count = 0
     # Make kickoff sufficiently far in future so deadline is also in future
-    # deadline_utc = kickoff_utc - 24h, so we need kickoff > now + 24h
+    # Business rule: deadline_utc = kickoff_utc - 1h
     kickoff = datetime.utcnow() + timedelta(days=2)
 
     for group in seed_groups:
@@ -114,7 +114,7 @@ def seed_matches(db_session, seed_groups, seed_teams):
                     away_team_id=away_team.id,
                     world_cup_group_id=group.id,
                     kickoff_utc=kickoff,
-                    deadline_utc=kickoff - timedelta(hours=24),
+                    deadline_utc=kickoff - timedelta(hours=1),
                     status="scheduled"
                 )
                 matches.append(match)

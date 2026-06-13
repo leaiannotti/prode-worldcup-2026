@@ -4,17 +4,17 @@
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-display-lg font-montserrat font-bold text-on-surface mb-2">
-          My Predictions
+          {{ t('history.title') }}
         </h1>
         <p class="text-body-lg text-on-surface-variant">
-          {{ groupName || 'History' }}
+          {{ groupName }}
         </p>
       </div>
 
       <!-- Loading state -->
       <div v-if="leaderboardStore.loading" class="py-8 text-center">
         <div class="inline-block animate-spin">⏳</div>
-        <p class="mt-4 text-body-md text-on-surface-variant">Loading your predictions...</p>
+        <p class="mt-4 text-body-md text-on-surface-variant">{{ t('history.loading') }}</p>
       </div>
 
       <!-- Error state -->
@@ -23,10 +23,10 @@
         class="bg-error-container rounded-lg p-6 text-center"
       >
         <p class="text-body-md text-on-error-container mb-4">
-          You're not a member of this group
+          {{ t('leaderboard.notMember') }}
         </p>
         <RouterLink to="/dashboard" class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-primary text-on-primary">
-          Back to Dashboard
+          {{ t('common.backToDashboard') }}
         </RouterLink>
       </div>
 
@@ -44,7 +44,7 @@
           class="bg-surface-dim rounded-lg p-8 text-center"
         >
           <p class="text-body-lg text-on-surface-variant">
-            No predictions made yet
+            {{ t('history.empty') }}
           </p>
         </div>
 
@@ -76,7 +76,7 @@
             <div class="grid grid-cols-2 gap-4 mb-4">
               <!-- Your prediction -->
               <div class="bg-surface-dim rounded-lg p-4">
-                <p class="text-label-sm text-on-surface-variant mb-2">Your Prediction</p>
+                <p class="text-label-sm text-on-surface-variant mb-2">{{ t('history.yourPrediction') }}</p>
                 <p class="text-headline-md font-bold text-on-surface">
                   {{ entry.prediction.home_score }} - {{ entry.prediction.away_score }}
                 </p>
@@ -84,30 +84,30 @@
 
               <!-- Actual result or pending -->
               <div v-if="entry.actual_result" class="bg-surface-dim rounded-lg p-4">
-                <p class="text-label-sm text-on-surface-variant mb-2">Actual Result</p>
+                <p class="text-label-sm text-on-surface-variant mb-2">{{ t('history.actualResult') }}</p>
                 <p class="text-headline-md font-bold text-on-surface">
                   {{ entry.actual_result.home_score }} - {{ entry.actual_result.away_score }}
                 </p>
               </div>
               <div v-else class="bg-surface-dim rounded-lg p-4">
-                <p class="text-label-sm text-on-surface-variant mb-2">Actual Result</p>
+                <p class="text-label-sm text-on-surface-variant mb-2">{{ t('history.actualResult') }}</p>
                 <p class="text-headline-md font-bold text-on-surface-variant">—</p>
               </div>
             </div>
 
             <!-- Points earned -->
             <div class="flex items-center justify-between pt-4 border-t border-outline-variant">
-              <p class="text-label-md text-on-surface-variant">Points Earned</p>
+              <p class="text-label-md text-on-surface-variant">{{ t('history.pointsEarned') }}</p>
               <div v-if="entry.points !== undefined && entry.points !== null">
                 <span
                   :class="['px-4 py-2 rounded-full font-semibold text-white', pointsBadgeColor(entry.points)]"
                 >
-                  {{ entry.points }} pts
+                  {{ entry.points }} {{ t('common.pts') }}
                 </span>
               </div>
               <div v-else>
                 <span class="px-4 py-2 rounded-full font-semibold text-on-surface-variant bg-surface-dim">
-                  Pending
+                  {{ t('history.pending') }}
                 </span>
               </div>
             </div>
@@ -120,10 +120,10 @@
             :to="`/groups/${groupId}/leaderboard`"
             class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-primary text-on-primary"
           >
-            View Leaderboard
+            {{ t('leaderboard.viewLeaderboard') }}
           </RouterLink>
           <RouterLink to="/dashboard" class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-secondary text-on-secondary">
-            Back to Dashboard
+            {{ t('common.backToDashboard') }}
           </RouterLink>
         </div>
       </div>
@@ -134,11 +134,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useLeaderboardStore } from '@/stores/leaderboard'
 import { useGroupsStore } from '@/stores/groups'
 import { useScoreFormatter } from '@/composables/useScoreFormatter'
 import AppLayout from '@/components/AppLayout.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const leaderboardStore = useLeaderboardStore()
@@ -148,7 +150,7 @@ const { pointsBadgeColor } = useScoreFormatter()
 const groupId = computed(() => route.params.id as string)
 
 const groupName = computed(() => {
-  return groupsStore.currentGroup?.name || 'History'
+  return groupsStore.currentGroup?.name || t('history.defaultGroup')
 })
 
 function formatDate(dateStr: string): string {
@@ -164,9 +166,9 @@ function formatDate(dateStr: string): string {
 
 function statusLabel(status: string): string {
   const labels: Record<string, string> = {
-    'scheduled': 'Upcoming',
-    'in_progress': 'Live',
-    'finished': 'Finished'
+    'scheduled': t('history.statusUpcoming'),
+    'in_progress': t('history.statusLive'),
+    'finished': t('history.statusFinished')
   }
   return labels[status] || status
 }

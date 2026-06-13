@@ -78,25 +78,25 @@
                     @click="confirmDelete = true"
                     class="w-full py-2.5 border border-error text-error rounded-xl font-semibold text-sm hover:bg-error/5 transition-all active:scale-[0.98] cursor-pointer"
                   >
-                    Eliminar liga
+                    {{ t('leagueDetail2.deleteLeague') }}
                   </button>
                 </div>
                 <div v-else class="bg-error/10 rounded-xl p-4 space-y-3">
-                  <p class="text-sm text-on-surface font-semibold text-center">¿Seguro que querés eliminar esta liga?</p>
-                  <p class="text-xs text-on-surface-variant text-center">Esta acción no se puede deshacer.</p>
+                  <p class="text-sm text-on-surface font-semibold text-center">{{ t('leagueDetail2.deleteConfirmTitle') }}</p>
+                  <p class="text-xs text-on-surface-variant text-center">{{ t('leagueDetail2.deleteConfirmWarning') }}</p>
                   <div class="flex gap-2">
                     <button
                       @click="confirmDelete = false"
                       class="flex-1 py-2 border border-outline-variant text-on-surface-variant rounded-xl text-sm transition-colors hover:bg-surface-container cursor-pointer"
                     >
-                      Cancelar
+                      {{ t('leagueDetail2.cancel') }}
                     </button>
                     <button
                       @click="handleDelete"
                       :disabled="isDeleting"
                       class="flex-1 py-2 bg-error text-on-error rounded-xl font-bold text-sm transition-all active:scale-95 disabled:opacity-60 cursor-pointer"
                     >
-                      {{ isDeleting ? 'Eliminando...' : 'Sí, eliminar' }}
+                      {{ isDeleting ? t('leagueDetail2.deleting') : t('leagueDetail2.deleteYes') }}
                     </button>
                   </div>
                 </div>
@@ -182,7 +182,7 @@ async function handleDelete() {
     emit('deleted')
     emit('close')
   } catch {
-    leaveError.value = 'Error al eliminar. Intentá de nuevo.'
+    leaveError.value = t('leagueDetail2.deleteError')
   } finally {
     isDeleting.value = false
   }

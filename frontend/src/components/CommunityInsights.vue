@@ -39,7 +39,7 @@
 
         <!-- No data -->
         <div v-if="!item.has_data" class="flex items-center justify-center h-7 rounded-full border-2 border-dashed border-outline-variant">
-          <span class="text-xs text-on-surface-variant font-label-sm uppercase tracking-wider">Sin predicciones aún</span>
+          <span class="text-xs text-on-surface-variant font-label-sm uppercase tracking-wider">{{ t('community.noVotes') }}</span>
         </div>
 
         <!-- Bar -->
@@ -72,7 +72,7 @@
               }"
             >
               <template v-if="item.draw_pct >= 20">
-                <span>Emp.</span>
+                <span>{{ t('match.drawShort') }}</span>
                 <span>{{ item.draw_pct }}%</span>
               </template>
               <span v-else-if="item.draw_pct >= 10">{{ item.draw_pct }}%</span>

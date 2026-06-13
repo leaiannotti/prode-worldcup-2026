@@ -10,7 +10,7 @@
         <div class="loader-bounce">
           <img
             src="/messi-copa.png"
-            alt="Cargando..."
+            :alt="t('common.loadingImage')"
             class="w-64 h-64 object-contain drop-shadow-2xl"
           />
         </div>
@@ -38,7 +38,9 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
+const { t } = useI18n()
 const props = defineProps<{ show: boolean }>()
 
 const messages = [

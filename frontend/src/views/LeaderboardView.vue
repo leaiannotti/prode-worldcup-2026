@@ -4,17 +4,17 @@
       <!-- Page Header -->
       <div class="mb-8">
         <h1 class="text-display-lg font-montserrat font-bold text-on-surface mb-2">
-          Standings
+          {{ t('leaderboard.title') }}
         </h1>
         <p class="text-body-lg text-on-surface-variant">
-          {{ groupName || 'Leaderboard' }}
+          {{ groupName }}
         </p>
       </div>
 
       <!-- Loading state -->
       <div v-if="leaderboardStore.loading" class="py-8 text-center">
         <div class="inline-block animate-spin">⏳</div>
-        <p class="mt-4 text-body-md text-on-surface-variant">Loading standings...</p>
+        <p class="mt-4 text-body-md text-on-surface-variant">{{ t('leaderboard.loading') }}</p>
       </div>
 
       <!-- Error state -->
@@ -23,10 +23,10 @@
         class="bg-error-container rounded-lg p-6 text-center"
       >
         <p class="text-body-md text-on-error-container mb-4">
-          You're not a member of this group
+          {{ t('leaderboard.notMember') }}
         </p>
         <RouterLink to="/dashboard" class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-primary text-on-primary">
-          Back to Dashboard
+          {{ t('common.backToDashboard') }}
         </RouterLink>
       </div>
 
@@ -55,10 +55,10 @@
           >
             <div class="text-4xl mb-2">{{ prizeIcon(entry.rank) }}</div>
             <p class="text-label-lg font-semibold text-on-secondary-container">
-              {{ entry.prize_description || `Rank ${entry.rank}` }}
+              {{ entry.prize_description || t('leaderboard.rankLabel', { rank: entry.rank }) }}
             </p>
             <p class="text-body-md text-on-secondary-container mt-2">{{ entry.name }}</p>
-            <p class="text-headline-md font-bold text-secondary mt-2">{{ entry.total_points }} pts</p>
+            <p class="text-headline-md font-bold text-secondary mt-2">{{ entry.total_points }} {{ t('common.pts') }}</p>
           </div>
         </div>
 
@@ -68,10 +68,10 @@
             :to="`/groups/${groupId}/history`"
             class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-primary text-on-primary"
           >
-            View History
+            {{ t('leaderboard.viewHistory') }}
           </RouterLink>
           <RouterLink to="/dashboard" class="px-6 py-3 rounded-lg font-semibold text-body-md transition-colors bg-secondary text-on-secondary">
-            Back to Dashboard
+            {{ t('common.backToDashboard') }}
           </RouterLink>
         </div>
       </div>
@@ -82,11 +82,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useLeaderboardStore } from '@/stores/leaderboard'
 import { useGroupsStore } from '@/stores/groups'
 import AppLayout from '@/components/AppLayout.vue'
 import LeaderboardTable from '@/components/LeaderboardTable.vue'
 
+const { t } = useI18n()
 const router = useRouter()
 const route = useRoute()
 const leaderboardStore = useLeaderboardStore()
@@ -95,7 +97,7 @@ const groupsStore = useGroupsStore()
 const groupId = computed(() => route.params.id as string)
 
 const groupName = computed(() => {
-  return groupsStore.currentGroup?.name || 'Leaderboard'
+  return groupsStore.currentGroup?.name || t('leaderboard.defaultTitle')
 })
 
 function prizeIcon(rank: number): string {
