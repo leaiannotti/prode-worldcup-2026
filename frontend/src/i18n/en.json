@@ -99,7 +99,19 @@
     "noPrizes": "No prizes configured",
     "leaving": "Leaving...",
     "leave": "Leave league",
-    "leaveError": "Error leaving. Please try again."
+    "leaveError": "Error leaving. Please try again.",
+    "editPrizes": "Edit prizes",
+    "savePrizes": "Save",
+    "cancel": "Cancel",
+    "viewHistory": "View history",
+    "hideHistory": "Hide history",
+    "charCounter": "{count}/200",
+    "prizeRankFirst": "1st prize",
+    "prizeRankSecond": "2nd prize",
+    "prizeRankThird": "3rd prize",
+    "errorForbidden": "You don't have permission to edit prizes in this league.",
+    "errorValidation": "A prize exceeds 200 characters or is empty.",
+    "errorGeneric": "We couldn't save the prizes. Try again."
   },
   "standing": {
     "myLeagues": "My Leagues",
@@ -135,7 +147,10 @@
     "exact": "exact score",
     "outcome": "correct outcome",
     "noPoints": "no points",
-    "aLeague": "a league"
+    "aLeague": "a league",
+    "prizeChanged": "{user} changed the {rank} from «{previous}» to «{new}»",
+    "adminMarker": "(admin)",
+    "someone": "Someone"
   },
   "points": {
     "title": "My points",

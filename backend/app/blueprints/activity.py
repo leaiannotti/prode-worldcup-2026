@@ -2,7 +2,7 @@
 from flask import Blueprint, request, jsonify, g
 from datetime import datetime
 from app.models.activity import ActivityEvent
-from app.models import GroupMembership
+from app.models import GroupMembership, User
 from app.middleware.auth import jwt_required, ADMIN_EMAILS
 
 bp = Blueprint("activity", __name__, url_prefix="/api/activity")
@@ -68,13 +68,16 @@ def list_activity():
     if cursor_dt is not None:
         query = query.filter(ActivityEvent.occurred_at < cursor_dt)
 
+    # Resolve actor_name via outer join to avoid N+1
+    query = query.outerjoin(User, ActivityEvent.user_id == User.id).add_entity(User)
+
     # Fetch one extra to determine if there are more pages
-    events = query.order_by(ActivityEvent.occurred_at.desc()).limit(limit + 1).all()
+    rows = query.order_by(ActivityEvent.occurred_at.desc()).limit(limit + 1).all()
 
-    has_more = len(events) > limit
-    events = events[:limit]
+    has_more = len(rows) > limit
+    rows = rows[:limit]
 
-    next_cursor = events[-1].occurred_at.isoformat() if has_more and events else None
+    next_cursor = rows[-1][0].occurred_at.isoformat() if has_more and rows else None
 
     return jsonify({
         "events": [
@@ -85,8 +88,9 @@ def list_activity():
                 "match_id": e.match_id,
                 "payload": e.payload,
                 "occurred_at": e.occurred_at.isoformat() + "Z",
+                "actor_name": user.name if user else None,
             }
-            for e in events
+            for e, user in rows
         ],
         "next_cursor": next_cursor,
     }), 200

@@ -334,6 +334,77 @@ class TestActivityFilters:
         assert len(events) == 5
         for e in events:
             assert e["group_id"] == group.id
+            assert e["actor_name"] == seed_user.name
+
+    def test_activity_response_includes_actor_name(
+        self, app, client, db_session, seed_user
+    ):
+        """Each event in the response includes actor_name resolved from User."""
+        from app.models.activity import ActivityEvent
+        from datetime import datetime, timedelta
+
+        with app.app_context():
+            event = ActivityEvent(
+                user_id=seed_user.id,
+                event_type="group_joined",
+                occurred_at=datetime.utcnow() - timedelta(minutes=1),
+                payload={"group_name": "Test"},
+            )
+            db_session.add(event)
+            db_session.commit()
+
+            _auth_client(app, client, seed_user.id)
+            response = client.get("/api/activity")
+
+        assert response.status_code == 200
+        data = response.get_json()
+        events = data["events"]
+        assert len(events) == 1
+        assert events[0]["actor_name"] == seed_user.name
+
+    def test_activity_actor_name_for_orphaned_event(
+        self, app, client, db_session, seed_user
+    ):
+        """Orphaned event (user deleted) returns actor_name as None."""
+        from app.models.activity import ActivityEvent
+        from app.models import PredictionGroup, GroupMembership
+        from datetime import datetime, timedelta
+        from uuid import uuid4
+
+        fake_user_id = str(uuid4())
+        with app.app_context():
+            # Create a group and add seed_user as admin so they can query it
+            group = PredictionGroup(
+                name="Orphan Test Group",
+                creator_id=seed_user.id,
+                invite_code=uuid4().hex[:6].upper(),
+            )
+            db_session.add(group)
+            db_session.commit()
+            db_session.add(GroupMembership(
+                user_id=seed_user.id, group_id=group.id, role="admin"
+            ))
+            db_session.commit()
+
+            # Create an event with a non-existent user_id but valid group_id
+            event = ActivityEvent(
+                user_id=fake_user_id,
+                event_type="prize_changed",
+                group_id=group.id,
+                occurred_at=datetime.utcnow() - timedelta(minutes=1),
+                payload={"rank": 1, "previous_value": "A", "new_value": "B"},
+            )
+            db_session.add(event)
+            db_session.commit()
+
+            _auth_client(app, client, seed_user.id)
+            response = client.get(f"/api/activity?group_id={group.id}")
+
+        assert response.status_code == 200
+        data = response.get_json()
+        events = data["events"]
+        assert len(events) == 1
+        assert events[0]["actor_name"] is None
 
     def test_activity_group_id_filter_returns_all_users_in_group(
         self, app, client, db_session, seed_user, _seed_group_with_member, _seed_non_member
