@@ -212,3 +212,138 @@ class TestLeaderboardPrizes:
         
         # Should have standings and possibly prizes
         assert "standings" in data
+
+
+class TestMemberRecentHistory:
+    """Tests for member recent history endpoint."""
+
+    def test_recent_history_happy_path(self, app, client, db_session, seed_user, seed_groups, seed_teams, seed_matches):
+        """
+        Given: Requester and target share a group with finished matches
+        When: Requester calls GET /api/scores/groups/<group_id>/members/<target_id>/recent-history
+        Then: Returns 200 with up to 5 finished matches ordered by kickoff_utc DESC,
+              including missing-prediction rows as null prediction with 0 points
+        """
+        # Create group and add both users
+        group = PredictionGroup(
+            name="Recent History Group",
+            creator_id=seed_user.id,
+            invite_code=_generate_invite_code()
+        )
+        db_session.add(group)
+        db_session.flush()
+        
+        membership = GroupMembership(user_id=seed_user.id, group_id=group.id)
+        db_session.add(membership)
+        
+        target_user = User(
+            google_sub="target-user",
+            email="target@example.com",
+            name="Target User"
+        )
+        db_session.add(target_user)
+        db_session.flush()
+        
+        target_membership = GroupMembership(user_id=target_user.id, group_id=group.id)
+        db_session.add(target_membership)
+        db_session.flush()
+        
+        # Mark first 5 matches as finished with actual scores
+        finished_matches = seed_matches[:5]
+        for i, match in enumerate(finished_matches):
+            match.status = "finished"
+            match.home_score = 2
+            match.away_score = 1
+            # Set kickoff_utc to descending order (newest first)
+            match.kickoff_utc = datetime.utcnow() + timedelta(days=10 - i)
+        
+        # Create predictions for target_user on first 3 matches
+        for i, match in enumerate(finished_matches[:3]):
+            pred = Prediction(
+                user_id=target_user.id,
+                match_id=match.id,
+                home_score=2 if i == 0 else 1,
+                away_score=1 if i == 0 else 0
+            )
+            db_session.add(pred)
+            db_session.flush()
+            
+            score = PredictionScore(
+                prediction_id=pred.id,
+                points=3 if i == 0 else 1,
+                score_type="exact" if i == 0 else "outcome"
+            )
+            db_session.add(score)
+        
+        # Matches 4 and 5 have no prediction from target_user
+        db_session.commit()
+        
+        with app.app_context():
+            token = issue_jwt(seed_user.id)
+            client.set_cookie(key="jwt_token", value=token)
+            response = client.get(
+                f"/api/scores/groups/{group.id}/members/{target_user.id}/recent-history"
+            )
+        
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["user_id"] == target_user.id
+        assert data["group_id"] == group.id
+        assert "history" in data
+        history = data["history"]
+        assert len(history) == 5
+        
+        # Verify descending order by kickoff_utc
+        kickoffs = [h["match"]["kickoff_utc"] for h in history]
+        assert kickoffs == sorted(kickoffs, reverse=True)
+        
+        # First 3 entries have predictions
+        for i in range(3):
+            assert history[i]["prediction"] is not None
+            assert history[i]["points"] in [1, 3]
+            assert history[i]["score_type"] in ["exact", "outcome"]
+        
+        # Last 2 entries have no prediction (null prediction, 0 points, null score_type)
+        for i in range(3, 5):
+            assert history[i]["prediction"] is None
+            assert history[i]["points"] == 0
+            assert history[i]["score_type"] is None
+            assert history[i]["actual_result"] is not None
+
+    def test_recent_history_non_shared_group_403(self, app, client, db_session, seed_user, seed_groups):
+        """
+        Given: Requester and target do NOT share any group
+        When: Requester calls the endpoint for a group they are not in
+        Then: Returns 403 Forbidden
+        """
+        # Create group with only target user
+        group = PredictionGroup(
+            name="Private Group",
+            creator_id=seed_user.id,
+            invite_code=_generate_invite_code()
+        )
+        db_session.add(group)
+        db_session.flush()
+        
+        target_user = User(
+            google_sub="target-user",
+            email="target@example.com",
+            name="Target User"
+        )
+        db_session.add(target_user)
+        db_session.flush()
+        
+        # Add target_user to group but NOT seed_user
+        target_membership = GroupMembership(user_id=target_user.id, group_id=group.id)
+        db_session.add(target_membership)
+        db_session.commit()
+        
+        # seed_user is not in the group, so they should get 403
+        with app.app_context():
+            token = issue_jwt(seed_user.id)
+            client.set_cookie(key="jwt_token", value=token)
+            response = client.get(
+                f"/api/scores/groups/{group.id}/members/{target_user.id}/recent-history"
+            )
+        
+        assert response.status_code == 403

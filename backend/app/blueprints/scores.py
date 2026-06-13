@@ -7,9 +7,12 @@ from app.models import (
 from app.schemas.score import (
     LeaderboardResponse, LeaderboardEntryResponse,
     HistoryResponse, HistoryEntryResponse, MyStandingItem,
+    MemberRecentHistoryResponse, MemberRecentHistoryEntry,
+    MemberRecentHistoryMatch, MemberRecentHistoryActualResult,
+    MemberRecentHistoryPrediction,
 )
 from app.middleware.auth import jwt_required
-from sqlalchemy import func
+from sqlalchemy import func, desc
 
 scores_bp = Blueprint("scores", __name__)
 
@@ -218,3 +221,79 @@ def my_standing():
         ).model_dump())
 
     return jsonify(results), 200
+
+
+@scores_bp.route("/groups/<group_id>/members/<user_id>/recent-history", methods=["GET"])
+@jwt_required
+def get_member_recent_history(group_id, user_id):
+    """GET /api/scores/groups/<group_id>/members/<user_id>/recent-history?limit=5
+    
+    Returns last N finished matches globally, left-joined with target user's predictions.
+    403 if requester and target do not share the group.
+    """
+    current_user_id = g.current_user.id
+    
+    # Permission check: requester must be in the group
+    if not _is_group_member(current_user_id, group_id):
+        return jsonify({"error": "not_member"}), 403
+    
+    # Permission check: target must also be in the group
+    if not _is_group_member(user_id, group_id):
+        return jsonify({"error": "target_not_member"}), 403
+    
+    # Validate limit (default 5, cap at 10)
+    try:
+        limit = int(request.args.get("limit", 5))
+    except (ValueError, TypeError):
+        limit = 5
+    
+    if limit < 1:
+        limit = 1
+    if limit > 10:
+        limit = 10
+    
+    # Query last N finished matches globally, ordered by kickoff_utc DESC
+    matches = (
+        Match.query
+        .filter_by(status="finished")
+        .order_by(desc(Match.kickoff_utc))
+        .limit(limit)
+        .all()
+    )
+    
+    results = []
+    for match in matches:
+        home_team = Team.query.get(match.home_team_id)
+        away_team = Team.query.get(match.away_team_id)
+        
+        pred = Prediction.query.filter_by(user_id=user_id, match_id=match.id).first()
+        score = None
+        if pred:
+            score = PredictionScore.query.filter_by(prediction_id=pred.id).first()
+        
+        entry = {
+            "match": {
+                "id": match.id,
+                "home_team_code": home_team.code if home_team else "",
+                "away_team_code": away_team.code if away_team else "",
+                "kickoff_utc": match.kickoff_utc.isoformat() + "Z",
+                "status": match.status,
+            },
+            "actual_result": {
+                "home_score": match.home_score,
+                "away_score": match.away_score,
+            } if match.home_score is not None else None,
+            "prediction": {
+                "home_score": pred.home_score,
+                "away_score": pred.away_score,
+            } if pred else None,
+            "points": score.points if score else 0,
+            "score_type": score.score_type if score else None,
+        }
+        results.append(entry)
+    
+    return jsonify({
+        "user_id": user_id,
+        "group_id": group_id,
+        "history": results,
+    }), 200

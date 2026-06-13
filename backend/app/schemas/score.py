@@ -78,3 +78,45 @@ class HistoryResponse(BaseModel):
     group_id: str
     user_id: str
     history: List[HistoryEntryResponse]
+
+
+class MemberRecentHistoryMatch(BaseModel):
+    """Match reference in member recent history."""
+    
+    id: int
+    home_team_code: str
+    away_team_code: str
+    kickoff_utc: datetime
+    status: str
+
+
+class MemberRecentHistoryActualResult(BaseModel):
+    """Actual match result in member recent history."""
+    
+    home_score: int
+    away_score: int
+
+
+class MemberRecentHistoryPrediction(BaseModel):
+    """Prediction in member recent history."""
+    
+    home_score: int
+    away_score: int
+
+
+class MemberRecentHistoryEntry(BaseModel):
+    """Single entry in a member's recent history."""
+    
+    match: MemberRecentHistoryMatch
+    actual_result: Optional[MemberRecentHistoryActualResult] = None
+    prediction: Optional[MemberRecentHistoryPrediction] = None
+    points: int
+    score_type: Optional[str] = None
+
+
+class MemberRecentHistoryResponse(BaseModel):
+    """Response for member recent history endpoint."""
+    
+    user_id: str
+    group_id: str
+    history: List[MemberRecentHistoryEntry]
