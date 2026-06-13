@@ -99,7 +99,19 @@
     "noPrizes": "Sin premios configurados",
     "leaving": "Abandonando...",
     "leave": "Abandonar liga",
-    "leaveError": "Error al abandonar. Intentá de nuevo."
+    "leaveError": "Error al abandonar. Intentá de nuevo.",
+    "editPrizes": "Editar premios",
+    "savePrizes": "Guardar",
+    "cancel": "Cancelar",
+    "viewHistory": "Ver historial",
+    "hideHistory": "Ocultar historial",
+    "charCounter": "{count}/200",
+    "prizeRankFirst": "1° premio",
+    "prizeRankSecond": "2° premio",
+    "prizeRankThird": "3° premio",
+    "errorForbidden": "No tenés permiso para editar los premios de esta liga.",
+    "errorValidation": "Algún premio supera los 200 caracteres o quedó vacío.",
+    "errorGeneric": "No pudimos guardar los premios. Probá de nuevo."
   },
   "standing": {
     "myLeagues": "Mis Ligas",
@@ -135,7 +147,10 @@
     "exact": "marcador exacto",
     "outcome": "resultado correcto",
     "noPoints": "sin puntos",
-    "aLeague": "una liga"
+    "aLeague": "una liga",
+    "prizeChanged": "{user} cambió el {rank} de «{previous}» a «{new}»",
+    "adminMarker": "(admin)",
+    "someone": "Alguien"
   },
   "points": {
     "title": "Mis puntos",

@@ -9,7 +9,6 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import LeagueDetailModal from './LeagueDetailModal.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useActivityStore } from '@/stores/activity'
 
 vi.mock('@/lib/api', () => ({
   apiClient: {
