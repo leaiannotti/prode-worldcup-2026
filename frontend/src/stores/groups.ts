@@ -96,26 +96,46 @@ export const useGroupsStore = defineStore('groups', () => {
   }
 
   /**
-   * Set prizes for a group (admin only)
+   * Patch prizes for a group (member or admin)
    */
-  async function setPrizes(
+  async function patchPrizes(
     id: string,
-    prizes: Array<{ rank: number; description: string }>
+    payload: { first?: string; second?: string; third?: string }
   ): Promise<void> {
     try {
-      await apiClient.post(`/api/groups/${id}/prizes`, { prizes })
+      const response = await apiClient.patch(`/api/groups/${id}/prizes`, payload)
       // Update local group
       if (currentGroup.value?.id === id) {
-        currentGroup.value.prizes = prizes
+        currentGroup.value.prizes = _buildPrizesFromPayload(
+          currentGroup.value.prizes,
+          payload
+        )
       }
       const groupIndex = groups.value.findIndex((g) => g.id === id)
       if (groupIndex >= 0) {
-        groups.value[groupIndex].prizes = prizes
+        groups.value[groupIndex].prizes = _buildPrizesFromPayload(
+          groups.value[groupIndex].prizes,
+          payload
+        )
       }
+      return response.data
     } catch (error) {
-      console.error('Error setting prizes:', error)
+      console.error('Error patching prizes:', error)
       throw error
     }
+  }
+
+  function _buildPrizesFromPayload(
+    existing: Prize[] | undefined,
+    payload: { first?: string; second?: string; third?: string }
+  ): Prize[] {
+    const map = new Map(existing?.map((p) => [p.rank, p.description]) ?? [])
+    if (payload.first !== undefined) map.set(1, payload.first)
+    if (payload.second !== undefined) map.set(2, payload.second)
+    if (payload.third !== undefined) map.set(3, payload.third)
+    return Array.from(map.entries())
+      .map(([rank, description]) => ({ rank, description }))
+      .sort((a, b) => a.rank - b.rank)
   }
 
   async function leaveGroup(id: string): Promise<void> {
@@ -136,7 +156,7 @@ export const useGroupsStore = defineStore('groups', () => {
     fetchGroup,
     createGroup,
     joinGroup,
-    setPrizes,
+    patchPrizes,
     leaveGroup,
     deleteGroup,
   }
