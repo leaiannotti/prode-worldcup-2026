@@ -8,13 +8,15 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'messi-copa.png'],
       manifest: {
         name: 'Prode Mundial 2026',
         short_name: 'Prode 2026',
         description: 'Predicciones del Mundial 2026 — predict matches and compete with your group.',
         theme_color: '#00134d',
-        background_color: '#f8f9fa',
+        // Matches theme_color so the PWA splash screen does not flash white
+        // when the user has dark mode enabled.
+        background_color: '#00134d',
         display: 'standalone',
         start_url: '/',
         scope: '/',
@@ -47,10 +49,32 @@ export default defineConfig({
         navigateFallbackDenylist: [/^\/api\//],
         runtimeCaching: [
           {
-            // Auth endpoints must never be cached — always hit the network.
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/auth/'),
+            // Auth mutations and OAuth flow must never be cached — always hit
+            // the network. /me is handled separately below.
+            urlPattern: ({ url }) =>
+              url.pathname.startsWith('/api/auth/') && url.pathname !== '/api/auth/me',
             handler: 'NetworkOnly',
             method: 'GET'
+          },
+          {
+            // Session check: NetworkFirst with very short TTL so the app can
+            // recover from brief network flakiness (subway, elevator, etc.)
+            // without forcing a logout. 30s is short enough that a real logout
+            // is reflected almost immediately on next navigation.
+            urlPattern: ({ url }) => url.pathname === '/api/auth/me',
+            handler: 'NetworkFirst',
+            method: 'GET',
+            options: {
+              cacheName: 'auth-me-cache',
+              networkTimeoutSeconds: 3,
+              expiration: {
+                maxEntries: 1,
+                maxAgeSeconds: 30
+              },
+              cacheableResponse: {
+                statuses: [200]
+              }
+            }
           },
           {
             // Other API calls: prefer fresh data, fall back to short-lived cache.
