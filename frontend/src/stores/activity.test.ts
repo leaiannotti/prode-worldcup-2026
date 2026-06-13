@@ -47,7 +47,7 @@ describe('useActivityStore — fetchActivity', () => {
     await store.fetchActivity({ groupId: 5 });
 
     expect(apiClient.get).toHaveBeenCalledTimes(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/api/activity?group_id=5&limit=10');
+    expect(apiClient.get).toHaveBeenCalledWith('/api/activity?limit=10&group_id=5');
   });
 
   it('adds all query params when provided', async () => {
@@ -61,7 +61,7 @@ describe('useActivityStore — fetchActivity', () => {
     await store.fetchActivity({ groupId: 5, eventType: 'prize_changed', limit: 10 });
 
     expect(apiClient.get).toHaveBeenCalledTimes(1);
-    expect(apiClient.get).toHaveBeenCalledWith('/api/activity?group_id=5&event_type=prize_changed&limit=10');
+    expect(apiClient.get).toHaveBeenCalledWith('/api/activity?limit=10&group_id=5&event_type=prize_changed');
   });
 
   it('stores result correctly', async () => {
