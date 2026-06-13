@@ -7,12 +7,13 @@ from app.schemas.group import (
     CreateGroupRequest,
     JoinGroupRequest,
     SetPrizesRequest,
+    PatchPrizesRequest,
     GroupResponse,
     GroupDetailResponse,
     MemberResponse,
     PrizeResponse,
 )
-from app.middleware.auth import jwt_required
+from app.middleware.auth import jwt_required, ADMIN_EMAILS
 from pydantic import ValidationError
 
 bp = Blueprint("groups", __name__, url_prefix="/api/groups")
@@ -309,6 +310,99 @@ def set_group_prizes(group_id):
     db.session.commit()
     
     return jsonify({"success": True}), 200
+
+
+@bp.route("/<group_id>/prizes", methods=["PATCH"])
+@jwt_required
+def patch_group_prizes(group_id):
+    """Patch group prizes (member or admin). PATCH /api/groups/{id}/prizes"""
+    user_id = g.current_user.id
+    user_email = g.current_user.email
+    
+    # Check membership or admin status
+    is_member = _is_group_member(user_id, group_id)
+    is_admin = user_email in ADMIN_EMAILS
+    if not is_member and not is_admin:
+        return jsonify({"error": "forbidden"}), 403
+    
+    group = PredictionGroup.query.get(group_id)
+    if not group:
+        return jsonify({"error": "not_found"}), 404
+    
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "invalid_request"}), 422
+        
+        req = PatchPrizesRequest(**data)
+    except ValidationError as e:
+        return jsonify({"error": "invalid_request", "details": str(e)}), 422
+    except Exception:
+        return jsonify({"error": "invalid_request"}), 422
+    
+    # Map rank field names to numeric rank values
+    rank_map = {"first": 1, "second": 2, "third": 3}
+    
+    # Get current prizes indexed by rank
+    current_prizes = {
+        p.rank: p for p in GroupPrize.query.filter_by(group_id=group_id).all()
+    }
+    
+    changed = []
+    
+    # Process each provided rank
+    for field_name, rank in rank_map.items():
+        value = getattr(req, field_name)
+        if value is None:
+            continue  # Missing key is ignored
+        
+        trimmed = value.strip()
+        current_prize = current_prizes.get(rank)
+        
+        if current_prize:
+            if current_prize.description != trimmed:
+                # Update existing prize
+                previous = current_prize.description
+                current_prize.description = trimmed
+                changed.append({
+                    "rank": rank,
+                    "previous": previous,
+                    "new": trimmed,
+                })
+        else:
+            # Create new prize for this rank
+            prize = GroupPrize(
+                group_id=group_id,
+                rank=rank,
+                description=trimmed,
+            )
+            db.session.add(prize)
+            changed.append({
+                "rank": rank,
+                "previous": None,
+                "new": trimmed,
+            })
+    
+    # Emit activity events for each actual change
+    if changed:
+        from app.services.activity_service import emit_event
+        for change in changed:
+            emit_event(
+                user_id=user_id,
+                event_type="prize_changed",
+                group_id=group_id,
+                payload={
+                    "rank": change["rank"],
+                    "previous_value": change["previous"],
+                    "new_value": change["new"],
+                    "actor_is_admin": is_admin,
+                },
+            )
+    
+    # Atomic commit: all updates and events in one transaction
+    db.session.commit()
+    
+    return jsonify({"changed": changed}), 200
 
 
 @bp.route("/<group_id>/leave", methods=["POST"])
