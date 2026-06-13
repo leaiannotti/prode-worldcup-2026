@@ -211,10 +211,14 @@
   },
   "friendRecentResults": {
     "title": "Recent predictions of {name}",
+    "subtitle": "Last 5 games",
     "empty": "No finished predictions yet",
     "noPrediction": "—",
     "loadingError": "Error loading predictions. Please try again.",
-    "ariaLabel": "View recent results of {name}"
+    "ariaLabel": "View recent results of {name}",
+    "columnMatch": "Match",
+    "columnPrediction": "Prediction",
+    "columnPoints": "Points"
   },
   "history": {
     "title": "My Predictions",

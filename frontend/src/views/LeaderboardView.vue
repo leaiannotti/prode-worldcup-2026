@@ -47,6 +47,8 @@
         <FriendRecentResultsSheet
           :is-open="isRecentResultsOpen"
           :user-name="selectedUser?.name ?? ''"
+          :user-picture="selectedUser?.picture ?? null"
+          :total-points="selectedUser?.total_points ?? null"
           :history="leaderboardStore.memberRecentHistory"
           :loading="leaderboardStore.memberRecentHistoryLoading"
           :error="leaderboardStore.memberRecentHistoryError"
