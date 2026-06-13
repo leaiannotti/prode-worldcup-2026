@@ -209,6 +209,13 @@
     "viewLeaderboard": "Ver Posiciones",
     "defaultTitle": "Tabla de Posiciones"
   },
+  "friendRecentResults": {
+    "title": "Últimas predicciones de {name}",
+    "empty": "Todavía no hay predicciones finalizadas",
+    "noPrediction": "—",
+    "loadingError": "Error al cargar las predicciones. Intentá de nuevo.",
+    "ariaLabel": "Ver últimos resultados de {name}"
+  },
   "history": {
     "title": "Mis Predicciones",
     "defaultGroup": "Historial",

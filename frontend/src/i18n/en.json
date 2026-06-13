@@ -209,6 +209,13 @@
     "viewLeaderboard": "View Leaderboard",
     "defaultTitle": "Leaderboard"
   },
+  "friendRecentResults": {
+    "title": "Recent predictions of {name}",
+    "empty": "No finished predictions yet",
+    "noPrediction": "—",
+    "loadingError": "Error loading predictions. Please try again.",
+    "ariaLabel": "View recent results of {name}"
+  },
   "history": {
     "title": "My Predictions",
     "defaultGroup": "History",
