@@ -65,6 +65,34 @@ class TestGroupSchemas:
         # Invalid rank (should fail validation)
         with pytest.raises(Exception):  # ValidationError
             PrizeRequest(rank=4, description="Invalid")
+    
+    def test_patch_prizes_request_schema_trims_and_validates(self):
+        """PatchPrizesRequest trims whitespace and rejects empty strings after trim."""
+        from app.schemas.group import PatchPrizesRequest
+        
+        # Valid: all fields
+        req = PatchPrizesRequest(first="Pizza", second="Beer", third="Cookie")
+        assert req.first == "Pizza"
+        assert req.second == "Beer"
+        assert req.third == "Cookie"
+        
+        # Valid: partial fields
+        req = PatchPrizesRequest(first="Asado")
+        assert req.first == "Asado"
+        assert req.second is None
+        assert req.third is None
+        
+        # Trim whitespace
+        req = PatchPrizesRequest(first="  Asado  ")
+        assert req.first == "Asado"
+        
+        # Empty after trim should fail
+        with pytest.raises(Exception):  # ValidationError
+            PatchPrizesRequest(first="   ")
+        
+        # Too long should fail
+        with pytest.raises(Exception):  # ValidationError
+            PatchPrizesRequest(first="x" * 201)
 
 
 class TestGroupService:
@@ -591,3 +619,296 @@ class TestGroupBlueprint:
             )
             
             assert response.status_code == 403
+
+
+class TestPatchPrizes:
+    """Test PATCH /api/groups/:id/prizes — member or admin can edit prizes."""
+
+    def _auth_client(self, app, client, user_id):
+        """Authenticate test client with JWT cookie."""
+        from app.services.auth_service import issue_jwt
+        token = issue_jwt(user_id)
+        client.set_cookie(key="jwt_token", value=token)
+        return client
+
+    def _create_group_with_member(self, db_session, user, prizes=None):
+        """Create a group with user as member, optional prizes."""
+        group = PredictionGroup(
+            name="Patch Test Group",
+            invite_code="PATCH01",
+            creator_id=user.id,
+        )
+        db_session.add(group)
+        db_session.commit()
+
+        membership = GroupMembership(
+            user_id=user.id,
+            group_id=group.id,
+            role="member",
+        )
+        db_session.add(membership)
+        db_session.commit()
+
+        if prizes:
+            for rank, description in prizes:
+                prize = GroupPrize(
+                    group_id=group.id,
+                    rank=rank,
+                    description=description,
+                )
+                db_session.add(prize)
+            db_session.commit()
+
+        return group
+
+    def test_patch_prizes_as_member_returns_200(self, app, client, db_session, seed_user):
+        """Member can PATCH prizes and gets 200 with changed array."""
+        with app.app_context():
+            group = self._create_group_with_member(
+                db_session, seed_user, prizes=[(1, "Pizza")]
+            )
+            self._auth_client(app, client, seed_user.id)
+
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "Asado"},
+            )
+
+            assert response.status_code == 200
+            data = response.get_json()
+            assert data["changed"] == [{"rank": 1, "previous": "Pizza", "new": "Asado"}]
+
+    def test_patch_prizes_as_admin_non_member_returns_200(self, app, client, db_session, seed_user):
+        """Admin (not member) can PATCH prizes and gets 200 with changed array + DB state."""
+        from app.middleware.auth import ADMIN_EMAILS
+        from app.models.activity import ActivityEvent
+
+        with app.app_context():
+            # Create admin user
+            admin_user = User(
+                google_sub="admin-sub",
+                email=list(ADMIN_EMAILS)[0],
+                name="Admin User",
+                picture_url="https://example.com/admin.jpg",
+            )
+            db_session.add(admin_user)
+            db_session.commit()
+
+            # Create group WITHOUT admin as member
+            group = PredictionGroup(
+                name="Admin Test Group",
+                invite_code="ADMIN01",
+                creator_id=seed_user.id,
+            )
+            db_session.add(group)
+            db_session.commit()
+
+            self._auth_client(app, client, admin_user.id)
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "Admin Prize"},
+            )
+
+            assert response.status_code == 200
+            data = response.get_json()
+
+            # 1. changed array reflects the newly created prize (no prior rank 1)
+            assert data["changed"] == [{"rank": 1, "previous": None, "new": "Admin Prize"}]
+
+            # 2. Activity event payload confirms actor_is_admin
+            events = ActivityEvent.query.filter_by(
+                group_id=group.id, event_type="prize_changed"
+            ).all()
+            assert len(events) == 1
+            assert events[0].payload["actor_is_admin"] is True
+            assert events[0].payload["rank"] == 1
+            assert events[0].payload["previous_value"] is None
+            assert events[0].payload["new_value"] == "Admin Prize"
+
+            # 3. DB query confirms GroupPrize was actually persisted
+            prizes = GroupPrize.query.filter_by(group_id=group.id).all()
+            assert len(prizes) == 1
+            assert prizes[0].rank == 1
+            assert prizes[0].description == "Admin Prize"
+
+    def test_patch_prizes_as_non_member_returns_403(self, app, client, db_session, seed_user):
+        """Non-member non-admin gets 403 on PATCH."""
+        with app.app_context():
+            other_user = User(
+                google_sub="other-sub",
+                email="other@example.com",
+                name="Other User",
+                picture_url="https://example.com/other.jpg",
+            )
+            db_session.add(other_user)
+            db_session.commit()
+
+            group = PredictionGroup(
+                name="Private Group",
+                invite_code="PRIV01",
+                creator_id=other_user.id,
+            )
+            db_session.add(group)
+            db_session.commit()
+
+            self._auth_client(app, client, seed_user.id)
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "Hacker Prize"},
+            )
+
+            assert response.status_code == 403
+            assert response.get_json()["error"] == "forbidden"
+
+    def test_patch_prizes_too_long_returns_422(self, app, client, db_session, seed_user):
+        """Prize description > 200 chars returns 422."""
+        with app.app_context():
+            group = self._create_group_with_member(db_session, seed_user)
+            self._auth_client(app, client, seed_user.id)
+
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "x" * 201},
+            )
+
+            assert response.status_code == 422
+            assert response.get_json()["error"] == "invalid_request"
+
+    def test_patch_prizes_empty_after_trim_returns_422(self, app, client, db_session, seed_user):
+        """Prize description empty after trim returns 422."""
+        with app.app_context():
+            group = self._create_group_with_member(db_session, seed_user)
+            self._auth_client(app, client, seed_user.id)
+
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "   "},
+            )
+
+            assert response.status_code == 422
+            assert response.get_json()["error"] == "invalid_request"
+
+    def test_patch_prizes_missing_key_ignored(self, app, client, db_session, seed_user):
+        """Missing rank keys are ignored; only provided keys evaluated."""
+        with app.app_context():
+            group = self._create_group_with_member(
+                db_session, seed_user, prizes=[(1, "A"), (2, "B")]
+            )
+            self._auth_client(app, client, seed_user.id)
+
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "Asado"},
+            )
+
+            assert response.status_code == 200
+            data = response.get_json()
+            assert data["changed"] == [{"rank": 1, "previous": "A", "new": "Asado"}]
+
+    def test_patch_prizes_noop_returns_empty_changed(self, app, client, db_session, seed_user):
+        """All ranks unchanged → 200 with empty changed array, no events."""
+        from app.models.activity import ActivityEvent
+
+        with app.app_context():
+            group = self._create_group_with_member(
+                db_session, seed_user,
+                prizes=[(1, "A"), (2, "B"), (3, "C")],
+            )
+            self._auth_client(app, client, seed_user.id)
+
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "A", "second": "B", "third": "C"},
+            )
+
+            assert response.status_code == 200
+            data = response.get_json()
+            assert data["changed"] == []
+
+            # No prize_changed events should be emitted
+            events = ActivityEvent.query.filter_by(
+                group_id=group.id, event_type="prize_changed"
+            ).all()
+            assert len(events) == 0
+
+    def test_patch_prizes_two_changes_emits_two_events(self, app, client, db_session, seed_user):
+        """Two prizes changed → two prize_changed events with correct payload."""
+        from app.models.activity import ActivityEvent
+
+        with app.app_context():
+            group = self._create_group_with_member(
+                db_session, seed_user,
+                prizes=[(1, "A"), (2, "B"), (3, "C")],
+            )
+            self._auth_client(app, client, seed_user.id)
+
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "X", "second": "Y"},
+            )
+
+            assert response.status_code == 200
+            data = response.get_json()
+            assert len(data["changed"]) == 2
+
+            events = ActivityEvent.query.filter_by(
+                group_id=group.id, event_type="prize_changed"
+            ).order_by(ActivityEvent.payload["rank"].asc()).all()
+            assert len(events) == 2
+
+            # Check event payloads
+            payloads = [e.payload for e in events]
+            assert any(
+                p["rank"] == 1 and p["previous_value"] == "A" and p["new_value"] == "X"
+                for p in payloads
+            )
+            assert any(
+                p["rank"] == 2 and p["previous_value"] == "B" and p["new_value"] == "Y"
+                for p in payloads
+            )
+            assert all(p["actor_is_admin"] is False for p in payloads)
+
+    def test_patch_prizes_admin_event_payload(self, app, client, db_session, seed_user):
+        """Admin PATCH emits prize_changed with actor_is_admin=True."""
+        from app.middleware.auth import ADMIN_EMAILS
+        from app.models.activity import ActivityEvent
+
+        with app.app_context():
+            admin_user = User(
+                google_sub="admin-sub",
+                email=list(ADMIN_EMAILS)[0],
+                name="Admin User",
+                picture_url="https://example.com/admin.jpg",
+            )
+            db_session.add(admin_user)
+            db_session.commit()
+
+            group = PredictionGroup(
+                name="Admin Event Group",
+                invite_code="ADEV01",
+                creator_id=seed_user.id,
+            )
+            db_session.add(group)
+            db_session.commit()
+
+            prize = GroupPrize(
+                group_id=group.id,
+                rank=1,
+                description="Old",
+            )
+            db_session.add(prize)
+            db_session.commit()
+
+            self._auth_client(app, client, admin_user.id)
+            response = client.patch(
+                f"/api/groups/{group.id}/prizes",
+                json={"first": "New"},
+            )
+
+            assert response.status_code == 200
+
+            events = ActivityEvent.query.filter_by(
+                group_id=group.id, event_type="prize_changed"
+            ).all()
+            assert len(events) == 1
+            assert events[0].payload["actor_is_admin"] is True
