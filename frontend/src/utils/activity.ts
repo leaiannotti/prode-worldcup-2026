@@ -2,7 +2,7 @@ import type { ActivityEvent } from '@/stores/activity'
 
 export function formatPrizeChangedEvent(event: ActivityEvent, t: any): string {
   const p = event.payload || {}
-  const actor = p.actor_name || t('activity.someone')
+  const actor = event.actor_name || t('activity.someone')
   const admin = p.actor_is_admin ? ` ${t('activity.adminMarker')}` : ''
   const rank =
     p.rank === 1

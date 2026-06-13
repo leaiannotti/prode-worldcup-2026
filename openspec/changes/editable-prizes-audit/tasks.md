@@ -48,12 +48,12 @@ Chain strategy: pending
 
 ## Phase 3: Frontend UI
 
-- [ ] 3.1 Write frontend tests (RED) — `frontend/src/components/LeagueDetailModal.test.ts`: edit toggle, save flow, validation error, history expand/collapse, audit line rendering
-- [ ] 3.2 Implement `frontend/src/components/LeagueDetailModal.vue` — inline editable inputs for prizes, collapsible "Ver historial" section, fetch filtered activity
-- [ ] 3.3 Run frontend tests (GREEN) — component tests pass
-- [ ] 3.4 Modify `frontend/src/components/NavBar.vue` — add `prize_changed` rendering in `eventText` switch with admin marker
-- [ ] 3.5 Add i18n keys to `frontend/src/i18n/es.json` and `frontend/src/i18n/en.json`: `leagueDetail.editPrizes`, `leagueDetail.viewHistory`, `leagueDetail.hideHistory`, `activity.prizeChanged`
-- [ ] 3.6 Run frontend tests (GREEN) — full suite passes
+- [x] 3.1 Write frontend tests (RED) — `frontend/src/components/LeagueDetailModal.test.ts`: edit toggle, save flow, validation error, history expand/collapse, audit line rendering
+- [x] 3.2 Implement `frontend/src/components/LeagueDetailModal.vue` — inline editable inputs for prizes, collapsible "Ver historial" section, fetch filtered activity
+- [x] 3.3 Run frontend tests (GREEN) — component tests pass
+- [x] 3.4 Modify `frontend/src/components/NavBar.vue` — add `prize_changed` rendering in `eventText` switch with admin marker
+- [x] 3.5 Add i18n keys to `frontend/src/i18n/es.json` and `frontend/src/i18n/en.json`: `leagueDetail.editPrizes`, `leagueDetail.viewHistory`, `leagueDetail.hideHistory`, `activity.prizeChanged`
+- [x] 3.6 Run frontend tests (GREEN) — full suite passes
 
 ## Phase 4: Integration & Verification
 

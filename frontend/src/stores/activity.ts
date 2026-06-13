@@ -12,6 +12,7 @@ export interface ActivityEvent {
   match_id: number | null
   payload: Record<string, any>
   occurred_at: string
+  actor_name: string | null
 }
 
 export const useActivityStore = defineStore('activity', () => {

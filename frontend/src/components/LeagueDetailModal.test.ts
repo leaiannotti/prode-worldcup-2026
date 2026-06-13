@@ -297,8 +297,9 @@ describe('LeagueDetailModal — audit history', () => {
     event_type: 'prize_changed',
     group_id: 'g1',
     match_id: null,
-    payload: { rank: 1, previous_value: 'Pizza', new_value: 'Asado', actor_is_admin: false, actor_name: 'Juan' },
+    payload: { rank: 1, previous_value: 'Pizza', new_value: 'Asado', actor_is_admin: false },
     occurred_at: '2024-01-01T00:00:00Z',
+    actor_name: 'Juan',
   }
 
   const mockHistoryEventAdmin = {
@@ -306,8 +307,9 @@ describe('LeagueDetailModal — audit history', () => {
     event_type: 'prize_changed',
     group_id: 'g1',
     match_id: null,
-    payload: { rank: 2, previous_value: 'Cerveza', new_value: 'Vino', actor_is_admin: true, actor_name: 'Lea' },
+    payload: { rank: 2, previous_value: 'Cerveza', new_value: 'Vino', actor_is_admin: true },
     occurred_at: '2024-01-02T00:00:00Z',
+    actor_name: 'Lea',
   }
 
   it('history section is collapsed by default', () => {
