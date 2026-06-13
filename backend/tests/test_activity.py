@@ -509,6 +509,47 @@ class TestActivityFilters:
         assert events[1]["payload"]["seq"] == 1
         assert events[2]["payload"]["seq"] == 0
 
+    def test_activity_negative_limit_returns_400(
+        self, app, client, seed_user
+    ):
+        """limit=-1 returns 400 with invalid_limit error."""
+        with app.app_context():
+            _auth_client(app, client, seed_user.id)
+            response = client.get("/api/activity?limit=-1")
+
+        assert response.status_code == 400
+        assert response.get_json()["error"] == "invalid_limit"
+
+    def test_activity_non_existent_group_returns_403(
+        self, app, client, seed_user
+    ):
+        """Querying a non-existent group returns 403 (membership check fails)."""
+        with app.app_context():
+            _auth_client(app, client, seed_user.id)
+            response = client.get("/api/activity?group_id=99999")
+
+        assert response.status_code == 403
+        assert response.get_json()["error"] == "forbidden"
+
+    def test_activity_unknown_event_type_returns_empty(
+        self, app, client, db_session, seed_user, _seed_group_with_member
+    ):
+        """Unknown event_type returns 200 with empty events array."""
+        group = _seed_group_with_member
+        # Seed events of a different type to confirm filtering is applied
+        self._emit_events(db_session, seed_user.id, group.id, "prize_changed", 3)
+
+        with app.app_context():
+            _auth_client(app, client, seed_user.id)
+            response = client.get(
+                f"/api/activity?group_id={group.id}&event_type=unknown_type"
+            )
+
+        assert response.status_code == 200
+        data = response.get_json()
+        assert data["events"] == []
+        assert data["next_cursor"] is None
+
 
 class TestActivityInstrumentation:
     """Integration tests: join and predict actions emit events."""
