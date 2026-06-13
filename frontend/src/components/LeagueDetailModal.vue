@@ -41,23 +41,100 @@
             </div>
 
             <!-- Prizes -->
-            <div v-if="group.prizes && group.prizes.length > 0" class="space-y-1.5">
-              <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('leagueDetail.prizes') }}</p>
-              <div class="space-y-2">
-                <div
-                  v-for="prize in sortedPrizes"
-                  :key="prize.rank"
-                  class="flex items-center gap-3 py-2"
+            <div class="space-y-1.5">
+              <div class="flex items-center justify-between">
+                <p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">{{ t('leagueDetail.prizes') }}</p>
+                <button
+                  v-if="!isEditing"
+                  @click="enterEdit"
+                  class="text-xs font-semibold text-secondary hover:text-primary transition-colors cursor-pointer"
                 >
+                  {{ t('leagueDetail.editPrizes') }}
+                </button>
+              </div>
+
+              <!-- Read-only view -->
+              <div v-if="!isEditing">
+                <div v-if="group.prizes && group.prizes.length > 0" class="space-y-2">
                   <div
-                    class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                    :class="rankStyle(prize.rank)"
-                  >{{ prize.rank }}°</div>
-                  <span class="text-sm text-on-surface">{{ prize.description }}</span>
+                    v-for="prize in sortedPrizes"
+                    :key="prize.rank"
+                    class="flex items-center gap-3 py-2"
+                  >
+                    <div
+                      class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+                      :class="rankStyle(prize.rank)"
+                    >{{ prize.rank }}°</div>
+                    <span class="text-sm text-on-surface">{{ prize.description }}</span>
+                  </div>
                 </div>
+                <div v-else class="text-xs text-on-surface-variant/60 italic">{{ t('leagueDetail.noPrizes') }}</div>
+              </div>
+
+              <!-- Edit mode -->
+              <div v-else class="space-y-3">
+                <div class="space-y-1">
+                  <label class="text-xs text-on-surface-variant">{{ t('leagueDetail.prizeRankFirst') }}</label>
+                  <input
+                    v-model="draftPrizes.first"
+                    :disabled="isSaving"
+                    type="text"
+                    maxlength="200"
+                    class="w-full text-sm bg-surface-container-low rounded-xl px-3 py-2 border border-outline-variant focus:border-primary focus:outline-none text-on-surface disabled:opacity-40"
+                  />
+                  <p class="text-[10px] text-on-surface-variant" :class="{ 'text-error': draftPrizes.first.length > 200 }">
+                    {{ t('leagueDetail.charCounter', { count: draftPrizes.first.length }) }}
+                  </p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-xs text-on-surface-variant">{{ t('leagueDetail.prizeRankSecond') }}</label>
+                  <input
+                    v-model="draftPrizes.second"
+                    :disabled="isSaving"
+                    type="text"
+                    maxlength="200"
+                    class="w-full text-sm bg-surface-container-low rounded-xl px-3 py-2 border border-outline-variant focus:border-primary focus:outline-none text-on-surface disabled:opacity-40"
+                  />
+                  <p class="text-[10px] text-on-surface-variant" :class="{ 'text-error': draftPrizes.second.length > 200 }">
+                    {{ t('leagueDetail.charCounter', { count: draftPrizes.second.length }) }}
+                  </p>
+                </div>
+                <div class="space-y-1">
+                  <label class="text-xs text-on-surface-variant">{{ t('leagueDetail.prizeRankThird') }}</label>
+                  <input
+                    v-model="draftPrizes.third"
+                    :disabled="isSaving"
+                    type="text"
+                    maxlength="200"
+                    class="w-full text-sm bg-surface-container-low rounded-xl px-3 py-2 border border-outline-variant focus:border-primary focus:outline-none text-on-surface disabled:opacity-40"
+                  />
+                  <p class="text-[10px] text-on-surface-variant" :class="{ 'text-error': draftPrizes.third.length > 200 }">
+                    {{ t('leagueDetail.charCounter', { count: draftPrizes.third.length }) }}
+                  </p>
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    @click="handleSave"
+                    :disabled="isSaving || !canSave"
+                    class="flex-1 py-2 bg-primary text-on-primary rounded-xl font-semibold text-sm transition-all active:scale-95 disabled:opacity-40 cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <svg v-if="isSaving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span v-else>{{ t('leagueDetail.savePrizes') }}</span>
+                  </button>
+                  <button
+                    @click="cancelEdit"
+                    :disabled="isSaving"
+                    class="flex-1 py-2 border border-outline-variant text-on-surface-variant rounded-xl font-semibold text-sm transition-colors hover:bg-surface-container disabled:opacity-40 cursor-pointer"
+                  >
+                    {{ t('leagueDetail.cancel') }}
+                  </button>
+                </div>
+                <p v-if="saveError" class="text-error text-xs text-center">{{ saveError }}</p>
               </div>
             </div>
-            <div v-else class="text-xs text-on-surface-variant/60 italic">{{ t('leagueDetail.noPrizes') }}</div>
 
             <!-- Actions -->
             <div class="pt-1 space-y-2">
@@ -139,9 +216,85 @@ const leaveError = ref<string | null>(null)
 const confirmDelete = ref(false)
 const isDeleting = ref(false)
 
+const isEditing = ref(false)
+const isSaving = ref(false)
+const saveError = ref<string | null>(null)
+const draftPrizes = ref({ first: '', second: '', third: '' })
+
 watch(() => props.isOpen, (v) => {
-  if (v) { copied.value = false; leaveError.value = null; confirmDelete.value = false }
+  if (v) {
+    copied.value = false
+    leaveError.value = null
+    confirmDelete.value = false
+    isEditing.value = false
+    saveError.value = null
+  }
 })
+
+const isOverLimit = computed(() => {
+  return (
+    draftPrizes.value.first.length > 200 ||
+    draftPrizes.value.second.length > 200 ||
+    draftPrizes.value.third.length > 200
+  )
+})
+
+const isAllEmpty = computed(() => {
+  return (
+    !draftPrizes.value.first.trim() &&
+    !draftPrizes.value.second.trim() &&
+    !draftPrizes.value.third.trim()
+  )
+})
+
+const canSave = computed(() => !isOverLimit.value && !isAllEmpty.value)
+
+function enterEdit() {
+  if (!props.group) return
+  draftPrizes.value = {
+    first: props.group.prizes?.find((p) => p.rank === 1)?.description ?? '',
+    second: props.group.prizes?.find((p) => p.rank === 2)?.description ?? '',
+    third: props.group.prizes?.find((p) => p.rank === 3)?.description ?? '',
+  }
+  isEditing.value = true
+  saveError.value = null
+}
+
+function cancelEdit() {
+  isEditing.value = false
+  saveError.value = null
+}
+
+async function handleSave() {
+  if (!props.group) return
+  isSaving.value = true
+  saveError.value = null
+  try {
+    const payload: any = {}
+    const currentFirst = props.group.prizes?.find((p) => p.rank === 1)?.description ?? ''
+    const currentSecond = props.group.prizes?.find((p) => p.rank === 2)?.description ?? ''
+    const currentThird = props.group.prizes?.find((p) => p.rank === 3)?.description ?? ''
+
+    if (draftPrizes.value.first.trim() !== currentFirst) payload.first = draftPrizes.value.first.trim()
+    if (draftPrizes.value.second.trim() !== currentSecond) payload.second = draftPrizes.value.second.trim()
+    if (draftPrizes.value.third.trim() !== currentThird) payload.third = draftPrizes.value.third.trim()
+
+    if (Object.keys(payload).length > 0) {
+      await groupsStore.patchPrizes(props.group.id, payload)
+    }
+    isEditing.value = false
+  } catch (err: any) {
+    if (err.response?.status === 403) {
+      saveError.value = t('leagueDetail.errorForbidden')
+    } else if (err.response?.status === 422) {
+      saveError.value = t('leagueDetail.errorValidation')
+    } else {
+      saveError.value = t('leagueDetail.errorGeneric')
+    }
+  } finally {
+    isSaving.value = false
+  }
+}
 
 const isAdmin = computed(() => {
   // Creator is admin — compare with current user

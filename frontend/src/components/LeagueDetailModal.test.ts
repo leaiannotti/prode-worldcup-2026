@@ -3,7 +3,7 @@
 /**
  * LeagueDetailModal component tests — prize editing.
  */
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
@@ -48,7 +48,7 @@ function createWrapper(props: any) {
   const pinia = createPinia()
   const i18n = createI18n({ legacy: false, locale: 'es', messages })
   return mount(LeagueDetailModal, {
-    global: { plugins: [pinia, i18n] },
+    global: { plugins: [pinia, i18n], stubs: { Teleport: true } },
     props,
   })
 }
@@ -93,21 +93,30 @@ const mockGroup = {
 }
 
 describe('LeagueDetailModal — prize editing', () => {
+  let wrapper: any
+
   beforeEach(() => {
     setActivePinia(createPinia())
     const authStore = useAuthStore()
     authStore.user = { id: 'user-1', email: 'test@example.com', name: 'Test User', picture: null }
   })
 
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
   it('renders the 3 prize ranks in read-only mode by default', () => {
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     expect(wrapper.text()).toContain('Pizza')
     expect(wrapper.text()).toContain('Cerveza')
     expect(wrapper.findAll('input').length).toBe(0)
   })
 
   it('clicking "Editar premios" enables inputs', async () => {
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     expect(inputs.length).toBe(3)
@@ -117,7 +126,7 @@ describe('LeagueDetailModal — prize editing', () => {
   })
 
   it('char counter updates as you type', async () => {
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     await inputs[0].setValue('Asado')
@@ -125,7 +134,7 @@ describe('LeagueDetailModal — prize editing', () => {
   })
 
   it('Save button disabled when input exceeds 200 chars', async () => {
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     await inputs[0].setValue('x'.repeat(201))
@@ -134,7 +143,7 @@ describe('LeagueDetailModal — prize editing', () => {
   })
 
   it('Save button disabled when all inputs are empty/whitespace', async () => {
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     for (const input of inputs) {
@@ -150,7 +159,7 @@ describe('LeagueDetailModal — prize editing', () => {
       data: { changed: [{ rank: 1, previous: 'Pizza', new: 'Asado' }] },
     })
 
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     await inputs[0].setValue('Asado')
@@ -170,7 +179,7 @@ describe('LeagueDetailModal — prize editing', () => {
       () => new Promise((resolve) => { resolvePatch = resolve })
     )
 
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     await inputs[0].setValue('Asado')
@@ -188,7 +197,7 @@ describe('LeagueDetailModal — prize editing', () => {
   })
 
   it('Cancel reverts to original values and exits edit mode', async () => {
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     await inputs[0].setValue('Asado')
@@ -204,7 +213,7 @@ describe('LeagueDetailModal — prize editing', () => {
     ;(error as any).response = { status: 403, data: { error: 'forbidden' } }
     vi.mocked(apiClient.patch).mockRejectedValueOnce(error)
 
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
     const inputs = wrapper.findAll('input')
     await inputs[0].setValue('Asado')
@@ -219,8 +228,10 @@ describe('LeagueDetailModal — prize editing', () => {
     ;(error as any).response = { status: 422, data: { error: 'invalid_request' } }
     vi.mocked(apiClient.patch).mockRejectedValueOnce(error)
 
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
+    const inputs = wrapper.findAll('input')
+    await inputs[0].setValue('Asado')
     await clickSave(wrapper)
 
     expect(wrapper.text()).toContain('Algún premio supera los 200 caracteres')
@@ -230,8 +241,10 @@ describe('LeagueDetailModal — prize editing', () => {
     const { apiClient } = await import('@/lib/api')
     vi.mocked(apiClient.patch).mockRejectedValueOnce(new Error('Network Error'))
 
-    const wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
     await enterEditMode(wrapper)
+    const inputs = wrapper.findAll('input')
+    await inputs[0].setValue('Asado')
     await clickSave(wrapper)
 
     expect(wrapper.text()).toContain('No pudimos guardar los premios')
