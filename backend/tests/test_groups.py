@@ -679,8 +679,9 @@ class TestPatchPrizes:
             assert data["changed"] == [{"rank": 1, "previous": "Pizza", "new": "Asado"}]
 
     def test_patch_prizes_as_admin_non_member_returns_200(self, app, client, db_session, seed_user):
-        """Admin (not member) can PATCH prizes and gets 200."""
+        """Admin (not member) can PATCH prizes and gets 200 with changed array + DB state."""
         from app.middleware.auth import ADMIN_EMAILS
+        from app.models.activity import ActivityEvent
 
         with app.app_context():
             # Create admin user
@@ -709,6 +710,26 @@ class TestPatchPrizes:
             )
 
             assert response.status_code == 200
+            data = response.get_json()
+
+            # 1. changed array reflects the newly created prize (no prior rank 1)
+            assert data["changed"] == [{"rank": 1, "previous": None, "new": "Admin Prize"}]
+
+            # 2. Activity event payload confirms actor_is_admin
+            events = ActivityEvent.query.filter_by(
+                group_id=group.id, event_type="prize_changed"
+            ).all()
+            assert len(events) == 1
+            assert events[0].payload["actor_is_admin"] is True
+            assert events[0].payload["rank"] == 1
+            assert events[0].payload["previous_value"] is None
+            assert events[0].payload["new_value"] == "Admin Prize"
+
+            # 3. DB query confirms GroupPrize was actually persisted
+            prizes = GroupPrize.query.filter_by(group_id=group.id).all()
+            assert len(prizes) == 1
+            assert prizes[0].rank == 1
+            assert prizes[0].description == "Admin Prize"
 
     def test_patch_prizes_as_non_member_returns_403(self, app, client, db_session, seed_user):
         """Non-member non-admin gets 403 on PATCH."""
