@@ -43,6 +43,25 @@ class SetPrizesRequest(BaseModel):
     prizes: List[PrizeRequest] = Field(..., min_length=0, max_length=3, description="Prize tiers")
 
 
+class PatchPrizesRequest(BaseModel):
+    """Request to patch prize tiers for a group (partial update)."""
+    
+    first: Optional[str] = Field(default=None, max_length=200, description="First place prize")
+    second: Optional[str] = Field(default=None, max_length=200, description="Second place prize")
+    third: Optional[str] = Field(default=None, max_length=200, description="Third place prize")
+    
+    @field_validator("first", "second", "third", mode="after")
+    @classmethod
+    def trim_and_validate(cls, v: Optional[str]) -> Optional[str]:
+        """Trim whitespace and reject empty strings after trimming."""
+        if v is None:
+            return None
+        trimmed = v.strip()
+        if len(trimmed) == 0:
+            raise ValueError("cannot be empty after trimming")
+        return trimmed
+
+
 class MemberResponse(BaseModel):
     """Response schema for a group member."""
     
