@@ -31,10 +31,10 @@ Chain strategy: pending
 - [x] 1.2 Write backend tests (RED) — `test_groups.py`: `TestPatchPrizes` class covering auth 403, admin 200, validation 422, empty trim, missing key, no-op, per-rank diff emission
 - [x] 1.3 Implement `backend/app/blueprints/groups.py` — `PATCH /api/groups/<group_id>/prizes` handler with auth check, per-rank diff loop, `prize_changed` event emission, atomic commit
 - [x] 1.4 Run backend tests (GREEN) — verify all `TestPatchPrizes` scenarios pass
-- [ ] 1.5 Write backend tests (RED) — `test_activity.py`: add `group_id` filter membership gate, `event_type` filter, default limit 10, custom limit, admin bypass
-- [ ] 1.6 Implement `backend/app/blueprints/activity.py` — add `group_id`, `event_type` query params, membership gate, newest-first ordering
-- [ ] 1.7 Run backend tests (GREEN) — verify activity filter scenarios pass
-- [ ] 1.8 Refactor — extract reusable emission helper or inline cleanup if needed
+- [x] 1.5 Write backend tests (RED) — `test_activity.py`: add `group_id` filter membership gate, `event_type` filter, default limit 10, custom limit, admin bypass
+- [x] 1.6 Implement `backend/app/blueprints/activity.py` — add `group_id`, `event_type` query params, membership gate, newest-first ordering
+- [x] 1.7 Run backend tests (GREEN) — verify activity filter scenarios pass
+- [x] 1.8 Refactor — extract reusable emission helper or inline cleanup if needed
 
 ## Phase 2: Frontend Foundation
 
