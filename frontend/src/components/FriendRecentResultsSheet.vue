@@ -96,12 +96,12 @@ const { t } = useI18n()
 function pointsBadgeClass(points: number | null): string {
   switch (points) {
     case 3:
-      return 'bg-tertiary-container text-on-tertiary-container'
+      return 'bg-tertiary text-on-tertiary'
     case 1:
-      return 'bg-secondary-container text-on-secondary-container'
+      return 'bg-secondary text-on-secondary'
     case 0:
     default:
-      return 'bg-error-container text-on-error-container'
+      return 'bg-surface-container text-on-surface-variant'
   }
 }
 
