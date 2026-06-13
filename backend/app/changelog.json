@@ -1,0 +1,33 @@
+{
+  "$schema_note": "First entry is the current version. Order: newest first. Each entry must have version, released_at (ISO date), and translations for es and en with 'new', 'fixed', and optional 'improved' arrays.",
+  "entries": [
+    {
+      "version": "1.1.0",
+      "released_at": "2026-06-14",
+      "translations": {
+        "es": {
+          "title": "¡Hay novedades!",
+          "new": [
+            "Mostramos la versión de la app en tu perfil — útil si necesitás reportar un bug",
+            "Cuando arrancamos una nueva versión, te avisamos con esta misma ventana"
+          ],
+          "fixed": [
+            "Los textos de la app ahora cambian bien cuando elegís inglés (varios quedaban en español)",
+            "Arreglamos el deadline en los tests internos para que coincida con la regla real (1 hora antes del partido)"
+          ]
+        },
+        "en": {
+          "title": "What's new",
+          "new": [
+            "We now show the app version in your profile — handy if you need to report a bug",
+            "When a new version ships, we let you know with this same dialog"
+          ],
+          "fixed": [
+            "App copy now switches correctly when you pick English (several strings were stuck in Spanish)",
+            "Test fixtures now use the correct 1-hour deadline rule"
+          ]
+        }
+      }
+    }
+  ]
+}

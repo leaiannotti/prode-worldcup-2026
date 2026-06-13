@@ -55,6 +55,7 @@ def create_app(config_name=None):
         from app.blueprints.scores import scores_bp
         from app.blueprints.activity import bp as activity_bp
         from app.blueprints.admin import bp as admin_bp
+        from app.blueprints.version import bp as version_bp
         app.register_blueprint(auth_bp)
         app.register_blueprint(groups_bp)
         app.register_blueprint(matches_bp)
@@ -63,6 +64,7 @@ def create_app(config_name=None):
         app.register_blueprint(scores_bp, url_prefix="/api/scores")
         app.register_blueprint(activity_bp)
         app.register_blueprint(admin_bp)
+        app.register_blueprint(version_bp)
     
     # Register CLI commands
     from app.seed import seed_command

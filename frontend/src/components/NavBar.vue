@@ -188,6 +188,14 @@
                 </svg>
                 {{ t('nav.logoutFull') }}
               </button>
+
+              <!-- App version badge — discreet, useful for bug reports -->
+              <div
+                v-if="appVersion"
+                class="px-4 py-2 border-t border-outline-variant text-[10px] text-on-surface-variant/60 text-center tabular-nums"
+              >
+                {{ t('whatsNew.versionBadge', { version: appVersion }) }}
+              </div>
             </div>
           </Transition>
         </div>
@@ -260,6 +268,7 @@ import PointsDrawer from '@/components/PointsDrawer.vue'
 import { formatRelativeTime } from '@/composables/useDateFormat'
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '@/i18n'
+import { useAppVersion } from '@/composables/useAppVersion'
 
 const { t, locale } = useI18n()
 
@@ -294,10 +303,13 @@ function initials(name: string): string {
 
 const totalPoints = computed(() => scoresStore.myTotalPoints)
 
+const { version: appVersion, fetchVersion } = useAppVersion()
+
 onMounted(async () => {
   await Promise.all([
     scoresStore.fetchMyTotal(),
     activityStore.fetchActivity(10),
+    fetchVersion(),
   ])
   if (activityStore.events.length > 0) hasUnread.value = true
   document.addEventListener('click', onClickOutside)
