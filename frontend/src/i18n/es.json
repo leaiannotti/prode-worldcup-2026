@@ -209,6 +209,17 @@
     "viewLeaderboard": "Ver Posiciones",
     "defaultTitle": "Tabla de Posiciones"
   },
+  "friendRecentResults": {
+    "title": "Últimas predicciones de {name}",
+    "subtitle": "Últimos 5 partidos",
+    "empty": "Todavía no hay predicciones finalizadas",
+    "noPrediction": "—",
+    "loadingError": "Error al cargar las predicciones. Intentá de nuevo.",
+    "ariaLabel": "Ver últimos resultados de {name}",
+    "columnMatch": "Partido",
+    "columnPrediction": "Predicción",
+    "columnPoints": "Puntos"
+  },
   "history": {
     "title": "Mis Predicciones",
     "defaultGroup": "Historial",

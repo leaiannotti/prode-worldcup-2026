@@ -40,8 +40,20 @@
       <div v-else>
         <!-- Leaderboard Table -->
         <div class="mb-8 bg-white rounded-lg shadow-sm border border-outline-variant p-6">
-          <LeaderboardTable :standings="leaderboardStore.sortedStandings" />
+          <LeaderboardTable :standings="leaderboardStore.sortedStandings" @select-user="handleSelectUser" />
         </div>
+
+        <!-- Friend Recent Results Sheet -->
+        <FriendRecentResultsSheet
+          :is-open="isRecentResultsOpen"
+          :user-name="selectedUser?.name ?? ''"
+          :user-picture="selectedUser?.picture ?? null"
+          :total-points="selectedUser?.total_points ?? null"
+          :history="leaderboardStore.memberRecentHistory"
+          :loading="leaderboardStore.memberRecentHistoryLoading"
+          :error="leaderboardStore.memberRecentHistoryError"
+          @close="handleCloseSheet"
+        />
 
         <!-- Prizes section (if any) -->
         <div
@@ -80,13 +92,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useLeaderboardStore } from '@/stores/leaderboard'
 import { useGroupsStore } from '@/stores/groups'
+import type { LeaderboardEntry } from '@/stores/leaderboard'
 import AppLayout from '@/components/AppLayout.vue'
 import LeaderboardTable from '@/components/LeaderboardTable.vue'
+import FriendRecentResultsSheet from '@/components/FriendRecentResultsSheet.vue'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -98,6 +112,25 @@ const groupId = computed(() => route.params.id as string)
 
 const groupName = computed(() => {
   return groupsStore.currentGroup?.name || t('leaderboard.defaultTitle')
+})
+
+const selectedUser = ref<LeaderboardEntry | null>(null)
+const isRecentResultsOpen = ref(false)
+
+function handleSelectUser(entry: LeaderboardEntry) {
+  selectedUser.value = entry
+  isRecentResultsOpen.value = true
+}
+
+function handleCloseSheet() {
+  isRecentResultsOpen.value = false
+  selectedUser.value = null
+}
+
+watch(isRecentResultsOpen, async (open) => {
+  if (open && selectedUser.value && groupId.value) {
+    await leaderboardStore.fetchMemberRecentHistory(groupId.value, selectedUser.value.user_id)
+  }
 })
 
 function prizeIcon(rank: number): string {

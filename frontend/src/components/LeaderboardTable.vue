@@ -32,15 +32,22 @@
           <!-- Player -->
           <td class="py-4 px-4">
             <div class="flex items-center gap-3">
-              <img
-                v-if="entry.picture"
-                :src="entry.picture"
-                :alt="entry.name"
-                class="w-10 h-10 rounded-full object-cover"
-              />
-              <div v-else class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                <span class="text-white text-xs font-bold">{{ initials(entry.name) }}</span>
-              </div>
+              <button
+                type="button"
+                class="w-11 h-11 rounded-full flex items-center justify-center p-0 border-none bg-transparent cursor-pointer hover:opacity-80 transition-opacity"
+                :aria-label="t('friendRecentResults.ariaLabel', { name: entry.name })"
+                @click="emit('select-user', entry)"
+              >
+                <img
+                  v-if="entry.picture"
+                  :src="entry.picture"
+                  :alt="entry.name"
+                  class="w-10 h-10 rounded-full object-cover"
+                />
+                <div v-else class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+                  <span class="text-white text-xs font-bold">{{ initials(entry.name) }}</span>
+                </div>
+              </button>
               <span class="font-body-md">{{ entry.name }}</span>
             </div>
           </td>
@@ -79,6 +86,10 @@ const { t } = useI18n()
 interface Props {
   standings: LeaderboardEntry[]
 }
+
+const emit = defineEmits<{
+  (e: 'select-user', entry: LeaderboardEntry): void
+}>()
 
 defineProps<Props>()
 

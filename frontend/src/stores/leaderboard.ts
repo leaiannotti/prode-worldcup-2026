@@ -41,11 +41,29 @@ export interface HistoryEntry {
   points?: number
 }
 
+export interface MemberHistoryEntry {
+  match: {
+    id: number
+    home_team_code: string
+    away_team_code: string
+    kickoff_utc: string
+    status: string
+  }
+  actual_result?: { home_score: number; away_score: number } | null
+  prediction?: { home_score: number; away_score: number } | null
+  points: number | null
+  score_type?: string | null
+}
+
 export const useLeaderboardStore = defineStore('leaderboard', () => {
   const standings = ref<LeaderboardEntry[]>([])
   const history = ref<HistoryEntry[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  const memberRecentHistory = ref<MemberHistoryEntry[]>([])
+  const memberRecentHistoryLoading = ref(false)
+  const memberRecentHistoryError = ref<string | null>(null)
 
   const sortedStandings = computed(() => {
     return [...standings.value].sort((a, b) => {
@@ -94,6 +112,25 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     }
   }
 
+  async function fetchMemberRecentHistory(groupId: string, userId: string, limit = 5) {
+    memberRecentHistoryLoading.value = true
+    memberRecentHistoryError.value = null
+    try {
+      const response = await api.get(
+        `/api/scores/groups/${groupId}/members/${userId}/recent-history?limit=${limit}`
+      )
+      memberRecentHistory.value = response.data.history || []
+    } catch (err: any) {
+      memberRecentHistoryError.value = err.response?.data?.error || 'Failed to fetch member history'
+      if (err.response?.status === 403) {
+        memberRecentHistoryError.value = 'not_member'
+      }
+      memberRecentHistory.value = []
+    } finally {
+      memberRecentHistoryLoading.value = false
+    }
+  }
+
   return {
     standings,
     history,
@@ -101,7 +138,11 @@ export const useLeaderboardStore = defineStore('leaderboard', () => {
     error,
     sortedStandings,
     topThree,
+    memberRecentHistory,
+    memberRecentHistoryLoading,
+    memberRecentHistoryError,
     fetchLeaderboard,
-    fetchHistory
+    fetchHistory,
+    fetchMemberRecentHistory
   }
 })
