@@ -38,13 +38,13 @@ Chain strategy: pending
 
 ## Phase 2: Frontend Foundation
 
-- [ ] 2.1 Remove dead `setPrizes` from `frontend/src/stores/groups.ts` and all references
-- [ ] 2.2 Write frontend tests (RED) — `frontend/src/stores/groups.test.ts`: `patchPrizes` calls correct URL, updates state, handles error
-- [ ] 2.3 Implement `frontend/src/stores/groups.ts` — add `patchPrizes` action
-- [ ] 2.4 Run frontend tests (GREEN) — stores pass
-- [ ] 2.5 Write frontend tests (RED) — `frontend/src/stores/activity.test.ts`: `fetchActivity` passes `group_id`, `event_type`, `limit` query params
-- [ ] 2.6 Implement `frontend/src/stores/activity.ts` — add query params to `fetchActivity`, add `'prize_changed'` to union
-- [ ] 2.7 Run frontend tests (GREEN) — activity store passes
+- [x] 2.1 Remove dead `setPrizes` from `frontend/src/stores/groups.ts` and all references
+- [x] 2.2 Write frontend tests (RED) — `frontend/src/stores/groups.test.ts`: `patchPrizes` calls correct URL, updates state, handles error
+- [x] 2.3 Implement `frontend/src/stores/groups.ts` — add `patchPrizes` action
+- [x] 2.4 Run frontend tests (GREEN) — stores pass
+- [x] 2.5 Write frontend tests (RED) — `frontend/src/stores/activity.test.ts`: `fetchActivity` passes `group_id`, `event_type`, `limit` query params
+- [x] 2.6 Implement `frontend/src/stores/activity.ts` — add query params to `fetchActivity`, add `'prize_changed'` to union
+- [x] 2.7 Run frontend tests (GREEN) — activity store passes
 
 ## Phase 3: Frontend UI
 
