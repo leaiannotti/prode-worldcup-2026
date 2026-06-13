@@ -259,5 +259,15 @@
   },
   "community": {
     "noVotes": "Sin predicciones aún"
+  },
+  "whatsNew": {
+    "version": "Versión {version}",
+    "new": "Nuevo",
+    "improved": "Mejoras",
+    "fixed": "Arreglos",
+    "acknowledge": "¡Listo!",
+    "close": "Cerrar",
+    "previousVersions": "También en versiones anteriores:",
+    "versionBadge": "Versión {version}"
   }
 }
