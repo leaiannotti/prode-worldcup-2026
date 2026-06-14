@@ -155,7 +155,7 @@ interface Props {
   error: string | null
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<{
   (e: 'close'): void
 }>()
