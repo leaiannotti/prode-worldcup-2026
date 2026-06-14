@@ -76,12 +76,12 @@
               <div class="flex items-center justify-center gap-2">
                 <button
                   @click="homeScore = Math.max(0, homeScore - 1)"
-                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95"
+                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95 touch-manipulation"
                 >−</button>
                 <span class="text-3xl font-bold text-on-surface tabular-nums w-8 text-center">{{ homeScore }}</span>
                 <button
                   @click="homeScore++"
-                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95"
+                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95 touch-manipulation"
                 >+</button>
               </div>
             </div>
@@ -94,12 +94,12 @@
               <div class="flex items-center justify-center gap-2">
                 <button
                   @click="awayScore = Math.max(0, awayScore - 1)"
-                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95"
+                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95 touch-manipulation"
                 >−</button>
                 <span class="text-3xl font-bold text-on-surface tabular-nums w-8 text-center">{{ awayScore }}</span>
                 <button
                   @click="awayScore++"
-                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95"
+                  class="w-9 h-9 rounded-full bg-surface-container hover:bg-surface-container-high transition-colors text-on-surface font-bold text-lg active:scale-95 touch-manipulation"
                 >+</button>
               </div>
             </div>
