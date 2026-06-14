@@ -199,14 +199,14 @@
                 <span class="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{{ resultModal.match?.home_team.code }}</span>
                 <div class="flex items-center gap-1">
                   <button @click="resultModal.homeScore = Math.max(0, resultModal.homeScore - 1)"
-                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90">
+                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90 touch-manipulation">
                     −
                   </button>
                   <div class="w-16 h-16 flex items-center justify-center bg-primary/5 border-2 border-primary/20 rounded-2xl">
                     <span class="font-display-lg text-4xl text-primary font-bold leading-none">{{ resultModal.homeScore }}</span>
                   </div>
                   <button @click="resultModal.homeScore++"
-                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90">
+                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90 touch-manipulation">
                     +
                   </button>
                 </div>
@@ -219,14 +219,14 @@
                 <span class="text-xs font-label-sm text-on-surface-variant uppercase tracking-wider">{{ resultModal.match?.away_team.code }}</span>
                 <div class="flex items-center gap-1">
                   <button @click="resultModal.awayScore = Math.max(0, resultModal.awayScore - 1)"
-                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90">
+                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90 touch-manipulation">
                     −
                   </button>
                   <div class="w-16 h-16 flex items-center justify-center bg-secondary/5 border-2 border-secondary/20 rounded-2xl">
                     <span class="font-display-lg text-4xl text-secondary font-bold leading-none">{{ resultModal.awayScore }}</span>
                   </div>
                   <button @click="resultModal.awayScore++"
-                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90">
+                    class="w-8 h-8 rounded-full bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface font-bold transition-all active:scale-90 touch-manipulation">
                     +
                   </button>
                 </div>
