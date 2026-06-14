@@ -1,0 +1,602 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-06-14T00:00:00.000Z",
+  "__export_source": "opencode:gpt-5.5",
+  "resources": [
+    {
+      "_id": "wrk_prode_worldcup_2026",
+      "_type": "workspace",
+      "name": "Prode World Cup 2026 API",
+      "description": "Local API suite for release testing after v1.1.0",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_prode_worldcup_2026_base",
+      "_type": "environment",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:5000",
+        "group_id": "1",
+        "match_id": "1",
+        "user_id": "1",
+        "invite_code": "ABC123",
+        "email": "tester@example.com",
+        "password": "password123",
+        "name": "Local Tester",
+        "admin_email": "leandro.iannotti87@gmail.com",
+        "webhook_signature": "t=REPLACE_WITH_TIMESTAMP,v1=REPLACE_WITH_HMAC"
+      }
+    },
+    {
+      "_id": "fld_health",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "01 Health"
+    },
+    {
+      "_id": "fld_version",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "02 Version & Changelog"
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "03 Auth"
+    },
+    {
+      "_id": "fld_groups",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "04 Groups"
+    },
+    {
+      "_id": "fld_matches",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "05 Matches"
+    },
+    {
+      "_id": "fld_predictions",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "06 Predictions"
+    },
+    {
+      "_id": "fld_scores",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "07 Scores & Leaderboard"
+    },
+    {
+      "_id": "fld_activity",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "08 Activity"
+    },
+    {
+      "_id": "fld_admin",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "09 Admin"
+    },
+    {
+      "_id": "fld_webhook",
+      "_type": "request_group",
+      "parentId": "wrk_prode_worldcup_2026",
+      "name": "10 Webhook"
+    },
+    {
+      "_id": "req_health_get",
+      "_type": "request",
+      "parentId": "fld_health",
+      "name": "GET /health",
+      "method": "GET",
+      "url": "{{ _.base_url }}/health",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_version_get",
+      "_type": "request",
+      "parentId": "fld_version",
+      "name": "GET /api/version",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/version",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_changelog_get",
+      "_type": "request",
+      "parentId": "fld_version",
+      "name": "GET /api/changelog",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/changelog",
+      "headers": [],
+      "parameters": [
+        { "name": "since", "value": "", "disabled": true }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_auth_google_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "GET /api/auth/login — Google OAuth redirect",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/auth/login",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_auth_google_callback",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "GET /api/auth/callback — OAuth callback",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/auth/callback",
+      "headers": [],
+      "parameters": [
+        { "name": "code", "value": "REPLACE_WITH_OAUTH_CODE", "disabled": false },
+        { "name": "state", "value": "", "disabled": true }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_auth_register",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST /api/auth/register",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/register",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\",\n  \"password\": \"{{ _.password }}\",\n  \"name\": \"{{ _.name }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_auth_login_email",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST /api/auth/login-email — sets jwt_token cookie",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/login-email",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"{{ _.email }}\",\n  \"password\": \"{{ _.password }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_auth_admin_google_note",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "ADMIN AUTH NOTE — Google account uses browser cookie",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/auth/me",
+      "headers": [
+        { "name": "X-Note", "value": "Admin is Google-only. Log in via the app/browser and copy the jwt_token cookie into Insomnia's cookie jar for localhost, or add a local email/password admin user only for testing." }
+      ],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_auth_me",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "GET /api/auth/me",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/auth/me",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_auth_logout",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "POST /api/auth/logout",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/auth/logout",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_groups_create",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "POST /api/groups — create group",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/groups",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Local Test Group\",\n  \"prizes\": [\n    { \"rank\": 1, \"description\": \"Champion prize\" },\n    { \"rank\": 2, \"description\": \"Runner-up prize\" },\n    { \"rank\": 3, \"description\": \"Third place prize\" }\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_groups_list",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "GET /api/groups — my groups",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/groups",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_groups_detail",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "GET /api/groups/{group_id}",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/groups/{{ _.group_id }}",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_groups_members",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "GET /api/groups/{group_id}/members",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/groups/{{ _.group_id }}/members",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_groups_join",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "POST /api/groups/join",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/groups/join",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"invite_code\": \"{{ _.invite_code }}\"\n}"
+      }
+    },
+    {
+      "_id": "req_groups_put_prizes",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "PUT /api/groups/{group_id}/prizes — replace prizes",
+      "method": "PUT",
+      "url": "{{ _.base_url }}/api/groups/{{ _.group_id }}/prizes",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"prizes\": [\n    { \"rank\": 1, \"description\": \"Updated champion prize\" },\n    { \"rank\": 2, \"description\": \"Updated runner-up prize\" },\n    { \"rank\": 3, \"description\": \"Updated third place prize\" }\n  ]\n}"
+      }
+    },
+    {
+      "_id": "req_groups_patch_prizes",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "PATCH /api/groups/{group_id}/prizes — editable prizes audit",
+      "method": "PATCH",
+      "url": "{{ _.base_url }}/api/groups/{{ _.group_id }}/prizes",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"first\": \"Champion prize edited from Insomnia\",\n  \"second\": \"Runner-up prize edited from Insomnia\",\n  \"third\": \"Third place prize edited from Insomnia\"\n}"
+      }
+    },
+    {
+      "_id": "req_groups_leave",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "POST /api/groups/{group_id}/leave",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/groups/{{ _.group_id }}/leave",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_groups_delete",
+      "_type": "request",
+      "parentId": "fld_groups",
+      "name": "DELETE /api/groups/{group_id}",
+      "method": "DELETE",
+      "url": "{{ _.base_url }}/api/groups/{{ _.group_id }}",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_matches_list",
+      "_type": "request",
+      "parentId": "fld_matches",
+      "name": "GET /api/matches — list",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/matches",
+      "headers": [],
+      "parameters": [
+        { "name": "group", "value": "", "disabled": true },
+        { "name": "date", "value": "", "disabled": true },
+        { "name": "status", "value": "upcoming", "disabled": true },
+        { "name": "limit", "value": "10", "disabled": true }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_matches_detail",
+      "_type": "request",
+      "parentId": "fld_matches",
+      "name": "GET /api/matches/{match_id}",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/matches/{{ _.match_id }}",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_matches_community_insights",
+      "_type": "request",
+      "parentId": "fld_matches",
+      "name": "GET /api/matches/community-insights",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/matches/community-insights",
+      "headers": [],
+      "parameters": [
+        { "name": "limit", "value": "10", "disabled": false }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_matches_distribution",
+      "_type": "request",
+      "parentId": "fld_matches",
+      "name": "GET /api/matches/{match_id}/distribution",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/matches/{{ _.match_id }}/distribution",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_predictions_upsert",
+      "_type": "request",
+      "parentId": "fld_predictions",
+      "name": "POST /api/predictions — submit/update",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/predictions",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"match_id\": {{ _.match_id }},\n  \"home_score\": 2,\n  \"away_score\": 1\n}"
+      }
+    },
+    {
+      "_id": "req_predictions_list",
+      "_type": "request",
+      "parentId": "fld_predictions",
+      "name": "GET /api/predictions — my predictions",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/predictions",
+      "headers": [],
+      "parameters": [
+        { "name": "match_id", "value": "{{ _.match_id }}", "disabled": true }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_predictions_group_match",
+      "_type": "request",
+      "parentId": "fld_predictions",
+      "name": "GET /api/predictions/matches/{match_id}/group/{group_id}",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/predictions/matches/{{ _.match_id }}/group/{{ _.group_id }}",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_scores_leaderboard",
+      "_type": "request",
+      "parentId": "fld_scores",
+      "name": "GET /api/scores/leaderboard",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/scores/leaderboard",
+      "headers": [],
+      "parameters": [
+        { "name": "group_id", "value": "{{ _.group_id }}", "disabled": false }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_scores_history",
+      "_type": "request",
+      "parentId": "fld_scores",
+      "name": "GET /api/scores/history",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/scores/history",
+      "headers": [],
+      "parameters": [
+        { "name": "group_id", "value": "{{ _.group_id }}", "disabled": true }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_scores_my_total",
+      "_type": "request",
+      "parentId": "fld_scores",
+      "name": "GET /api/scores/my-total",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/scores/my-total",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_scores_my_standing",
+      "_type": "request",
+      "parentId": "fld_scores",
+      "name": "GET /api/scores/my-standing",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/scores/my-standing",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_scores_recent_history",
+      "_type": "request",
+      "parentId": "fld_scores",
+      "name": "GET /api/scores/groups/{group_id}/members/{user_id}/recent-history",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/scores/groups/{{ _.group_id }}/members/{{ _.user_id }}/recent-history",
+      "headers": [],
+      "parameters": [
+        { "name": "limit", "value": "5", "disabled": false }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_activity_list",
+      "_type": "request",
+      "parentId": "fld_activity",
+      "name": "GET /api/activity — all/user scoped",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/activity",
+      "headers": [],
+      "parameters": [
+        { "name": "limit", "value": "20", "disabled": false },
+        { "name": "cursor", "value": "", "disabled": true }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_activity_group",
+      "_type": "request",
+      "parentId": "fld_activity",
+      "name": "GET /api/activity — by group",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/activity",
+      "headers": [],
+      "parameters": [
+        { "name": "group_id", "value": "{{ _.group_id }}", "disabled": false },
+        { "name": "limit", "value": "10", "disabled": false }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_activity_prize_changed",
+      "_type": "request",
+      "parentId": "fld_activity",
+      "name": "GET /api/activity — prize_changed audit",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/activity",
+      "headers": [],
+      "parameters": [
+        { "name": "group_id", "value": "{{ _.group_id }}", "disabled": false },
+        { "name": "event_type", "value": "prize_changed", "disabled": false },
+        { "name": "limit", "value": "10", "disabled": false }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_admin_stats",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "GET /api/admin/stats",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/admin/stats",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_admin_matches",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "GET /api/admin/matches",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/admin/matches",
+      "headers": [],
+      "parameters": [],
+      "body": {}
+    },
+    {
+      "_id": "req_admin_set_result",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "POST /api/admin/matches/{match_id}/result",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/admin/matches/{{ _.match_id }}/result",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"home_score\": 2,\n  \"away_score\": 1\n}"
+      }
+    },
+    {
+      "_id": "req_admin_audit_log",
+      "_type": "request",
+      "parentId": "fld_admin",
+      "name": "GET /api/admin/audit-log",
+      "method": "GET",
+      "url": "{{ _.base_url }}/api/admin/audit-log",
+      "headers": [],
+      "parameters": [
+        { "name": "limit", "value": "50", "disabled": false }
+      ],
+      "body": {}
+    },
+    {
+      "_id": "req_webhook_result",
+      "_type": "request",
+      "parentId": "fld_webhook",
+      "name": "POST /api/webhook/result — HMAC required",
+      "method": "POST",
+      "url": "{{ _.base_url }}/api/webhook/result",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json" },
+        { "name": "X-Signature", "value": "{{ _.webhook_signature }}" }
+      ],
+      "parameters": [],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"match_id\": {{ _.match_id }},\n  \"home_score\": 2,\n  \"away_score\": 1\n}"
+      }
+    }
+  ]
+}

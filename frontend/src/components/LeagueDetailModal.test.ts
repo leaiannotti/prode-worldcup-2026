@@ -378,3 +378,32 @@ describe('LeagueDetailModal — audit history', () => {
     expect(wrapper.text()).not.toContain('Ocultar historial')
   })
 })
+
+describe('LeagueDetailModal — deletion UI removed', () => {
+  let wrapper: any
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    const authStore = useAuthStore()
+    authStore.user = { id: 'user-1', email: 'test@example.com', name: 'Test User', picture: null }
+  })
+
+  afterEach(() => {
+    if (wrapper) {
+      wrapper.unmount()
+      wrapper = null
+    }
+  })
+
+  it('does not render a league deletion button for admin', () => {
+    wrapper = createWrapper({ isOpen: true, group: mockGroup })
+    expect(wrapper.text()).not.toContain('Eliminar liga')
+    expect(wrapper.text()).not.toContain('Eliminar')
+  })
+
+  it('does not render a league deletion button for non-admin', () => {
+    wrapper = createWrapper({ isOpen: true, group: { ...mockGroup, creator_id: 'other-user' } })
+    expect(wrapper.text()).not.toContain('Eliminar liga')
+    expect(wrapper.text()).not.toContain('Eliminar')
+  })
+})

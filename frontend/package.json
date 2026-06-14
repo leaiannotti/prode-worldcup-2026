@@ -4,8 +4,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:lan": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
+    "preview:lan": "vite preview --host",
+    "preview:pwa": "npm run build && vite preview --host & cloudflared tunnel --url http://localhost:4173",
     "test": "vitest",
     "test:coverage": "vitest run --coverage"
   },
